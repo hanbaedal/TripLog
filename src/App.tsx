@@ -36,7 +36,7 @@ export default function App() {
   const [sampleEditId, setSampleEditId] = useState<string | null>(null)
   const [editingSample, setEditingSample] = useState<SampleRecord | null>(null)
   const [samplePreview, setSamplePreview] = useState(false)
-  const authIntent = useRef<null | 'newTrip' | 'claimSample'>(null)
+  const authIntent = useRef<null | 'newTrip' | 'claimSample' | 'trips'>(null)
 
   useEffect(() => {
     void (async () => {
@@ -108,7 +108,7 @@ export default function App() {
     setTrip(next)
   }
 
-  function askAuth(intent: null | 'newTrip' | 'claimSample' = null) {
+  function askAuth(intent: null | 'newTrip' | 'claimSample' | 'trips' = null) {
     authIntent.current = intent
     setAuthOpen(true)
   }
@@ -146,6 +146,10 @@ export default function App() {
       openPlanner(emptyTrip())
       return
     }
+    if (intent === 'trips') {
+      setView('trips')
+      return
+    }
     if (samplePreview && !sampleEditId) {
       if (intent === 'claimSample') {
         await saveSampleCopy(next)
@@ -164,15 +168,31 @@ export default function App() {
     setView('home')
   }
 
+  function goHome() {
+    setView('home')
+  }
+
+  function goSamples() {
+    setView('samples')
+  }
+
+  function goTrips() {
+    if (!user) {
+      askAuth('trips')
+      return
+    }
+    setView('trips')
+  }
+
   return (
     <>
       {view === 'home' ? (
         <Landing
           user={user}
-          onOpenSamples={() => setView('samples')}
+          onOpenSamples={goSamples}
           onPickSample={(sample) => openPlanner(cloneSampleTrip(sample), 'preview')}
           onNewTrip={startNewTrip}
-          onTrips={() => setView('trips')}
+          onTrips={goTrips}
           onAuth={() => askAuth()}
           onLogout={handleLogout}
         />
@@ -189,8 +209,10 @@ export default function App() {
             openPlanner(next)
           }}
           onNew={startNewTrip}
-          onDemo={() => setView('samples')}
-          onHome={() => setView('home')}
+          onDemo={goSamples}
+          onHome={goHome}
+          onAuth={() => askAuth()}
+          onLogout={handleLogout}
           onDelete={(id) => {
             void (async () => {
               const next = user && isRemote()
@@ -205,7 +227,11 @@ export default function App() {
       {view === 'samples' ? (
         <SampleGallery
           user={user}
-          onBack={() => setView('home')}
+          onBack={goHome}
+          onTrips={goTrips}
+          onNewTrip={startNewTrip}
+          onAuth={() => askAuth()}
+          onLogout={handleLogout}
           onPick={(sample) => openPlanner(cloneSampleTrip(sample), 'preview')}
           onEdit={(sample) => {
             setSamplePreview(false)
@@ -230,14 +256,21 @@ export default function App() {
           copyingSample={samplePreview && !sampleEditId}
           onChange={handleTripChange}
           onSaveCopy={() => void saveSampleCopy()}
-          onHome={() => setView('home')}
-          onTrips={() => setView('trips')}
+          onHome={goHome}
+          onSamples={goSamples}
+          onTrips={goTrips}
           onGuide={() => setView('guide')}
           onAuth={() => askAuth(samplePreview && !sampleEditId ? 'claimSample' : null)}
         />
       ) : null}
       {view === 'guide' ? (
-        <Guidebook trip={trip} onBack={() => setView('planner')} />
+        <Guidebook
+          trip={trip}
+          onBack={() => setView('planner')}
+          onHome={goHome}
+          onSamples={goSamples}
+          onTrips={goTrips}
+        />
       ) : null}
       {authOpen ? (
         <AuthModal onClose={() => setAuthOpen(false)} onAuthed={(next) => void handleAuthed(next)} />

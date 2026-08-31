@@ -16,6 +16,7 @@ type Props = {
   onChange: (trip: Trip) => void
   onSaveCopy?: () => void
   onHome: () => void
+  onSamples: () => void
   onTrips: () => void
   onGuide: () => void
   onAuth: () => void
@@ -74,6 +75,7 @@ export function Planner({
   onChange,
   onSaveCopy,
   onHome,
+  onSamples,
   onTrips,
   onGuide,
   onAuth,
@@ -212,6 +214,15 @@ export function Planner({
             </div>
           </div>
           <div className="nav-actions">
+            <button className="btn ghost" type="button" onClick={onHome}>
+              메뉴
+            </button>
+            <button className="btn ghost" type="button" onClick={onSamples}>
+              샘플 일정
+            </button>
+            <button className="btn ghost" type="button" onClick={onTrips}>
+              내 여행
+            </button>
             {user && copyingSample && onSaveCopy ? (
               <button className="btn stamp" type="button" onClick={onSaveCopy}>
                 내 여행에 저장

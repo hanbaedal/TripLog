@@ -89,6 +89,11 @@ p {
   align-items: center;
   gap: 10px;
   text-decoration: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  cursor: pointer;
 }
 
 .brand-mark {
@@ -134,6 +139,12 @@ p {
   background: transparent;
   color: var(--ink);
   border: 1px solid var(--line);
+}
+
+.btn.ghost.is-on {
+  background: var(--ink);
+  color: var(--cream);
+  border-color: var(--ink);
 }
 
 .btn.stamp {
@@ -311,6 +322,52 @@ p {
   gap: 16px;
   align-items: end;
   margin-bottom: 22px;
+}
+
+.hub {
+  padding: 18px 0 8px;
+}
+
+.hub-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.hub-tile {
+  text-align: left;
+  background: var(--cream);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 22px 20px 18px;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.hub-tile .en {
+  font-family: var(--en);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.hub-tile h2 {
+  font-size: 1.45rem;
+  margin: 0;
+}
+
+.hub-tile.sight { border-top: 4px solid var(--gold); }
+.hub-tile.hotel { border-top: 4px solid var(--forest); }
+.hub-tile.move { border-top: 4px solid var(--ink); }
+.hub-tile.cost { border-top: 4px solid var(--stamp); }
+
+.hub-tile:hover {
+  border-color: #c9bba8;
 }
 
 .muted {
@@ -1345,6 +1402,15 @@ p {
 
   .section-head {
     margin-bottom: 14px;
+  }
+
+  .hub-tile {
+    min-height: 96px;
+    padding: 16px 14px 14px;
+  }
+
+  .hub-tile h2 {
+    font-size: 1.2rem;
   }
 
   .tile {

@@ -1,4 +1,4 @@
-import { BrandMark } from './Icons'
+import { AppNav } from './AppNav'
 import type { Trip, User } from '../types'
 import { formatRange } from '../lib/dates'
 import { krw, summarize } from '../lib/costs'
@@ -10,29 +10,24 @@ type Props = {
   onNew: () => void
   onDemo: () => void
   onHome: () => void
+  onAuth: () => void
+  onLogout: () => void
   onDelete: (id: string) => void
 }
 
-export function TripList({ user, trips, onOpen, onNew, onDemo, onHome, onDelete }: Props) {
+export function TripList({ user, trips, onOpen, onNew, onDemo, onHome, onAuth, onLogout, onDelete }: Props) {
   return (
     <div>
-      <header className="wrap topnav">
-        <button className="brand" type="button" onClick={onHome} style={{ background: 'none', border: 0, padding: 0 }}>
-          <BrandMark className="brand-mark" />
-          <span className="brand-name">
-            triplog.my
-            <small>my journeys</small>
-          </span>
-        </button>
-        <div className="nav-actions">
-          <button className="btn ghost" type="button" onClick={onDemo}>
-            샘플 일정
-          </button>
-          <button className="btn" type="button" onClick={onNew}>
-            새 여행
-          </button>
-        </div>
-      </header>
+      <AppNav
+        view="trips"
+        user={user}
+        onHome={onHome}
+        onSamples={onDemo}
+        onTrips={() => undefined}
+        onNewTrip={onNew}
+        onAuth={onAuth}
+        onLogout={onLogout}
+      />
 
       <section className="wrap section">
         <div className="section-head">

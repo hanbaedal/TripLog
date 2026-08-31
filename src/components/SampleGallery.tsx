@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { BrandMark } from './Icons'
+import { AppNav } from './AppNav'
 import type { SampleRecord, User } from '../types'
 import { SAMPLE_GROUPS, SAMPLE_CATALOG } from '../data/sampleCatalog.js'
 import { sampleCover } from '../data/sampleCovers'
@@ -9,12 +9,26 @@ import { isSupervisor } from '../lib/auth'
 type Props = {
   user: User | null
   onBack: () => void
+  onTrips: () => void
+  onNewTrip: () => void
+  onAuth: () => void
+  onLogout: () => void
   onPick: (sample: SampleRecord) => void
   onEdit: (sample: SampleRecord) => void
   onCreate: () => void
 }
 
-export function SampleGallery({ user, onBack, onPick, onEdit, onCreate }: Props) {
+export function SampleGallery({
+  user,
+  onBack,
+  onTrips,
+  onNewTrip,
+  onAuth,
+  onLogout,
+  onPick,
+  onEdit,
+  onCreate,
+}: Props) {
   const [rows, setRows] = useState<SampleRecord[]>(() => SAMPLE_CATALOG as SampleRecord[])
   const supervisor = isSupervisor(user)
 
@@ -45,25 +59,23 @@ export function SampleGallery({ user, onBack, onPick, onEdit, onCreate }: Props)
 
   return (
     <div>
-      <header className="wrap topnav">
-        <button className="brand" type="button" onClick={onBack} style={{ background: 'none', border: 0, padding: 0 }}>
-          <BrandMark className="brand-mark" />
-          <span className="brand-name">
-            triplog.my
-            <small>samples</small>
-          </span>
-        </button>
-        <div className="nav-actions">
-          {supervisor ? (
+      <AppNav
+        view="samples"
+        user={user}
+        onHome={onBack}
+        onSamples={() => undefined}
+        onTrips={onTrips}
+        onNewTrip={onNewTrip}
+        onAuth={onAuth}
+        onLogout={onLogout}
+        extra={
+          supervisor ? (
             <button className="btn ghost" type="button" onClick={onCreate}>
               새 샘플
             </button>
-          ) : null}
-          <button className="btn" type="button" onClick={onBack}>
-            홈
-          </button>
-        </div>
-      </header>
+          ) : null
+        }
+      />
 
       <section className="wrap section">
         {groups.map((group) => (

@@ -5,9 +5,12 @@ import { buildGuidebook } from '../lib/guide'
 type Props = {
   trip: Trip
   onBack: () => void
+  onHome: () => void
+  onSamples: () => void
+  onTrips: () => void
 }
 
-export function Guidebook({ trip, onBack }: Props) {
+export function Guidebook({ trip, onBack, onHome, onSamples, onTrips }: Props) {
   const book = buildGuidebook(trip)
 
   return (
@@ -22,6 +25,15 @@ export function Guidebook({ trip, onBack }: Props) {
             </span>
           </button>
           <div className="nav-actions">
+            <button className="btn ghost" type="button" onClick={onHome}>
+              메뉴
+            </button>
+            <button className="btn ghost" type="button" onClick={onSamples}>
+              샘플 일정
+            </button>
+            <button className="btn ghost" type="button" onClick={onTrips}>
+              내 여행
+            </button>
             <button className="btn ghost" type="button" onClick={onBack}>
               일정으로
             </button>
