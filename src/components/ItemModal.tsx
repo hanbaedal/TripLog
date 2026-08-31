@@ -49,6 +49,7 @@ export function ItemModal({ dayIndex, initial, preset, onClose, onSave, onDelete
   const [place, setPlace] = useState(initial?.place ?? '')
   const [subtitle, setSubtitle] = useState(initial?.subtitle ?? '')
   const [note, setNote] = useState(initial?.note ?? '')
+  const [photo, setPhoto] = useState(initial?.photo ?? '')
   const [cost, setCost] = useState(initial ? String(initial.cost) : '')
   const parsed = parseFlightForm(initial?.kind === 'flight' ? initial : undefined)
   const [departTerminal, setDepartTerminal] = useState(parsed.departTerminal)
@@ -110,6 +111,7 @@ export function ItemModal({ dayIndex, initial, preset, onClose, onSave, onDelete
       cost: Number(cost) || 0,
       mealSlot: kind === 'meal' ? mealSlot : undefined,
       transportMode: kind === 'transport' ? transportMode : undefined,
+      photo: kind === 'sight' ? photo.trim() || undefined : undefined,
     }
     onSave(item)
   }
@@ -271,6 +273,16 @@ export function ItemModal({ dayIndex, initial, preset, onClose, onSave, onDelete
               placeholder="0"
             />
           </label>
+          {kind === 'sight' ? (
+            <label className="span-2">
+              사진 주소
+              <input
+                value={photo}
+                onChange={(e) => setPhoto(e.target.value)}
+                placeholder="https://..."
+              />
+            </label>
+          ) : null}
           <label className={kind === 'flight' ? 'span-2' : undefined}>
             메모
             <textarea rows={3} value={note} onChange={(e) => setNote(e.target.value)} />

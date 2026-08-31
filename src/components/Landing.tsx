@@ -7,11 +7,9 @@ import { listSamples } from '../data/samples'
 
 type Props = {
   user: User | null
-  tripCount: number
   onOpenSamples: () => void
   onPickSample: (sample: SampleRecord) => void
   onNewTrip: () => void
-  onContinue: () => void
   onTrips: () => void
   onAuth: () => void
   onLogout: () => void
@@ -31,11 +29,9 @@ const tiles = [
 
 export function Landing({
   user,
-  tripCount,
   onOpenSamples,
   onPickSample,
   onNewTrip,
-  onContinue,
   onTrips,
   onAuth,
   onLogout,
@@ -77,11 +73,6 @@ export function Landing({
               로그인
             </button>
           )}
-          {tripCount > 0 && !user ? (
-            <button className="btn ghost" type="button" onClick={onContinue}>
-              이어서 짜기
-            </button>
-          ) : null}
           <button className="btn ghost" type="button" onClick={onNewTrip}>
             새 여행
           </button>

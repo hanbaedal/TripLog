@@ -22,6 +22,7 @@ export type TripItem = {
   subtitle?: string
   place?: string
   note?: string
+  photo?: string
   cost: number
   mealSlot?: MealSlot
   transportMode?: TransportMode

@@ -18,19 +18,23 @@ function toSample(doc) {
 }
 
 export async function seedSamples() {
-  const n = await Sample.countDocuments()
-  if (n > 0) return
-  await Sample.insertMany(
-    SAMPLE_CATALOG.map((row) => ({
-      sampleId: row.id,
-      sort: row.sort,
-      nights: row.nights,
-      place: row.place,
-      title: row.title,
-      destination: row.destination,
-      trip: row.trip,
-    })),
-  )
+  for (const row of SAMPLE_CATALOG) {
+    await Sample.updateOne(
+      { sampleId: row.id },
+      {
+        $setOnInsert: {
+          sampleId: row.id,
+          sort: row.sort,
+          nights: row.nights,
+          place: row.place,
+          title: row.title,
+          destination: row.destination,
+          trip: row.trip,
+        },
+      },
+      { upsert: true },
+    )
+  }
 }
 
 function payload(body, fallbackId) {

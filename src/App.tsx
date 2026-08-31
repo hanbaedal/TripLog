@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { AuthModal } from './components/AuthModal'
 import { Guidebook } from './components/Guidebook'
 import { Landing } from './components/Landing'
@@ -36,6 +36,7 @@ export default function App() {
   const [sampleEditId, setSampleEditId] = useState<string | null>(null)
   const [editingSample, setEditingSample] = useState<SampleRecord | null>(null)
   const [samplePreview, setSamplePreview] = useState(false)
+  const authIntent = useRef<null | 'newTrip' | 'claimSample'>(null)
 
   useEffect(() => {
     void (async () => {
@@ -59,6 +60,7 @@ export default function App() {
 
   useEffect(() => {
     if (view !== 'planner' && view !== 'guide') return
+    if (!user) return
     if (samplePreview && !sampleEditId) return
     const timer = window.setTimeout(() => {
       void persistTrip(trip)
@@ -66,8 +68,8 @@ export default function App() {
     return () => window.clearTimeout(timer)
   }, [trip, view, user, sampleEditId, editingSample, samplePreview])
 
-  async function persistTrip(next: Trip) {
-    if (sampleEditId && isSupervisor(user)) {
+  async function persistTrip(next: Trip, forceMine = false, actor: User | null = user) {
+    if (sampleEditId && isSupervisor(actor) && !forceMine) {
       const record = sampleFromTrip(next, editingSample ?? undefined)
       record.id = sampleEditId === '__new__' ? '' : sampleEditId
       const saved = await saveSample(record)
@@ -75,16 +77,17 @@ export default function App() {
       if (sampleEditId === '__new__') setSampleEditId(saved.id)
       return
     }
-    if (samplePreview || next.savedByUser === false) return
+    if (!actor) return
+    if (!forceMine && (samplePreview || next.savedByUser === false)) return
     if (isBlankDraft(next)) return
     const owned = { ...next, savedByUser: true }
-    if (user && isRemote()) {
+    if (isRemote()) {
       await upsertTripRemote(owned)
       setTrips(onlyPersonalTrips(await listTripsRemote()))
       return
     }
-    upsertTrip(owner, owned)
-    setTrips(onlyPersonalTrips(loadTrips(owner)))
+    upsertTrip(actor.id, owned)
+    setTrips(onlyPersonalTrips(loadTrips(actor.id)))
   }
 
   function openPlanner(next: Trip, mode: 'mine' | 'preview' = 'mine') {
@@ -96,6 +99,7 @@ export default function App() {
   }
 
   function handleTripChange(next: Trip) {
+    if (!user) return
     if (samplePreview) {
       setSamplePreview(false)
       setTrip({ ...next, savedByUser: true })
@@ -104,20 +108,50 @@ export default function App() {
     setTrip(next)
   }
 
+  function askAuth(intent: null | 'newTrip' | 'claimSample' = null) {
+    authIntent.current = intent
+    setAuthOpen(true)
+  }
+
+  function startNewTrip() {
+    if (!user) {
+      askAuth('newTrip')
+      return
+    }
+    openPlanner(emptyTrip())
+  }
+
+  async function saveSampleCopy(actor: User | null = user) {
+    if (!actor) return
+    const owned = { ...trip, savedByUser: true }
+    setSamplePreview(false)
+    setTrip(owned)
+    await persistTrip(owned, true, actor)
+    setView('trips')
+  }
+
   async function handleAuthed(next: User) {
+    const intent = authIntent.current
+    authIntent.current = null
     setUser(next)
+    setAuthOpen(false)
     if (isRemote()) {
       await importGuestTripsRemote()
-      const list = onlyPersonalTrips(await listTripsRemote())
-      setTrips(list)
-      if (list[0]) setTrip(list[0])
+      setTrips(onlyPersonalTrips(await listTripsRemote()))
     } else {
       importGuestTrips(next.id)
-      const list = onlyPersonalTrips(loadTrips(next.id))
-      setTrips(list)
-      if (list[0]) setTrip(list[0])
+      setTrips(onlyPersonalTrips(loadTrips(next.id)))
     }
-    setAuthOpen(false)
+    if (intent === 'newTrip') {
+      openPlanner(emptyTrip())
+      return
+    }
+    if (samplePreview && !sampleEditId) {
+      if (intent === 'claimSample') {
+        await saveSampleCopy(next)
+      }
+      return
+    }
     setView('trips')
   }
 
@@ -135,19 +169,11 @@ export default function App() {
       {view === 'home' ? (
         <Landing
           user={user}
-          tripCount={trips.length}
           onOpenSamples={() => setView('samples')}
           onPickSample={(sample) => openPlanner(cloneSampleTrip(sample), 'preview')}
-          onNewTrip={() => openPlanner(emptyTrip())}
-          onContinue={() => {
-            if (trips.length !== 1) {
-              setView('trips')
-              return
-            }
-            openPlanner(trips[0])
-          }}
+          onNewTrip={startNewTrip}
           onTrips={() => setView('trips')}
-          onAuth={() => setAuthOpen(true)}
+          onAuth={() => askAuth()}
           onLogout={handleLogout}
         />
       ) : null}
@@ -155,8 +181,14 @@ export default function App() {
         <TripList
           user={user}
           trips={trips}
-          onOpen={openPlanner}
-          onNew={() => openPlanner(emptyTrip())}
+          onOpen={(next) => {
+            if (!user) {
+              askAuth()
+              return
+            }
+            openPlanner(next)
+          }}
+          onNew={startNewTrip}
           onDemo={() => setView('samples')}
           onHome={() => setView('home')}
           onDelete={(id) => {
@@ -195,11 +227,13 @@ export default function App() {
         <Planner
           trip={trip}
           user={user}
+          copyingSample={samplePreview && !sampleEditId}
           onChange={handleTripChange}
+          onSaveCopy={() => void saveSampleCopy()}
           onHome={() => setView('home')}
           onTrips={() => setView('trips')}
           onGuide={() => setView('guide')}
-          onAuth={() => setAuthOpen(true)}
+          onAuth={() => askAuth(samplePreview && !sampleEditId ? 'claimSample' : null)}
         />
       ) : null}
       {view === 'guide' ? (

@@ -1,5 +1,6 @@
 import type { SampleRecord, Trip } from '../types'
 import { SAMPLE_CATALOG } from './sampleCatalog.js'
+import { resolveSightPhoto } from './sightPhotos'
 import { addDays, dayCount, todayIso } from '../lib/dates'
 import { uid } from '../lib/id'
 import { api, isRemote, probeRemote } from '../lib/remote'
@@ -40,7 +41,14 @@ export function cloneSampleTrip(sample: SampleRecord): Trip {
     destination: sample.destination || sample.place,
     startDate: start,
     endDate: addDays(start, nights),
-    items: (sample.trip.items || []).map((entry) => ({ ...entry, id: uid('item') })),
+    items: (sample.trip.items || []).map((entry) => ({
+      ...entry,
+      id: uid('item'),
+      photo:
+        entry.kind === 'sight'
+          ? entry.photo || resolveSightPhoto(entry, sample.destination || sample.place)
+          : entry.photo,
+    })),
     updatedAt: new Date().toISOString(),
     savedByUser: false,
   }
@@ -50,16 +58,30 @@ function seedLocal(): SampleRecord[] {
   return SAMPLE_CATALOG.map((row) => ({ ...row, trip: { ...row.trip, items: [...row.trip.items] } }))
 }
 
+function fillMissing(rows: SampleRecord[]): SampleRecord[] {
+  const byId = new Map(rows.map((row) => [row.id, row]))
+  for (const row of seedLocal()) {
+    if (!byId.has(row.id)) byId.set(row.id, row)
+  }
+  return [...byId.values()]
+}
+
+function mergeCatalog(rows: SampleRecord[]): SampleRecord[] {
+  const next = fillMissing(rows)
+  if (next.length !== rows.length) writeLocal(next)
+  return next
+}
+
 function readLocal(): SampleRecord[] {
   try {
     const raw = localStorage.getItem(SAMPLES_KEY)
     if (!raw) {
       const seed = seedLocal()
-      localStorage.setItem(SAMPLES_KEY, JSON.stringify(seed))
+      writeLocal(seed)
       return seed
     }
     const parsed = JSON.parse(raw) as SampleRecord[]
-    return Array.isArray(parsed) && parsed.length ? parsed : seedLocal()
+    return Array.isArray(parsed) && parsed.length ? mergeCatalog(parsed) : seedLocal()
   } catch {
     return seedLocal()
   }
@@ -73,7 +95,9 @@ export async function listSamples(): Promise<SampleRecord[]> {
   if (isRemote() || (await probeRemote())) {
     try {
       const data = await api<{ samples: SampleRecord[] }>('/samples')
-      if (Array.isArray(data.samples) && data.samples.length) return data.samples
+      if (Array.isArray(data.samples) && data.samples.length) {
+        return fillMissing(data.samples).sort((a, b) => a.sort - b.sort || a.nights - b.nights)
+      }
     } catch {
       /* local fallback */
     }

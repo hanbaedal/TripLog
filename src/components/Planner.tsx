@@ -7,11 +7,14 @@ import { ItemModal } from './ItemModal'
 import { attachFlight, attachHotel } from '../lib/connect/attach'
 import { KIND_LABEL, MEAL_LABEL, TRANSPORT_LABEL, krw, summarize } from '../lib/costs'
 import { dateOn, dayCount, formatRange, formatShort } from '../lib/dates'
+import { resolveSightPhoto } from '../data/sightPhotos'
 
 type Props = {
   trip: Trip
   user: User | null
+  copyingSample?: boolean
   onChange: (trip: Trip) => void
+  onSaveCopy?: () => void
   onHome: () => void
   onTrips: () => void
   onGuide: () => void
@@ -46,13 +49,43 @@ function badgeText(item: TripItem): string {
   return item.source === 'connect' ? `연동 · ${label}` : label
 }
 
-export function Planner({ trip, user, onChange, onHome, onTrips, onGuide, onAuth }: Props) {
+function SightThumb({ src, label, onOpen }: { src: string; label: string; onOpen: () => void }) {
+  const [ok, setOk] = useState(true)
+  if (!ok) return null
+  return (
+    <button
+      type="button"
+      className="item-photo"
+      aria-label={`${label} 사진 크게 보기`}
+      onClick={(e) => {
+        e.stopPropagation()
+        onOpen()
+      }}
+    >
+      <img src={src} alt="" onError={() => setOk(false)} />
+    </button>
+  )
+}
+
+export function Planner({
+  trip,
+  user,
+  copyingSample,
+  onChange,
+  onSaveCopy,
+  onHome,
+  onTrips,
+  onGuide,
+  onAuth,
+}: Props) {
   const days = dayCount(trip.startDate, trip.endDate)
   const [day, setDay] = useState(0)
   const [editing, setEditing] = useState<TripItem | null>(null)
   const [preset, setPreset] = useState<{ kind: ItemKind; mealSlot?: MealSlot } | null>(null)
   const [search, setSearch] = useState<null | 'flight' | 'hotel'>(null)
+  const [lightbox, setLightbox] = useState<{ src: string; title: string } | null>(null)
   const open = editing !== null || preset !== null
+  const locked = !user
 
   const summary = useMemo(() => summarize(trip), [trip])
   const selected = Math.min(day, Math.max(0, days - 1))
@@ -67,6 +100,7 @@ export function Planner({ trip, user, onChange, onHome, onTrips, onGuide, onAuth
   const maxBar = Math.max(1, ...Object.values(summary.byKind))
 
   function patch(partial: Partial<Trip>) {
+    if (locked) return
     const next = { ...trip, ...partial }
     if (next.endDate < next.startDate) next.endDate = next.startDate
     const n = dayCount(next.startDate, next.endDate)
@@ -77,7 +111,14 @@ export function Planner({ trip, user, onChange, onHome, onTrips, onGuide, onAuth
     onChange(next)
   }
 
+  function openItem(item: TripItem) {
+    if (locked) return
+    setPreset(null)
+    setEditing(item)
+  }
+
   function saveItem(item: TripItem) {
+    if (locked) return
     const exists = trip.items.some((it) => it.id === item.id)
     onChange({
       ...trip,
@@ -90,13 +131,14 @@ export function Planner({ trip, user, onChange, onHome, onTrips, onGuide, onAuth
   }
 
   function deleteItem(id: string) {
+    if (locked) return
     onChange({ ...trip, items: trip.items.filter((it) => it.id !== id) })
     setEditing(null)
     setPreset(null)
   }
 
   return (
-    <div className="planner-shell">
+    <div className={`planner-shell${locked ? ' is-locked' : ''}`}>
       <header className="planner-bar">
         <div className="planner-bar-inner">
           <button className="brand" type="button" onClick={onHome} style={{ background: 'none', border: 0, padding: 0 }}>
@@ -112,6 +154,7 @@ export function Planner({ trip, user, onChange, onHome, onTrips, onGuide, onAuth
               <input
                 value={trip.title}
                 onChange={(e) => patch({ title: e.target.value })}
+                disabled={locked}
               />
             </label>
             <label className="field">
@@ -120,6 +163,7 @@ export function Planner({ trip, user, onChange, onHome, onTrips, onGuide, onAuth
                 value={trip.destination}
                 onChange={(e) => patch({ destination: e.target.value })}
                 placeholder="도시"
+                disabled={locked}
               />
             </label>
             <label className="field">
@@ -128,6 +172,7 @@ export function Planner({ trip, user, onChange, onHome, onTrips, onGuide, onAuth
                 type="date"
                 value={trip.startDate}
                 onChange={(e) => patch({ startDate: e.target.value })}
+                disabled={locked}
               />
             </label>
             <label className="field">
@@ -136,17 +181,18 @@ export function Planner({ trip, user, onChange, onHome, onTrips, onGuide, onAuth
                 type="date"
                 value={trip.endDate}
                 onChange={(e) => patch({ endDate: e.target.value })}
+                disabled={locked}
               />
             </label>
             <div className="people">
               <div className="field">
                 <span>Adults</span>
                 <div className="stepper">
-                  <button type="button" onClick={() => patch({ adults: Math.max(1, trip.adults - 1) })}>
+                  <button type="button" disabled={locked} onClick={() => patch({ adults: Math.max(1, trip.adults - 1) })}>
                     –
                   </button>
                   <b>{trip.adults}</b>
-                  <button type="button" onClick={() => patch({ adults: trip.adults + 1 })}>
+                  <button type="button" disabled={locked} onClick={() => patch({ adults: trip.adults + 1 })}>
                     +
                   </button>
                 </div>
@@ -154,11 +200,11 @@ export function Planner({ trip, user, onChange, onHome, onTrips, onGuide, onAuth
               <div className="field">
                 <span>Children</span>
                 <div className="stepper">
-                  <button type="button" onClick={() => patch({ children: Math.max(0, trip.children - 1) })}>
+                  <button type="button" disabled={locked} onClick={() => patch({ children: Math.max(0, trip.children - 1) })}>
                     –
                   </button>
                   <b>{trip.children}</b>
-                  <button type="button" onClick={() => patch({ children: trip.children + 1 })}>
+                  <button type="button" disabled={locked} onClick={() => patch({ children: trip.children + 1 })}>
                     +
                   </button>
                 </div>
@@ -166,13 +212,23 @@ export function Planner({ trip, user, onChange, onHome, onTrips, onGuide, onAuth
             </div>
           </div>
           <div className="nav-actions">
+            {user && copyingSample && onSaveCopy ? (
+              <button className="btn stamp" type="button" onClick={onSaveCopy}>
+                내 여행에 저장
+              </button>
+            ) : null}
+            {!user && copyingSample ? (
+              <button className="btn stamp" type="button" onClick={onAuth}>
+                로그인하고 내 일정으로
+              </button>
+            ) : null}
             {user ? (
               <button className="btn ghost" type="button" onClick={onTrips}>
                 {user.name}
               </button>
-            ) : (
+            ) : copyingSample ? null : (
               <button className="btn ghost" type="button" onClick={onAuth}>
-                로그인하고 저장
+                로그인
               </button>
             )}
             <button className="btn forest" type="button" onClick={onGuide}>
@@ -207,57 +263,92 @@ export function Planner({ trip, user, onChange, onHome, onTrips, onGuide, onAuth
             </div>
             <div className="muted">{dayItems.length}개 일정</div>
           </div>
-          <div className="chips">
-            {ADD_CHIPS.map((chip) => (
-              <button
-                key={chip.label}
-                className={`chip ${chip.kind === 'flight' || chip.kind === 'hotel' ? 'connect' : ''}`}
-                type="button"
-                onClick={() => {
-                  setEditing(null)
-                  if (chip.kind === 'flight') {
-                    setSearch('flight')
-                    return
-                  }
-                  if (chip.kind === 'hotel') {
-                    setSearch('hotel')
-                    return
-                  }
-                  setPreset({ kind: chip.kind, mealSlot: chip.mealSlot })
-                }}
-              >
-                {chip.label}
-              </button>
-            ))}
-          </div>
+          {!locked ? (
+            <div className="chips">
+              {ADD_CHIPS.map((chip) => (
+                <button
+                  key={chip.label}
+                  className={`chip ${chip.kind === 'flight' || chip.kind === 'hotel' ? 'connect' : ''}`}
+                  type="button"
+                  onClick={() => {
+                    setEditing(null)
+                    if (chip.kind === 'flight') {
+                      setSearch('flight')
+                      return
+                    }
+                    if (chip.kind === 'hotel') {
+                      setSearch('hotel')
+                      return
+                    }
+                    setPreset({ kind: chip.kind, mealSlot: chip.mealSlot })
+                  }}
+                >
+                  {chip.label}
+                </button>
+              ))}
+            </div>
+          ) : null}
           {dayItems.length === 0 ? null : (
-            dayItems.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                className="item-row"
-                onClick={() => {
-                  setPreset(null)
-                  setEditing(item)
-                }}
-                style={{ width: '100%', background: 'none', border: 0, textAlign: 'left' }}
-              >
-                <div className="item-time">{item.time}</div>
-                <div className="rail">
-                  <div className={`dot ${item.kind}`} />
-                </div>
-                <article className="card">
-                  <div>
-                    <span className={`badge ${item.kind}`}>{badgeText(item)}</span>
-                    <h3>{item.title}</h3>
-                    <div className="meta">
-                      {[item.place, item.subtitle, item.note].filter(Boolean).join(' · ')}
-                    </div>
+            dayItems.map((item) => {
+              const photo = item.kind === 'sight' ? resolveSightPhoto(item, trip.destination) : undefined
+              const copy = (
+                <>
+                  <span className={`badge ${item.kind}`}>{badgeText(item)}</span>
+                  <h3>{item.title}</h3>
+                  <div className="meta">
+                    {[item.place, item.subtitle, item.note].filter(Boolean).join(' · ')}
                   </div>
-                  <div className="cost-n">{item.cost ? krw(item.cost) : '—'}</div>
-                </article>
-              </button>
-            ))
+                  {item.kind === 'sight' ? (
+                    <div className="cost-n cost-line">{item.cost ? krw(item.cost) : '—'}</div>
+                  ) : null}
+                </>
+              )
+              const body = locked ? (
+                <div className={item.kind === 'sight' ? 'card-copy' : 'card-main'}>
+                  {item.kind === 'sight' ? (
+                    copy
+                  ) : (
+                    <>
+                      <div>{copy}</div>
+                      <div className="cost-n">{item.cost ? krw(item.cost) : '—'}</div>
+                    </>
+                  )}
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  className={item.kind === 'sight' ? 'card-copy' : 'card-main'}
+                  onClick={() => openItem(item)}
+                >
+                  {item.kind === 'sight' ? (
+                    copy
+                  ) : (
+                    <>
+                      <div>{copy}</div>
+                      <div className="cost-n">{item.cost ? krw(item.cost) : '—'}</div>
+                    </>
+                  )}
+                </button>
+              )
+              return (
+                <div key={item.id} className="item-row">
+                  <div className="item-time">{item.time}</div>
+                  <div className="rail">
+                    <div className={`dot ${item.kind}`} />
+                  </div>
+                  <article className={`card${item.kind === 'sight' ? ' card-sight' : ''}`}>
+                    {body}
+                    {item.kind === 'sight' && photo ? (
+                      <SightThumb
+                        src={photo}
+                        label={item.title}
+                        onOpen={() => setLightbox({ src: photo, title: item.title })}
+                      />
+                    ) : null}
+                  </article>
+                </div>
+              )
+            })
           )}
         </section>
 
@@ -329,7 +420,7 @@ export function Planner({ trip, user, onChange, onHome, onTrips, onGuide, onAuth
         </aside>
       </div>
 
-      {open ? (
+      {open && !locked ? (
         <ItemModal
           dayIndex={selected}
           initial={editing ?? undefined}
@@ -342,7 +433,7 @@ export function Planner({ trip, user, onChange, onHome, onTrips, onGuide, onAuth
           onDelete={editing ? () => deleteItem(editing.id) : undefined}
         />
       ) : null}
-      {search === 'flight' ? (
+      {search === 'flight' && !locked ? (
         <FlightSearch
           trip={trip}
           focusDate={dateOn(trip.startDate, selected)}
@@ -357,7 +448,7 @@ export function Planner({ trip, user, onChange, onHome, onTrips, onGuide, onAuth
           }}
         />
       ) : null}
-      {search === 'hotel' ? (
+      {search === 'hotel' && !locked ? (
         <HotelSearch
           trip={trip}
           onClose={() => setSearch(null)}
@@ -370,6 +461,17 @@ export function Planner({ trip, user, onChange, onHome, onTrips, onGuide, onAuth
             setSearch(null)
           }}
         />
+      ) : null}
+      {lightbox ? (
+        <div
+          className="photo-lightbox"
+          role="dialog"
+          aria-modal="true"
+          aria-label={lightbox.title}
+          onClick={() => setLightbox(null)}
+        >
+          <img src={lightbox.src} alt={lightbox.title} onClick={(e) => e.stopPropagation()} />
+        </div>
       ) : null}
     </div>
   )
