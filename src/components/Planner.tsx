@@ -429,6 +429,7 @@ export function Planner({
           initial={editing ?? undefined}
           preset={editing ? undefined : preset ?? undefined}
           user={user}
+          tripDestination={trip.destination}
           onClose={() => {
             setEditing(null)
             setPreset(null)

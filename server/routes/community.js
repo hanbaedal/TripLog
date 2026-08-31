@@ -2,6 +2,7 @@ import { Router } from 'express'
 import crypto from 'node:crypto'
 import { BoardPost, GalleryPhoto, Inquiry } from '../models.js'
 import { optionalUser, requireSupervisor, requireUser, supervisorRole } from '../auth.js'
+import { parseGalleryMeta } from '../galleryMeta.js'
 
 function nid(prefix) {
   return `${prefix}-${crypto.randomUUID()}`
@@ -12,6 +13,9 @@ function toPhoto(doc) {
     id: doc.photoId,
     title: doc.title,
     src: doc.src,
+    city: doc.city || 'other',
+    category: doc.category || 'other',
+    sightType: doc.sightType || undefined,
     catalog: Boolean(doc.catalog),
     ownerId: doc.ownerId ? String(doc.ownerId) : undefined,
     ownerName: doc.ownerName || '',
@@ -83,8 +87,13 @@ galleryRouter.get('/', async (_req, res) => {
 galleryRouter.post('/', requireUser, async (req, res) => {
   const title = String(req.body?.title || '').trim()
   const src = String(req.body?.src || '').trim()
+  const meta = parseGalleryMeta(req.body)
   if (!title || !src) {
     res.status(400).json({ error: '제목과 사진이 필요합니다.' })
+    return
+  }
+  if (!req.body?.city || !req.body?.category) {
+    res.status(400).json({ error: '도시와 분류를 선택해 주세요.' })
     return
   }
   if (src.length > 4_500_000) {
@@ -97,6 +106,9 @@ galleryRouter.post('/', requireUser, async (req, res) => {
     ownerName: req.user.name,
     title,
     src,
+    city: meta.city,
+    category: meta.category,
+    sightType: meta.sightType,
     at: new Date(),
   })
   res.json({ photo: toPhoto(doc) })
@@ -105,8 +117,13 @@ galleryRouter.post('/', requireUser, async (req, res) => {
 galleryRouter.put('/:id', requireUser, async (req, res) => {
   const title = String(req.body?.title || '').trim()
   const src = String(req.body?.src || '').trim()
+  const meta = parseGalleryMeta(req.body)
   if (!title || !src) {
     res.status(400).json({ error: '제목과 사진이 필요합니다.' })
+    return
+  }
+  if (!req.body?.city || !req.body?.category) {
+    res.status(400).json({ error: '도시와 분류를 선택해 주세요.' })
     return
   }
   const doc = await GalleryPhoto.findOne({ photoId: req.params.id })
@@ -116,6 +133,9 @@ galleryRouter.put('/:id', requireUser, async (req, res) => {
   }
   doc.title = title
   doc.src = src
+  doc.city = meta.city
+  doc.category = meta.category
+  doc.sightType = meta.sightType
   await doc.save()
   res.json({ photo: toPhoto(doc) })
 })

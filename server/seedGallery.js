@@ -1,22 +1,34 @@
 import { GalleryPhoto } from './models.js'
-import { GALLERY_PHOTOS } from '../src/data/galleryCatalog.js'
+import { GALLERY_PHOTOS, cityGalleryId } from '../src/data/galleryCatalog.js'
 import { TRAVEL_SPOT_CATALOG } from '../src/data/travelSpotCatalog.js'
-import { cityGalleryId } from '../src/data/galleryCatalog.js'
+import { guessSightType, normalizeCity, normalizeGalleryCategory, normalizeSightType } from '../src/data/galleryTaxonomy.js'
+
+function catalogMeta(row) {
+  return {
+    city: normalizeCity(row.city || row.id),
+    category: normalizeGalleryCategory(row.category || 'sight'),
+    sightType: normalizeSightType(row.sightType || 'other', row.category || 'sight'),
+  }
+}
 
 export async function seedGallery() {
   const srcById = new Map(GALLERY_PHOTOS.map((row) => [row.id, row.src]))
 
   for (const row of GALLERY_PHOTOS) {
+    const meta = catalogMeta(row)
     await GalleryPhoto.updateOne(
       { photoId: row.id },
       {
-        $setOnInsert: {
-          photoId: row.id,
+        $set: {
           title: row.title,
           src: row.src,
           catalog: true,
-          ownerId: null,
           ownerName: '',
+          ...meta,
+        },
+        $setOnInsert: {
+          photoId: row.id,
+          ownerId: null,
           at: new Date(),
         },
       },
@@ -25,19 +37,26 @@ export async function seedGallery() {
   }
 
   for (const spot of TRAVEL_SPOT_CATALOG) {
-    const cityId = cityGalleryId(spot.cityId)
-    const src = srcById.get(cityId) || ''
+    const city = normalizeCity(cityGalleryId(spot.cityId))
+    const src = srcById.get(city) || ''
     if (!src) continue
+    const category = 'sight'
+    const sightType = normalizeSightType(guessSightType(spot.name), category)
     await GalleryPhoto.updateOne(
       { photoId: spot.id },
       {
-        $setOnInsert: {
-          photoId: spot.id,
+        $set: {
           title: spot.name,
           src,
           catalog: true,
-          ownerId: null,
           ownerName: '',
+          city,
+          category,
+          sightType,
+        },
+        $setOnInsert: {
+          photoId: spot.id,
+          ownerId: null,
           at: new Date(),
         },
       },

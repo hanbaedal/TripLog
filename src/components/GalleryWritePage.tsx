@@ -2,10 +2,12 @@ import { useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import { PageShell } from './PageShell'
 import { ImagePicker } from './ImagePicker'
+import { GalleryTaxonomyFields } from './GalleryTaxonomyFields'
 import { isSupervisor } from '../lib/auth'
 import { canEditGallery, listGallery, removeGalleryPhoto, saveGalleryPhoto } from '../lib/community'
 import { loadGalleryPhotos, resolvePhotoSrc } from '../lib/galleryResolve'
-import type { GalleryPhoto } from '../types'
+import { photoTaxonomyLabel } from '../lib/galleryFilter'
+import type { GalleryCategory, GalleryPhoto, SightType } from '../types'
 import type { SiteNav } from '../lib/siteNav'
 
 export function GalleryWritePage(nav: SiteNav) {
@@ -13,6 +15,9 @@ export function GalleryWritePage(nav: SiteNav) {
   const [editing, setEditing] = useState<GalleryPhoto | null>(null)
   const [title, setTitle] = useState('')
   const [photoId, setPhotoId] = useState('')
+  const [city, setCity] = useState('')
+  const [category, setCategory] = useState<GalleryCategory | ''>('')
+  const [sightType, setSightType] = useState<SightType | ''>('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
 
@@ -24,6 +29,15 @@ export function GalleryWritePage(nav: SiteNav) {
     void loadGalleryPhotos().then(setPhotos)
   }, [nav.user])
 
+  const uploadMeta = useMemo(() => {
+    if (!city || !category) return undefined
+    return {
+      city,
+      category,
+      sightType: (category === 'sight' ? sightType || 'other' : '') as SightType | '',
+    }
+  }, [city, category, sightType])
+
   const mine = useMemo(
     () => photos.filter((photo) => canEditGallery(photo, nav.user)),
     [photos, nav.user],
@@ -33,6 +47,9 @@ export function GalleryWritePage(nav: SiteNav) {
     setEditing(photo)
     setTitle(photo.title)
     setPhotoId(photo.id)
+    setCity(photo.city || '')
+    setCategory(photo.category || '')
+    setSightType(photo.sightType || '')
     setError('')
   }
 
@@ -40,6 +57,9 @@ export function GalleryWritePage(nav: SiteNav) {
     setEditing(null)
     setTitle('')
     setPhotoId('')
+    setCity('')
+    setCategory('')
+    setSightType('')
     setError('')
   }
 
@@ -49,8 +69,8 @@ export function GalleryWritePage(nav: SiteNav) {
       nav.go.auth()
       return
     }
-    if (!title.trim() || !photoId) {
-      setError('제목과 사진이 필요합니다.')
+    if (!title.trim() || !photoId || !city || !category) {
+      setError('제목, 도시, 분류, 사진이 필요합니다.')
       return
     }
     setBusy(true)
@@ -65,6 +85,9 @@ export function GalleryWritePage(nav: SiteNav) {
         id: editing?.id || photoId,
         title: title.trim(),
         src,
+        city,
+        category,
+        sightType: category === 'sight' ? sightType || 'other' : undefined,
         ownerId: nav.user.id,
         ownerName: nav.user.name,
         at: editing?.at,
@@ -95,7 +118,19 @@ export function GalleryWritePage(nav: SiteNav) {
             갤러리
           </button>
         </div>
-        <form className="board-form" onSubmit={(e) => void submit(e)}>
+        <form className="board-form gallery-write-form" onSubmit={(e) => void submit(e)}>
+          <GalleryTaxonomyFields
+            city={city}
+            category={category}
+            sightType={sightType}
+            onCity={setCity}
+            onCategory={(value) => {
+              setCategory(value)
+              if (value !== 'sight') setSightType('')
+            }}
+            onSightType={setSightType}
+            disabled={busy}
+          />
           <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="사진 제목" required />
           <ImagePicker
             photoId={photoId}
@@ -104,6 +139,7 @@ export function GalleryWritePage(nav: SiteNav) {
             defaultTitle={title}
             disabled={busy}
             scope="mine"
+            uploadMeta={uploadMeta}
           />
           <div className="nav-actions">
             <button className="btn" type="submit" disabled={busy}>
@@ -126,6 +162,7 @@ export function GalleryWritePage(nav: SiteNav) {
             <article className="info-card" key={photo.id}>
               <img className="gallery-preview" src={photo.src} alt={photo.title} />
               <h3>{photo.title}</h3>
+              <p className="muted">{photoTaxonomyLabel(photo)}</p>
               <div className="nav-actions">
                 <button className="btn ghost" type="button" onClick={() => startEdit(photo)}>
                   수정

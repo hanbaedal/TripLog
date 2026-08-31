@@ -66,10 +66,17 @@ export type User = {
   role?: 'user' | 'supervisor'
 }
 
+export type GalleryCategory = 'sight' | 'meal' | 'hotel' | 'transport' | 'flight' | 'other'
+
+export type SightType = 'mountain' | 'lake' | 'beach' | 'palace' | 'temple' | 'town' | 'park' | 'other'
+
 export type GalleryPhoto = {
   id: string
   title: string
   src: string
+  city?: string
+  category?: GalleryCategory
+  sightType?: SightType
   ownerId?: string
   ownerName?: string
   at?: string

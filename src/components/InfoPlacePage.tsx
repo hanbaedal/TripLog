@@ -10,7 +10,8 @@ import {
   saveTravelSpot,
 } from '../lib/community'
 import { cityGalleryId } from '../data/galleryCatalog.js'
-import { loadGalleryPhotos, resolvePhotoSrc } from '../lib/galleryResolve'
+import { guessSightType } from '../data/galleryTaxonomy.js'
+import { loadGalleryPhotos, resolvePhotoSrc, type GalleryUploadMeta } from '../lib/galleryResolve'
 import { mapSearchLinks } from '../lib/mapLinks'
 import type { GalleryPhoto, TravelInfo, TravelSpot } from '../types'
 import type { SiteNav } from '../lib/siteNav'
@@ -42,6 +43,14 @@ export function InfoPlacePage({ cityId, ...nav }: Props) {
     () => [...spots].sort((a, b) => (a.sort || 80) - (b.sort || 80) || a.name.localeCompare(b.name, 'ko')),
     [spots],
   )
+
+  const uploadMeta = useMemo((): GalleryUploadMeta | undefined => {
+    return {
+      city: cityGalleryId(cityId),
+      category: 'sight',
+      sightType: guessSightType(name || city?.place || '') || 'other',
+    }
+  }, [cityId, name, city?.place])
 
   function reset() {
     setWriting(false)
@@ -174,6 +183,7 @@ export function InfoPlacePage({ cityId, ...nav }: Props) {
               user={nav.user}
               defaultTitle={name || place}
               disabled={busy}
+              uploadMeta={uploadMeta}
             />
             <div className="nav-actions">
               <button className="btn" type="submit" disabled={busy}>

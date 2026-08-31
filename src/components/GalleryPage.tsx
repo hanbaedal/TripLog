@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { PageShell } from './PageShell'
 import { listGallery } from '../lib/community'
-import type { GalleryPhoto } from '../types'
+import { photoTaxonomyLabel } from '../lib/galleryFilter'
+import { GALLERY_CATEGORIES, GALLERY_CITIES } from '../data/galleryTaxonomy.js'
+import type { GalleryCategory, GalleryPhoto } from '../types'
 import type { SiteNav } from '../lib/siteNav'
 
 type Props = SiteNav & {
@@ -15,6 +17,8 @@ export function GalleryPage({ focusId, ...nav }: Props) {
   const [photos, setPhotos] = useState<GalleryPhoto[]>([])
   const [mode, setMode] = useState<ViewMode>(() => (focusId ? 'slide' : 'list'))
   const [activeId, setActiveId] = useState<string | null>(() => focusId ?? null)
+  const [cityFilter, setCityFilter] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState<GalleryCategory | ''>('')
 
   useEffect(() => {
     void listGallery().then(setPhotos)
@@ -26,7 +30,14 @@ export function GalleryPage({ focusId, ...nav }: Props) {
     setActiveId(focusId)
   }, [focusId])
 
-  const items = useMemo(() => photos, [photos])
+  const items = useMemo(() => {
+    return photos.filter((photo) => {
+      if (cityFilter && photo.city !== cityFilter) return false
+      if (categoryFilter && photo.category !== categoryFilter) return false
+      return true
+    })
+  }, [photos, cityFilter, categoryFilter])
+
   const activeIndex = useMemo(
     () => (activeId ? items.findIndex((row) => row.id === activeId) : -1),
     [activeId, items],
@@ -81,6 +92,33 @@ export function GalleryPage({ focusId, ...nav }: Props) {
               사진 올리기
             </button>
           </div>
+          <div className="gallery-list-filters">
+            <label>
+              도시
+              <select value={cityFilter} onChange={(e) => setCityFilter(e.target.value)}>
+                <option value="">전체</option>
+                {GALLERY_CITIES.map((row) => (
+                  <option key={row.slug} value={row.slug}>
+                    {row.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              분류
+              <select
+                value={categoryFilter}
+                onChange={(e) => setCategoryFilter(e.target.value as GalleryCategory | '')}
+              >
+                <option value="">전체</option>
+                {GALLERY_CATEGORIES.map((row) => (
+                  <option key={row.slug} value={row.slug}>
+                    {row.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
           <div className="gallery-grid">
             {items.map((photo) => (
               <button
@@ -91,6 +129,7 @@ export function GalleryPage({ focusId, ...nav }: Props) {
               >
                 <img src={photo.src} alt={photo.title} loading="lazy" />
                 <span>{photo.title}</span>
+                <small>{photoTaxonomyLabel(photo)}</small>
               </button>
             ))}
           </div>
@@ -113,7 +152,11 @@ export function GalleryPage({ focusId, ...nav }: Props) {
                   alt={photo.title}
                   loading={photo.id === activeId ? 'eager' : 'lazy'}
                 />
-                <figcaption>{photo.title}</figcaption>
+                <figcaption>
+                  {photo.title}
+                  <br />
+                  <small>{photoTaxonomyLabel(photo)}</small>
+                </figcaption>
               </figure>
             ))}
           </div>

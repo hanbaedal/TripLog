@@ -1,7 +1,10 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import type { FormEvent } from 'react'
 import type { ItemKind, MealSlot, TransportMode, TripItem, User } from '../types'
 import { ImagePicker } from './ImagePicker'
+import { citySlugFromPlace, guessSightType } from '../data/galleryTaxonomy.js'
+import { itemKindToGalleryCategory } from '../lib/galleryFilter'
+import type { GalleryUploadMeta } from '../lib/galleryResolve'
 import { KIND_LABEL, MEAL_LABEL, TRANSPORT_LABEL } from '../lib/costs'
 import { composeFlightItem, parseFlightForm } from '../lib/flightFields'
 
@@ -10,6 +13,7 @@ type Props = {
   initial?: TripItem
   preset?: { kind: ItemKind; mealSlot?: MealSlot }
   user?: User | null
+  tripDestination?: string
   onClose: () => void
   onSave: (item: TripItem) => void
   onDelete?: () => void
@@ -36,7 +40,7 @@ function uid(): string {
   return crypto.randomUUID()
 }
 
-export function ItemModal({ dayIndex, initial, preset, user, onClose, onSave, onDelete }: Props) {
+export function ItemModal({ dayIndex, initial, preset, user, tripDestination, onClose, onSave, onDelete }: Props) {
   const [kind, setKind] = useState<ItemKind>(initial?.kind ?? preset?.kind ?? 'sight')
   const [mealSlot, setMealSlot] = useState<MealSlot>(
     initial?.mealSlot ?? preset?.mealSlot ?? 'lunch',
@@ -53,6 +57,15 @@ export function ItemModal({ dayIndex, initial, preset, user, onClose, onSave, on
   const [note, setNote] = useState(initial?.note ?? '')
   const [photoId, setPhotoId] = useState(initial?.photoId ?? initial?.photo ?? '')
   const [cost, setCost] = useState(initial ? String(initial.cost) : '')
+  const uploadMeta = useMemo((): GalleryUploadMeta | undefined => {
+    const category = itemKindToGalleryCategory(kind)
+    if (!category) return undefined
+    return {
+      city: citySlugFromPlace(tripDestination) || 'other',
+      category,
+      sightType: category === 'sight' ? guessSightType(title) || 'other' : '',
+    }
+  }, [kind, tripDestination, title])
   const parsed = parseFlightForm(initial?.kind === 'flight' ? initial : undefined)
   const [departTerminal, setDepartTerminal] = useState(parsed.departTerminal)
   const [destination, setDestination] = useState(parsed.destination)
@@ -280,7 +293,17 @@ export function ItemModal({ dayIndex, initial, preset, user, onClose, onSave, on
           </label>
           {kind === 'sight' || kind === 'meal' || kind === 'hotel' || kind === 'transport' ? (
             <div className="span-2">
-              <ImagePicker photoId={photoId} onChange={setPhotoId} user={user ?? null} defaultTitle={title} scope="all" />
+              <ImagePicker
+                photoId={photoId}
+                onChange={setPhotoId}
+                user={user ?? null}
+                defaultTitle={title}
+                scope="all"
+                itemKind={kind}
+                tripDestination={tripDestination}
+                itemTitle={title}
+                uploadMeta={uploadMeta}
+              />
             </div>
           ) : null}
           <label className={kind === 'flight' ? 'span-2' : undefined}>

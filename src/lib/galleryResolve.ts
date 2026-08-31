@@ -1,6 +1,8 @@
-import type { GalleryPhoto, User } from '../types'
+import type { GalleryCategory, GalleryPhoto, SightType, User } from '../types'
 import { GALLERY_PHOTOS } from '../data/galleryCatalog.js'
 import { compressImage } from './imageFile'
+import type { GalleryFilter } from './galleryFilter'
+import { buildGalleryFilter, filterGalleryPhotos, photoTaxonomyLabel } from './galleryFilter'
 
 let cache: GalleryPhoto[] | null = null
 
@@ -42,20 +44,47 @@ export function pickableGalleryPhotos(
   return photos.filter((row) => row.catalog || row.ownerId === user.id)
 }
 
+export type GalleryUploadMeta = {
+  city: string
+  category: GalleryCategory
+  sightType?: SightType | ''
+}
+
 export async function uploadGalleryImage(
   file: File,
   user: User,
   title?: string,
+  meta?: GalleryUploadMeta,
 ): Promise<GalleryPhoto> {
   const { saveGalleryPhoto } = await import('./community')
+  if (!meta?.city || !meta?.category) {
+    throw new Error('사진을 올리기 전에 도시와 분류를 선택해 주세요.')
+  }
   const src = await compressImage(file)
   const saved = await saveGalleryPhoto({
     id: '',
     title: title?.trim() || file.name.replace(/\.[^.]+$/, '') || '내 사진',
     src,
+    city: meta.city,
+    category: meta.category,
+    sightType: meta.category === 'sight' ? meta.sightType || 'other' : undefined,
     ownerId: user.id,
     ownerName: user.name,
   })
   invalidateGalleryCache()
   return saved
 }
+
+export function filteredPickablePhotos(
+  photos: GalleryPhoto[],
+  user: User | null | undefined,
+  scope: 'default' | 'mine' | 'all',
+  filter?: GalleryFilter,
+): { items: GalleryPhoto[]; relaxed: boolean } {
+  const base = pickableGalleryPhotos(photos, user, scope)
+  return filterGalleryPhotos(base, filter)
+}
+
+export type { GalleryFilter }
+
+export { buildGalleryFilter, photoTaxonomyLabel }

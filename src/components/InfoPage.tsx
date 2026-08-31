@@ -4,8 +4,9 @@ import { PageShell } from './PageShell'
 import { ImagePicker } from './ImagePicker'
 import { TRAVEL_INFO_CATALOG } from '../data/travelInfoCatalog.js'
 import { cityGalleryId } from '../data/galleryCatalog.js'
+import { citySlugFromPlace, guessSightType } from '../data/galleryTaxonomy.js'
 import { canEditTravelInfo, listTravelInfo, removeTravelInfo, saveTravelInfo } from '../lib/community'
-import { resolvePhotoSrc, loadGalleryPhotos } from '../lib/galleryResolve'
+import { resolvePhotoSrc, loadGalleryPhotos, type GalleryUploadMeta } from '../lib/galleryResolve'
 import type { GalleryPhoto, TravelInfo } from '../types'
 import type { SiteNav } from '../lib/siteNav'
 
@@ -32,6 +33,15 @@ export function InfoPage(nav: SiteNav) {
     () => [...items].sort((a, b) => (a.sort || 80) - (b.sort || 80) || a.place.localeCompare(b.place, 'ko')),
     [items],
   )
+
+  const uploadMeta = useMemo((): GalleryUploadMeta | undefined => {
+    const city = citySlugFromPlace(place) || 'other'
+    return {
+      city,
+      category: 'sight',
+      sightType: guessSightType(title || place) || 'other',
+    }
+  }, [place, title])
 
   function startWrite() {
     if (!nav.user) {
@@ -144,6 +154,7 @@ export function InfoPage(nav: SiteNav) {
               user={nav.user}
               defaultTitle={title || place}
               disabled={busy}
+              uploadMeta={uploadMeta}
             />
             <div className="nav-actions">
               <button className="btn" type="submit" disabled={busy}>

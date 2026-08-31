@@ -1402,6 +1402,45 @@ p {
   color: var(--ink);
 }
 
+.gallery-card small {
+  font-size: 0.72rem;
+  color: var(--muted);
+  line-height: 1.2;
+}
+
+.gallery-list-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.gallery-list-filters label {
+  display: grid;
+  gap: 4px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.gallery-list-filters select {
+  min-width: 120px;
+}
+
+.gallery-write-form label select {
+  width: 100%;
+}
+
+.image-picker-cell small {
+  font-size: 0.68rem;
+  color: var(--muted);
+  line-height: 1.2;
+}
+
+.image-picker-filter-note {
+  margin: 0 0 8px;
+  font-size: 0.85rem;
+}
+
 .gallery-page {
   position: relative;
   width: 100%;
