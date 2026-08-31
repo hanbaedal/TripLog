@@ -16,7 +16,6 @@ export function FlightSearch({ trip, onClose, onManual, onPick }: Props) {
   const [to, setTo] = useState('KIX')
   const [date, setDate] = useState(trip.startDate)
   const [returnDate, setReturnDate] = useState(trip.endDate)
-  const [round, setRound] = useState(true)
   const [out, setOut] = useState<FlightOffer[] | null>(null)
   const [back, setBack] = useState<FlightOffer[] | null>(null)
   const [busy, setBusy] = useState(false)
@@ -29,11 +28,7 @@ export function FlightSearch({ trip, onClose, onManual, onPick }: Props) {
     try {
       const going = await searchFlights({ from, to, date })
       setOut(going)
-      if (round) {
-        setBack(await searchFlights({ from: to, to: from, date: returnDate }))
-      } else {
-        setBack(null)
-      }
+      setBack(await searchFlights({ from: to, to: from, date: returnDate }))
     } finally {
       setBusy(false)
     }
@@ -65,7 +60,7 @@ export function FlightSearch({ trip, onClose, onManual, onPick }: Props) {
         <p className="muted" style={{ margin: '6px 0 14px' }}>
           노선과 날짜를 넣으면 시범 연동 운임이 나옵니다. 고른 편은 일정·비용에 바로 붙습니다.
         </p>
-        <form className="search-form" onSubmit={submit}>
+        <form className="search-form flight-search-form" onSubmit={submit}>
           <label>
             출발
             <select value={from} onChange={(e) => setFrom(e.target.value)}>
@@ -88,16 +83,13 @@ export function FlightSearch({ trip, onClose, onManual, onPick }: Props) {
               type="date"
               value={returnDate}
               onChange={(e) => setReturnDate(e.target.value)}
-              disabled={!round}
             />
           </label>
-          <label className="check-row">
-            <input type="checkbox" checked={round} onChange={(e) => setRound(e.target.checked)} />
-            왕복
-          </label>
-          <button className="btn" type="submit" disabled={busy}>
-            {busy ? '시세 조회 중…' : '검색'}
-          </button>
+          <div className="search-actions">
+            <button className="btn" type="submit" disabled={busy || from === to}>
+              {busy ? '시세 조회 중…' : '검색'}
+            </button>
+          </div>
         </form>
 
         {out ? (

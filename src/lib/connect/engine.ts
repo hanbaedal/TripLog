@@ -74,6 +74,56 @@ const FLIGHTS: FlightTemplate[] = [
   { from: 'CTU', to: 'ICN', airline: '중국국제항공', airlineCode: 'CA', flightNo: '439', depart: '08:15', arrive: '13:35', duration: '4시간 20분', base: 228000 },
   { from: 'ICN', to: 'XIY', airline: '아시아나항공', airlineCode: 'OZ', flightNo: '317', depart: '11:30', arrive: '14:10', duration: '3시간 40분', base: 198000 },
   { from: 'XIY', to: 'ICN', airline: '아시아나항공', airlineCode: 'OZ', flightNo: '318', depart: '15:40', arrive: '19:10', duration: '3시간 30분', base: 198000 },
+  { from: 'ICN', to: 'PEK', airline: '아시아나항공', airlineCode: 'OZ', flightNo: '335', depart: '08:20', arrive: '09:35', duration: '2시간 15분', base: 178000 },
+  { from: 'PEK', to: 'ICN', airline: '아시아나항공', airlineCode: 'OZ', flightNo: '336', depart: '16:10', arrive: '19:20', duration: '2시간 10분', base: 178000 },
+  { from: 'ICN', to: 'PEK', airline: '중국남방항공', airlineCode: 'CZ', flightNo: '318', depart: '11:05', arrive: '12:20', duration: '2시간 15분', base: 158000 },
+  { from: 'PEK', to: 'ICN', airline: '중국남방항공', airlineCode: 'CZ', flightNo: '317', depart: '07:50', arrive: '11:00', duration: '2시간 10분', base: 158000 },
+  { from: 'ICN', to: 'PKX', airline: '대한항공', airlineCode: 'KE', flightNo: '859', depart: '10:30', arrive: '11:45', duration: '2시간 15분', base: 184000 },
+  { from: 'PKX', to: 'ICN', airline: '대한항공', airlineCode: 'KE', flightNo: '860', depart: '17:10', arrive: '20:20', duration: '2시간 10분', base: 184000 },
+  { from: 'ICN', to: 'PKX', airline: '중국국제항공', airlineCode: 'CA', flightNo: '140', depart: '14:00', arrive: '15:15', duration: '2시간 15분', base: 166000 },
+  { from: 'PKX', to: 'ICN', airline: '중국국제항공', airlineCode: 'CA', flightNo: '139', depart: '09:20', arrive: '12:30', duration: '2시간 10분', base: 166000 },
+  { from: 'ICN', to: 'PVG', airline: '아시아나항공', airlineCode: 'OZ', flightNo: '351', depart: '09:15', arrive: '10:25', duration: '2시간 10분', base: 188000 },
+  { from: 'PVG', to: 'ICN', airline: '아시아나항공', airlineCode: 'OZ', flightNo: '352', depart: '15:30', arrive: '18:35', duration: '2시간 5분', base: 188000 },
+  { from: 'ICN', to: 'PVG', airline: '중국남방항공', airlineCode: 'CZ', flightNo: '326', depart: '13:50', arrive: '15:00', duration: '2시간 10분', base: 162000 },
+  { from: 'PVG', to: 'ICN', airline: '중국남방항공', airlineCode: 'CZ', flightNo: '325', depart: '18:40', arrive: '21:45', duration: '2시간 5분', base: 162000 },
+  { from: 'ICN', to: 'SHA', airline: '대한항공', airlineCode: 'KE', flightNo: '897', depart: '07:50', arrive: '08:50', duration: '2시간', base: 192000 },
+  { from: 'SHA', to: 'ICN', airline: '대한항공', airlineCode: 'KE', flightNo: '898', depart: '16:40', arrive: '19:40', duration: '2시간', base: 192000 },
+  { from: 'ICN', to: 'SHA', airline: '중국동방항공', airlineCode: 'MU', flightNo: '5046', depart: '11:20', arrive: '12:20', duration: '2시간', base: 170000 },
+  { from: 'SHA', to: 'ICN', airline: '중국동방항공', airlineCode: 'MU', flightNo: '5045', depart: '14:50', arrive: '17:50', duration: '2시간', base: 170000 },
+  { from: 'GMP', to: 'SHA', airline: '아시아나항공', airlineCode: 'OZ', flightNo: '1091', depart: '11:00', arrive: '12:00', duration: '2시간', base: 182000 },
+  { from: 'SHA', to: 'GMP', airline: '아시아나항공', airlineCode: 'OZ', flightNo: '1092', depart: '19:00', arrive: '22:00', duration: '2시간', base: 182000 },
+  { from: 'GMP', to: 'SHA', airline: '중국동방항공', airlineCode: 'MU', flightNo: '5052', depart: '08:30', arrive: '09:30', duration: '2시간', base: 174000 },
+  { from: 'SHA', to: 'GMP', airline: '중국동방항공', airlineCode: 'MU', flightNo: '5051', depart: '16:00', arrive: '19:00', duration: '2시간', base: 174000 },
+  { from: 'ICN', to: 'CAN', airline: '대한항공', airlineCode: 'KE', flightNo: '581', depart: '08:50', arrive: '11:40', duration: '3시간 50분', base: 220000 },
+  { from: 'CAN', to: 'ICN', airline: '대한항공', airlineCode: 'KE', flightNo: '582', depart: '13:20', arrive: '18:00', duration: '3시간 40분', base: 220000 },
+  { from: 'ICN', to: 'CAN', airline: '중국남방항공', airlineCode: 'CZ', flightNo: '338', depart: '12:10', arrive: '15:00', duration: '3시간 50분', base: 198000 },
+  { from: 'CAN', to: 'ICN', airline: '중국남방항공', airlineCode: 'CZ', flightNo: '337', depart: '16:40', arrive: '21:20', duration: '3시간 40분', base: 198000 },
+  { from: 'ICN', to: 'SZX', airline: '대한항공', airlineCode: 'KE', flightNo: '177', depart: '09:40', arrive: '12:30', duration: '3시간 50분', base: 208000 },
+  { from: 'SZX', to: 'ICN', airline: '대한항공', airlineCode: 'KE', flightNo: '178', depart: '14:10', arrive: '18:50', duration: '3시간 40분', base: 208000 },
+  { from: 'ICN', to: 'SZX', airline: '아시아나항공', airlineCode: 'OZ', flightNo: '325', depart: '11:10', arrive: '14:00', duration: '3시간 50분', base: 196000 },
+  { from: 'SZX', to: 'ICN', airline: '아시아나항공', airlineCode: 'OZ', flightNo: '326', depart: '15:50', arrive: '20:30', duration: '3시간 40분', base: 196000 },
+  { from: 'ICN', to: 'SZX', airline: '선전항공', airlineCode: 'ZH', flightNo: '9872', depart: '13:20', arrive: '16:10', duration: '3시간 50분', base: 168000 },
+  { from: 'SZX', to: 'ICN', airline: '선전항공', airlineCode: 'ZH', flightNo: '9871', depart: '08:00', arrive: '12:40', duration: '3시간 40분', base: 168000 },
+  { from: 'ICN', to: 'TAO', airline: '아시아나항공', airlineCode: 'OZ', flightNo: '307', depart: '07:50', arrive: '08:40', duration: '1시간 50분', base: 138000 },
+  { from: 'TAO', to: 'ICN', airline: '아시아나항공', airlineCode: 'OZ', flightNo: '308', depart: '16:20', arrive: '19:00', duration: '1시간 40분', base: 138000 },
+  { from: 'ICN', to: 'TAO', airline: '산동항공', airlineCode: 'SC', flightNo: '4616', depart: '12:40', arrive: '13:30', duration: '1시간 50분', base: 128000 },
+  { from: 'TAO', to: 'ICN', airline: '산동항공', airlineCode: 'SC', flightNo: '4615', depart: '14:00', arrive: '16:40', duration: '1시간 40분', base: 128000 },
+  { from: 'ICN', to: 'CTU', airline: '대한항공', airlineCode: 'KE', flightNo: '643', depart: '08:10', arrive: '11:40', duration: '4시간 30분', base: 238000 },
+  { from: 'CTU', to: 'ICN', airline: '대한항공', airlineCode: 'KE', flightNo: '644', depart: '13:00', arrive: '18:20', duration: '4시간 20분', base: 238000 },
+  { from: 'ICN', to: 'CTU', airline: '사천항공', airlineCode: '3U', flightNo: '3928', depart: '15:20', arrive: '18:50', duration: '4시간 30분', base: 214000 },
+  { from: 'CTU', to: 'ICN', airline: '사천항공', airlineCode: '3U', flightNo: '3927', depart: '09:40', arrive: '15:00', duration: '4시간 20분', base: 214000 },
+  { from: 'ICN', to: 'XIY', airline: '대한항공', airlineCode: 'KE', flightNo: '623', depart: '08:00', arrive: '10:40', duration: '3시간 40분', base: 206000 },
+  { from: 'XIY', to: 'ICN', airline: '대한항공', airlineCode: 'KE', flightNo: '624', depart: '12:20', arrive: '15:50', duration: '3시간 30분', base: 206000 },
+  { from: 'ICN', to: 'XIY', airline: '중국동방항공', airlineCode: 'MU', flightNo: '2078', depart: '13:10', arrive: '15:50', duration: '3시간 40분', base: 186000 },
+  { from: 'XIY', to: 'ICN', airline: '중국동방항공', airlineCode: 'MU', flightNo: '2077', depart: '17:20', arrive: '20:50', duration: '3시간 30분', base: 186000 },
+  { from: 'PUS', to: 'PVG', airline: '대한항공', airlineCode: 'KE', flightNo: '767', depart: '09:30', arrive: '10:40', duration: '2시간 10분', base: 176000 },
+  { from: 'PVG', to: 'PUS', airline: '대한항공', airlineCode: 'KE', flightNo: '768', depart: '15:10', arrive: '18:15', duration: '2시간 5분', base: 176000 },
+  { from: 'PUS', to: 'PVG', airline: '중국동방항공', airlineCode: 'MU', flightNo: '5032', depart: '12:00', arrive: '13:10', duration: '2시간 10분', base: 154000 },
+  { from: 'PVG', to: 'PUS', airline: '중국동방항공', airlineCode: 'MU', flightNo: '5031', depart: '18:20', arrive: '21:25', duration: '2시간 5분', base: 154000 },
+  { from: 'PUS', to: 'TAO', airline: '제주항공', airlineCode: '7C', flightNo: '2303', depart: '08:15', arrive: '09:05', duration: '1시간 50분', base: 98000 },
+  { from: 'TAO', to: 'PUS', airline: '제주항공', airlineCode: '7C', flightNo: '2304', depart: '17:40', arrive: '20:20', duration: '1시간 40분', base: 98000 },
+  { from: 'PUS', to: 'TAO', airline: '중국국제항공', airlineCode: 'CA', flightNo: '130', depart: '11:50', arrive: '12:40', duration: '1시간 50분', base: 112000 },
+  { from: 'TAO', to: 'PUS', airline: '중국국제항공', airlineCode: 'CA', flightNo: '129', depart: '14:20', arrive: '17:00', duration: '1시간 40분', base: 112000 },
   { from: 'ICN', to: 'LAX', airline: '대한항공', airlineCode: 'KE', flightNo: '17', depart: '15:00', arrive: '10:30', duration: '11시간 30분', base: 890000 },
   { from: 'ICN', to: 'LAX', airline: '아시아나항공', airlineCode: 'OZ', flightNo: '202', depart: '20:30', arrive: '16:00', duration: '11시간 30분', base: 820000 },
   { from: 'LAX', to: 'ICN', airline: '대한항공', airlineCode: 'KE', flightNo: '18', depart: '12:20', arrive: '18:10', plusDay: 1, duration: '13시간 50분', base: 890000 },
@@ -209,7 +259,7 @@ export async function searchFlights(query: FlightQuery): Promise<FlightOffer[]> 
       price,
       seats: 3 + (seed(query.date + f.flightNo) % 9),
     }
-  }).sort((a, b) => a.price - b.price)
+  }).sort((a, b) => a.depart.localeCompare(b.depart) || a.airline.localeCompare(b.airline, 'ko'))
 }
 
 export async function searchHotels(query: HotelQuery): Promise<HotelOffer[]> {
@@ -240,4 +290,11 @@ export function groupedAirports() {
     groups.set(a.country, list)
   }
   return [...groups.entries()]
+    .sort(([a], [b]) => a.localeCompare(b, 'ko'))
+    .map(([country, list]) => [
+      country,
+      [...list].sort(
+        (x, y) => x.city.localeCompare(y.city, 'ko') || x.name.localeCompare(y.name, 'ko'),
+      ),
+    ] as const)
 }
