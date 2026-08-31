@@ -7,7 +7,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "지하철 2호선 싱하이광장역 1번 출구",
     "photoId": "spot-dalian-1",
     "sort": 1,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Xinghai%20Square%20Dalian.jpg?width=960"
   },
   {
     "id": "spot-dalian-2",
@@ -17,7 +18,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "관광버스 후탄선, 택시로 후탄 공원",
     "photoId": "spot-dalian-2",
     "sort": 2,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/L%C3%BCshun%20Port.jpg?width=960"
   },
   {
     "id": "spot-dalian-3",
@@ -27,7 +29,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "지하철 2호선 동해역 근처",
     "photoId": "spot-dalian-3",
     "sort": 3,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Donggang%20District%20Dalian.jpg?width=960"
   },
   {
     "id": "spot-dalian-4",
@@ -37,7 +40,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "관광버스 라오후탄선",
     "photoId": "spot-dalian-4",
     "sort": 4,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Laohutan%20Amusement%20Park%20Dalian.jpg?width=960"
   },
   {
     "id": "spot-dalian-5",
@@ -47,7 +51,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "지하철 1·2호선 청니광장역 도보",
     "photoId": "spot-dalian-5",
     "sort": 5,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Xigang%2C%20Dalian%2C%20Liaoning%2C%20China%20-%20panoramio%20(18).jpg?width=960"
   },
   {
     "id": "spot-dalian-6",
@@ -57,7 +62,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "경철 발견왕국역",
     "photoId": "spot-dalian-6",
     "sort": 6,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Dalian%20Discovery%20Kingdom.jpg?width=960"
   },
   {
     "id": "spot-dalian-7",
@@ -67,7 +73,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "관광버스 풍리해변선",
     "photoId": "spot-dalian-7",
     "sort": 7,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Fujiazhuang%20Beach%20Dalian.jpg?width=960"
   },
   {
     "id": "spot-dalian-8",
@@ -77,7 +84,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "지하철 2호선 청niwa역 근처",
     "photoId": "spot-dalian-8",
     "sort": 8,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Qingniwa%20Bridge%20Dalian.jpg?width=960"
   },
   {
     "id": "spot-dalian-9",
@@ -87,7 +95,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "택시로 대련항 광장",
     "photoId": "spot-dalian-9",
     "sort": 9,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Dalian%20port.jpg?width=960"
   },
   {
     "id": "spot-dalian-10",
@@ -97,7 +106,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "관광버스 흑석초선",
     "photoId": "spot-dalian-10",
     "sort": 10,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Heishi%20Reef%20Dalian.jpg?width=960"
   },
   {
     "id": "spot-dalian-11",
@@ -107,7 +117,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "택시 또는 렌터카로 빈하이로",
     "photoId": "spot-dalian-11",
     "sort": 11,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Dalian%20Binhai%20Road.jpg?width=960"
   },
   {
     "id": "spot-yantai-1",
@@ -117,7 +128,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "펑라이 시내에서 각 입구까지 버스·택시",
     "photoId": "spot-yantai-1",
     "sort": 1,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Penglai%20Pavilion%20viewed%20from%20the%20southeast.jpg?width=960"
   },
   {
     "id": "spot-yantai-2",
@@ -127,7 +139,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "양마도 항구에서 배",
     "photoId": "spot-yantai-2",
     "sort": 2,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Yangma%20Island%20Lighthouse.jpg?width=960"
   },
   {
     "id": "spot-yantai-3",
@@ -137,7 +150,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "장어도 항구 연안선",
     "photoId": "spot-yantai-3",
     "sort": 3,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Changyu%20Island%20Yantai.jpg?width=960"
   },
   {
     "id": "spot-yantai-4",
@@ -147,7 +161,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "연태산 공원 입구",
     "photoId": "spot-yantai-4",
     "sort": 4,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Yantai%20Hill.jpg?width=960"
   },
   {
     "id": "spot-yantai-5",
@@ -157,7 +172,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "1·10·17·23·28·37·38·601·701·708번",
     "photoId": "spot-yantai-5",
     "sort": 5,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Yantai%20Beach%20Park.jpg?width=960"
   },
   {
     "id": "spot-yantai-6",
@@ -167,7 +183,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "쯔보 시내 버스 또는 택시",
     "photoId": "spot-yantai-6",
     "sort": 6,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Changyu%20Wine%20City.jpg?width=960"
   },
   {
     "id": "spot-yantai-7",
@@ -177,7 +194,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "장어항에서 배",
     "photoId": "spot-yantai-7",
     "sort": 7,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Zhangyu%20Island%20Yantai.jpg?width=960"
   },
   {
     "id": "spot-yantai-8",
@@ -187,7 +205,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "쯔bo 방향 버스",
     "photoId": "spot-yantai-8",
     "sort": 8,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Changyu%20Wine%20Culture%20Museum.jpg?width=960"
   },
   {
     "id": "spot-yantai-9",
@@ -197,7 +216,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "동포 방향 버스",
     "photoId": "spot-yantai-9",
     "sort": 9,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Dongpo%20Hotel%20Yantai.jpg?width=960"
   },
   {
     "id": "spot-yantai-10",
@@ -207,7 +227,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "황금해변 버스",
     "photoId": "spot-yantai-10",
     "sort": 10,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Golden%20Beach%20Yantai.jpg?width=960"
   },
   {
     "id": "spot-yantai-11",
@@ -217,7 +238,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "모지산 공원 입구",
     "photoId": "spot-yantai-11",
     "sort": 11,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Mojishan%20Yantai.jpg?width=960"
   },
   {
     "id": "spot-qingdao-1",
@@ -227,7 +249,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "지하철 3호선 청dao역 도보",
     "photoId": "spot-qingdao-1",
     "sort": 1,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Badaguan%20Qingdao.jpg?width=960"
   },
   {
     "id": "spot-qingdao-2",
@@ -237,7 +260,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "26·304·312·501·801번 버스",
     "photoId": "spot-qingdao-2",
     "sort": 2,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Shilaoren%20Beach%20Qingdao.jpg?width=960"
   },
   {
     "id": "spot-qingdao-3",
@@ -247,7 +271,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "304·311·321·375·501번, 케이블카",
     "photoId": "spot-qingdao-3",
     "sort": 3,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/20240730%20Dabiao%20Mountain%20of%20Mount%20Lao%2001.jpg?width=960"
   },
   {
     "id": "spot-qingdao-4",
@@ -257,7 +282,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "1·205·217·221·604번",
     "photoId": "spot-qingdao-4",
     "sort": 4,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Tsingtao%20Beer%20Museum.jpg?width=960"
   },
   {
     "id": "spot-qingdao-5",
@@ -267,7 +293,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "220·604·606·618번",
     "photoId": "spot-qingdao-5",
     "sort": 5,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Badaguan%20scenic%20area%20Qingdao.jpg?width=960"
   },
   {
     "id": "spot-qingdao-6",
@@ -277,7 +304,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "104·110·301·304·311·312·501번",
     "photoId": "spot-qingdao-6",
     "sort": 6,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Tianhou%20Temple%20Qingdao.jpg?width=960"
   },
   {
     "id": "spot-qingdao-7",
@@ -287,7 +315,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "1·3·6·15·26·231·304·311·312·501·801번",
     "photoId": "spot-qingdao-7",
     "sort": 7,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Zhongshan%20Park%20Qingdao.jpg?width=960"
   },
   {
     "id": "spot-qingdao-8",
@@ -297,7 +326,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "26·304·312·501·801번",
     "photoId": "spot-qingdao-8",
     "sort": 8,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/May%20Fourth%20Square%20Qingdao.jpg?width=960"
   },
   {
     "id": "spot-qingdao-9",
@@ -307,7 +337,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "316·321·501·801번",
     "photoId": "spot-qingdao-9",
     "sort": 9,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Golden%20Beach%20Huangdao.jpg?width=960"
   },
   {
     "id": "spot-qingdao-10",
@@ -317,7 +348,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "1·205·217·221·604번",
     "photoId": "spot-qingdao-10",
     "sort": 10,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/St.%20Michael%20Cathedral%20Qingdao.jpg?width=960"
   },
   {
     "id": "spot-qingdao-11",
@@ -327,7 +359,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "104·110·301·304번",
     "photoId": "spot-qingdao-11",
     "sort": 11,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Qingdao%20Harbour%2051341-Qingdao%20(49055637186).jpg?width=960"
   },
   {
     "id": "spot-harbin-1",
@@ -337,7 +370,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "1·2·5·13·15·64·101·113·201·206번",
     "photoId": "spot-harbin-1",
     "sort": 1,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/West%20facade%20of%20St.%20Sophia%20Cathedral%2C%20Harbin%20(20230721150450).jpg?width=960"
   },
   {
     "id": "spot-harbin-2",
@@ -347,7 +381,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "1·2·5·13·15·64·101·113·201·206번",
     "photoId": "spot-harbin-2",
     "sort": 2,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Central%20Street%2C%20Harbin%2016.jpg?width=960"
   },
   {
     "id": "spot-harbin-3",
@@ -357,7 +392,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "29·47·80·119·125·126·211·212·213·551번",
     "photoId": "spot-harbin-3",
     "sort": 3,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Harbin%20Ice%20and%20Snow%20World.jpg?width=960"
   },
   {
     "id": "spot-harbin-4",
@@ -367,7 +403,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "29·47·80·119·125·126·211·212·213·551번",
     "photoId": "spot-harbin-4",
     "sort": 4,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Songhua%20River%20Harbin.jpg?width=960"
   },
   {
     "id": "spot-harbin-5",
@@ -377,7 +414,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "송화강 유람선 또는 택시",
     "photoId": "spot-harbin-5",
     "sort": 5,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/26935-Harbin%20(29661238117).jpg?width=960"
   },
   {
     "id": "spot-harbin-6",
@@ -387,7 +425,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "47·80·119·125·126·211·212·213·551번",
     "photoId": "spot-harbin-6",
     "sort": 6,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Volga%20Manor%20Harbin.jpg?width=960"
   },
   {
     "id": "spot-harbin-7",
@@ -397,7 +436,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "중앙대 도보",
     "photoId": "spot-harbin-7",
     "sort": 7,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Russian%20bread%20Harbin%20Central%20Street.jpg?width=960"
   },
   {
     "id": "spot-harbin-8",
@@ -407,7 +447,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "1·2·5·13·15·64·101·113·201·206번",
     "photoId": "spot-harbin-8",
     "sort": 8,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Dragon%20Tower%20Harbin.jpg?width=960"
   },
   {
     "id": "spot-harbin-9",
@@ -417,7 +458,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "47·80·119·125·126·211·212·213·551번",
     "photoId": "spot-harbin-9",
     "sort": 9,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Harbin%20International%20Ice%20and%20Snow%20Sculpture%20Festival.jpg?width=960"
   },
   {
     "id": "spot-harbin-10",
@@ -427,7 +469,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "14·22·56·74·84·116·117·119·336·337·338번",
     "photoId": "spot-harbin-10",
     "sort": 10,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Harbin%20Botanical%20Garden.jpg?width=960"
   },
   {
     "id": "spot-harbin-11",
@@ -437,7 +480,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "59·68·103·106·114·118·132·136·201·209·331·337·338번",
     "photoId": "spot-harbin-11",
     "sort": 11,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Harbin%20Institute%20of%20Technology.jpg?width=960"
   },
   {
     "id": "spot-beijing-1",
@@ -447,7 +491,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "지하철 1호선 천anmen동역",
     "photoId": "spot-beijing-1",
     "sort": 1,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/The%20Forbidden%20City%20-%20View%20from%20Coal%20Hill.jpg?width=960"
   },
   {
     "id": "spot-beijing-2",
@@ -457,7 +502,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "지하철 1호선 천anmen동·서역",
     "photoId": "spot-beijing-2",
     "sort": 2,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Tiananmen%20Square%20(54137047250).jpg?width=960"
   },
   {
     "id": "spot-beijing-3",
@@ -467,7 +513,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "S2선 또는 관광버스 팔달ling",
     "photoId": "spot-beijing-3",
     "sort": 3,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Great%20Wall%20of%20China%20July%202006.JPG?width=960"
   },
   {
     "id": "spot-beijing-4",
@@ -477,7 +524,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "지하철 4호선 beihaigongyuan역",
     "photoId": "spot-beijing-4",
     "sort": 4,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Longevity%20Hill%20of%20the%20Summer%20Palace.jpg?width=960"
   },
   {
     "id": "spot-beijing-5",
@@ -487,7 +535,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "지하철 5호선 tiandongmen역",
     "photoId": "spot-beijing-5",
     "sort": 5,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Temple%20of%20Heaven%20Beijing.jpg?width=960"
   },
   {
     "id": "spot-beijing-6",
@@ -497,7 +546,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "4·331·432·562·664·982번",
     "photoId": "spot-beijing-6",
     "sort": 6,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Old%20Summer%20Palace%20Beijing.jpg?width=960"
   },
   {
     "id": "spot-beijing-7",
@@ -507,7 +557,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "지하철 2·6호선 gulou dajie역",
     "photoId": "spot-beijing-7",
     "sort": 7,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Nanluoguxiang%20Beijing.jpg?width=960"
   },
   {
     "id": "spot-beijing-8",
@@ -517,7 +568,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "401·402·405·418·445·688·909·955·973·988·991·992·993·996·998·909·955·973·988·991·992·993·996·998번",
     "photoId": "spot-beijing-8",
     "sort": 8,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Beijing%20798%20Art%20District.jpg?width=960"
   },
   {
     "id": "spot-beijing-9",
@@ -527,7 +579,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "103·104·108·111·420·803·814·846·特11번",
     "photoId": "spot-beijing-9",
     "sort": 9,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Wangfujing%20Beijing.jpg?width=960"
   },
   {
     "id": "spot-beijing-10",
@@ -537,7 +590,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "지하철 2·6·8호선 gulou dajie역",
     "photoId": "spot-beijing-10",
     "sort": 10,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Hutong%20Beijing.jpg?width=960"
   },
   {
     "id": "spot-beijing-11",
@@ -547,7 +601,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "지하철 6호선 beihaigongyuan역",
     "photoId": "spot-beijing-11",
     "sort": 11,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Beihai%20Park%20Beijing.jpg?width=960"
   },
   {
     "id": "spot-shanghai-1",
@@ -557,7 +612,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "지하철 2·10호선 nanjingdonglu역 도보",
     "photoId": "spot-shanghai-1",
     "sort": 1,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/The%20Bund%202.jpg?width=960"
   },
   {
     "id": "spot-shanghai-2",
@@ -567,7 +623,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "지하철 2호선 lujiazui역",
     "photoId": "spot-shanghai-2",
     "sort": 2,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Oriental%20Pearl%20Tower%2020251126.jpg?width=960"
   },
   {
     "id": "spot-shanghai-3",
@@ -577,7 +634,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "지하철 10호선 yuyuan역",
     "photoId": "spot-shanghai-3",
     "sort": 3,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Yu%20Garden%20Shanghai.jpg?width=960"
   },
   {
     "id": "spot-shanghai-4",
@@ -587,7 +645,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "지하철 2·10호선 nanjingdonglu역",
     "photoId": "spot-shanghai-4",
     "sort": 4,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/East%20Nanjing%20Road%202020%20(50361842166).jpg?width=960"
   },
   {
     "id": "spot-shanghai-5",
@@ -597,7 +656,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "외탄 유람선 부두",
     "photoId": "spot-shanghai-5",
     "sort": 5,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/The%20Bund%20at%20night.jpg?width=960"
   },
   {
     "id": "spot-shanghai-6",
@@ -607,7 +667,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "지하철 10·13호선 xintiandi역",
     "photoId": "spot-shanghai-6",
     "sort": 6,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Shanghai%20French%20Concession.jpg?width=960"
   },
   {
     "id": "spot-shanghai-7",
@@ -617,7 +678,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "지하철 1·10·13호선 xintiandi역",
     "photoId": "spot-shanghai-7",
     "sort": 7,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Xintiandi%20Shanghai.jpg?width=960"
   },
   {
     "id": "spot-shanghai-8",
@@ -627,7 +689,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "지하철 2호선 lujiazui역",
     "photoId": "spot-shanghai-8",
     "sort": 8,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Shanghai%20Pudong%20skyline.jpg?width=960"
   },
   {
     "id": "spot-shanghai-9",
@@ -637,7 +700,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "지하철 2호선 lujiazui역",
     "photoId": "spot-shanghai-9",
     "sort": 9,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Jin%20Mao%20Tower%20Shanghai.jpg?width=960"
   },
   {
     "id": "spot-shanghai-10",
@@ -647,7 +711,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "지하철 2·10호선 lujiazui역",
     "photoId": "spot-shanghai-10",
     "sort": 10,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Shanghai%20World%20Financial%20Center.jpg?width=960"
   },
   {
     "id": "spot-shanghai-11",
@@ -657,7 +722,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "지하철 1·2·8호선 renmin guangchang역",
     "photoId": "spot-shanghai-11",
     "sort": 11,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Shanghai%20Museum.jpg?width=960"
   },
   {
     "id": "spot-hongkong-1",
@@ -667,7 +733,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "피크 트램 센트럴역",
     "photoId": "spot-hongkong-1",
     "sort": 1,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/High%20West%20and%20Victoria%20Peak%20from%20Victoria%20Gap%20(crop1).jpg?width=960"
   },
   {
     "id": "spot-hongkong-2",
@@ -677,7 +744,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "센트럴·침사추이 부두",
     "photoId": "spot-hongkong-2",
     "sort": 2,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Tsim%20Sha%20Tsui%20Ferry%20Pier.jpg?width=960"
   },
   {
     "id": "spot-hongkong-3",
@@ -687,7 +755,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "MTR 디즈니랜드 리조트역",
     "photoId": "spot-hongkong-3",
     "sort": 3,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Hong%20Kong%20Disneyland.jpg?width=960"
   },
   {
     "id": "spot-hongkong-4",
@@ -697,7 +766,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "MTR 침사추이역",
     "photoId": "spot-hongkong-4",
     "sort": 4,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Vista%20del%20Puerto%20de%20Victoria%20desde%20Sky100%2C%20Hong%20Kong%2C%202013-08-09%2C%20DD%2010.JPG?width=960"
   },
   {
     "id": "spot-hongkong-5",
@@ -707,7 +777,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "MTR 몽콕역",
     "photoId": "spot-hongkong-5",
     "sort": 5,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Mong%20Kok%20street%20market.jpg?width=960"
   },
   {
     "id": "spot-hongkong-6",
@@ -717,7 +788,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "MTR 통 chung역, 케이블카",
     "photoId": "spot-hongkong-6",
     "sort": 6,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Tian%20Tan%20Buddha%20Lantau.jpg?width=960"
   },
   {
     "id": "spot-hongkong-7",
@@ -727,7 +799,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "MTR 오션파크역",
     "photoId": "spot-hongkong-7",
     "sort": 7,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Ocean%20Park%20Hong%20Kong.jpg?width=960"
   },
   {
     "id": "spot-hongkong-8",
@@ -737,7 +810,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "MTR wong tai sin역",
     "photoId": "spot-hongkong-8",
     "sort": 8,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Temple%20Street%20Night%20Market.jpg?width=960"
   },
   {
     "id": "spot-hongkong-9",
@@ -747,7 +821,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "MTR sham shui po역",
     "photoId": "spot-hongkong-9",
     "sort": 9,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Sham%20Shui%20Po%20Hong%20Kong.jpg?width=960"
   },
   {
     "id": "spot-hongkong-10",
@@ -757,7 +832,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "MTR hung hom역, ferry",
     "photoId": "spot-hongkong-10",
     "sort": 10,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/View%20of%20Repulse%20Bay%20from%20Sir%20Cecil's%20Ride.jpg?width=960"
   },
   {
     "id": "spot-hongkong-11",
@@ -767,7 +843,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "6·6A·6X·260번 버스",
     "photoId": "spot-hongkong-11",
     "sort": 11,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Stanley%2C%20Hong%20Kong.jpg?width=960"
   },
   {
     "id": "spot-baekdusan-1",
@@ -777,7 +854,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "북파·서파 셔틀, 입산 시간 확인",
     "photoId": "spot-baekdusan-1",
     "sort": 1,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/%E4%BB%8E%E9%95%BF%E7%99%BD%E5%B1%B1%E8%A5%BF%E5%9D%A1%E7%9C%8B%E5%A4%A9%E6%B1%A0-2017-08-24%201.jpg?width=960"
   },
   {
     "id": "spot-baekdusan-2",
@@ -787,7 +865,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "북파 셔틀 하차 후 도보",
     "photoId": "spot-baekdusan-2",
     "sort": 2,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Laika%20ac%20Mt.%20Paekdu%20(7998657081).jpg?width=960"
   },
   {
     "id": "spot-baekdusan-3",
@@ -797,7 +876,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "서파 셔틀 구간",
     "photoId": "spot-baekdusan-3",
     "sort": 3,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Green%20Deep%20Lake%20Changbai.jpg?width=960"
   },
   {
     "id": "spot-baekdusan-4",
@@ -807,7 +887,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "백두산역",
     "photoId": "spot-baekdusan-4",
     "sort": 4,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/%E5%BB%B6%E5%90%89%E5%B8%82%E4%B8%AD%E5%BF%83.jpg?width=960"
   },
   {
     "id": "spot-baekdusan-5",
@@ -817,7 +898,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "이rdaohe 환승 후 셔틀",
     "photoId": "spot-baekdusan-5",
     "sort": 5,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Changbai%20Mountain%20North%20Slope.jpg?width=960"
   },
   {
     "id": "spot-baekdusan-6",
@@ -827,7 +909,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "songjianghe 환승 후 셔틀",
     "photoId": "spot-baekdusan-6",
     "sort": 6,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Changbai%20Mountain%20West%20Slope.jpg?width=960"
   },
   {
     "id": "spot-baekdusan-7",
@@ -837,7 +920,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "북파 셔틀 구간",
     "photoId": "spot-baekdusan-7",
     "sort": 7,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Yaojing%20Pool%20Changbai.jpg?width=960"
   },
   {
     "id": "spot-baekdusan-8",
@@ -847,7 +931,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "서파 셔틀 구간",
     "photoId": "spot-baekdusan-8",
     "sort": 8,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Wangji%20Pool%20Changbai.jpg?width=960"
   },
   {
     "id": "spot-baekdusan-9",
@@ -857,7 +942,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "changbai 온천 마을",
     "photoId": "spot-baekdusan-9",
     "sort": 9,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Changbai%20hot%20spring.jpg?width=960"
   },
   {
     "id": "spot-baekdusan-10",
@@ -867,7 +953,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "erdaohe 근처",
     "photoId": "spot-baekdusan-10",
     "sort": 10,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Changbai%20Forest%20Park.jpg?width=960"
   },
   {
     "id": "spot-baekdusan-11",
@@ -877,7 +964,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "북파·서파 셔틀 구간",
     "photoId": "spot-baekdusan-11",
     "sort": 11,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Korean%20Pine%20Changbai%20Mountain.jpg?width=960"
   },
   {
     "id": "spot-xian-1",
@@ -887,7 +975,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "306·307·914·915·游5·游8번, 1호선 fangzhicheng역",
     "photoId": "spot-xian-1",
     "sort": 1,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Terracotta%20Army%2C%20Xi'an.jpg?width=960"
   },
   {
     "id": "spot-xian-2",
@@ -897,7 +986,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "6·8·11·12·603·610·611·216·229·239·321·600·603·610·611·706·707·708·709·712·游7번",
     "photoId": "spot-xian-2",
     "sort": 2,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Xi'an%20City%20Wall.jpg?width=960"
   },
   {
     "id": "spot-xian-3",
@@ -907,7 +997,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "307·914·915·游5·游8번",
     "photoId": "spot-xian-3",
     "sort": 3,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Huaqing%20Palace.jpg?width=960"
   },
   {
     "id": "spot-xian-4",
@@ -917,7 +1008,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "5·19·21·22·23·24·27·30·34·400·401·521·游6·游8·游9번",
     "photoId": "spot-xian-4",
     "sort": 4,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Giant%20Wild%20Goose%20Pagoda.jpg?width=960"
   },
   {
     "id": "spot-xian-5",
@@ -927,7 +1019,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "4·6·7·8·11·12·15·16·26·29·32·35·36·46·203·205·206·208·214·215·216·218·221·222·229·235·239·251·252·300·301·309·600·603·604·611·706·707·708·709·712·游7·游8·游9번",
     "photoId": "spot-xian-5",
     "sort": 5,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Bell%20Tower%20of%20Xi'an.jpg?width=960"
   },
   {
     "id": "spot-xian-6",
@@ -937,7 +1030,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "4·7·15·32·43·45·201·205·206·215·218·221·222·229·235·251·252·300·301·309·604·611·706·707·708·709·712·游7·游8·游9번",
     "photoId": "spot-xian-6",
     "sort": 6,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Muslim%20Quarter%20Xi'an.jpg?width=960"
   },
   {
     "id": "spot-xian-7",
@@ -947,7 +1041,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "5·19·21·22·23·24·27·30·34·400·401·521·游6·游8·游9번",
     "photoId": "spot-xian-7",
     "sort": 7,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Small%20Wild%20Goose%20Pagoda.jpg?width=960"
   },
   {
     "id": "spot-xian-8",
@@ -957,7 +1052,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "5·19·24·26·27·30·34·400·401·521·游6·游8·游9번",
     "photoId": "spot-xian-8",
     "sort": 8,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Shaanxi%20History%20Museum.jpg?width=960"
   },
   {
     "id": "spot-xian-9",
@@ -967,7 +1063,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "5·19·21·22·23·24·27·30·34·400·401·521·游6·游8·游9번",
     "photoId": "spot-xian-9",
     "sort": 9,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Daxingshan%20Temple%20Xi'an.jpg?width=960"
   },
   {
     "id": "spot-xian-10",
@@ -977,7 +1074,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "游6·游8·游9번",
     "photoId": "spot-xian-10",
     "sort": 10,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Han%20Yang%20Ling.jpg?width=960"
   },
   {
     "id": "spot-xian-11",
@@ -987,7 +1085,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "307·914·915·游5·游8번",
     "photoId": "spot-xian-11",
     "sort": 11,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Huaqing%20Pool%20Xi'an.jpg?width=960"
   },
   {
     "id": "spot-chengdu-1",
@@ -997,7 +1096,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "87·198·198A·867·904번",
     "photoId": "spot-chengdu-1",
     "sort": 1,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Chengdu%20Research%20Base%20Eingang.jpg?width=960"
   },
   {
     "id": "spot-chengdu-2",
@@ -1007,7 +1107,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "62·70·93·126·127·340·343·1093번",
     "photoId": "spot-chengdu-2",
     "sort": 2,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Wide%20and%20Narrow%20Alley.jpg?width=960"
   },
   {
     "id": "spot-chengdu-3",
@@ -1017,7 +1118,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "1·57·82·334·335·340·343·1093번",
     "photoId": "spot-chengdu-3",
     "sort": 3,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Jinli%20Street.jpg?width=960"
   },
   {
     "id": "spot-chengdu-4",
@@ -1027,7 +1129,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "1·57·82·334·335·340·343·1093번",
     "photoId": "spot-chengdu-4",
     "sort": 4,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Jinsha%20Site%20Museum%20Chengdu.jpg?width=960"
   },
   {
     "id": "spot-chengdu-5",
@@ -1037,7 +1140,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "1·57·82·334·335·340·343·1093번",
     "photoId": "spot-chengdu-5",
     "sort": 5,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Sichuan%20Museum%20Chengdu.jpg?width=960"
   },
   {
     "id": "spot-chengdu-6",
@@ -1047,7 +1151,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "1·57·82·334·335·340·343·1093번",
     "photoId": "spot-chengdu-6",
     "sort": 6,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Wuhou%20Temple.jpg?width=960"
   },
   {
     "id": "spot-chengdu-7",
@@ -1057,7 +1162,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "4·6·9·15·19·26·27·34·101번",
     "photoId": "spot-chengdu-7",
     "sort": 7,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Dujiangyan%20irrigation%20system.jpg?width=960"
   },
   {
     "id": "spot-chengdu-8",
@@ -1067,7 +1173,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "5·13·43·47·58·64·78·81·905번",
     "photoId": "spot-chengdu-8",
     "sort": 8,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Qingyang%20Palace%20Chengdu.jpg?width=960"
   },
   {
     "id": "spot-chengdu-9",
@@ -1077,7 +1184,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "4·6·9·15·19·26·27·34·101번",
     "photoId": "spot-chengdu-9",
     "sort": 9,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Guanxian%20ancient%20irrigation.jpg?width=960"
   },
   {
     "id": "spot-chengdu-10",
@@ -1087,7 +1195,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "601·602·604·607·608·609번",
     "photoId": "spot-chengdu-10",
     "sort": 10,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/36275-Leshan%20(49067653383).jpg?width=960"
   },
   {
     "id": "spot-chengdu-11",
@@ -1097,7 +1206,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "19·35·58·82·151·165·170번",
     "photoId": "spot-chengdu-11",
     "sort": 11,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Du%20Fu%20cao%20tang.jpg?width=960"
   },
   {
     "id": "spot-taihang-1",
@@ -1107,7 +1217,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "린저우 방향 버스, 홍ya산 입구",
     "photoId": "spot-taihang-1",
     "sort": 1,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/%E5%A4%AA%E8%A1%8C%E5%B1%B1%E9%B8%9F%E7%9E%B0%20(%E6%B2%B3%E5%8D%97%E8%BE%89%E5%8E%BF).jpg?width=960"
   },
   {
     "id": "spot-taihang-2",
@@ -1117,7 +1228,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "린저우·홍ya 방향 버스",
     "photoId": "spot-taihang-2",
     "sort": 2,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/LinzhouHenan004.jpg?width=960"
   },
   {
     "id": "spot-taihang-3",
@@ -1127,7 +1239,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "린저우 방향 버스",
     "photoId": "spot-taihang-3",
     "sort": 3,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Taihang%20Mountains%20China.jpg?width=960"
   },
   {
     "id": "spot-taihang-4",
@@ -1137,7 +1250,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "린저우 방향 버스",
     "photoId": "spot-taihang-4",
     "sort": 4,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/RedFlagCanal_TigersMouthCliff.jpg?width=960"
   },
   {
     "id": "spot-taihang-5",
@@ -1147,7 +1261,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "린저우·郭chan 방향 버스",
     "photoId": "spot-taihang-5",
     "sort": 5,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Guoliang%20Tunnel%20Taihang.jpg?width=960"
   },
   {
     "id": "spot-taihang-6",
@@ -1157,7 +1272,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "린저우 방향 버스",
     "photoId": "spot-taihang-6",
     "sort": 6,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Taihang%20rock%20formations.jpg?width=960"
   },
   {
     "id": "spot-taihang-7",
@@ -1167,7 +1283,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "홍ya·郭chan 셔틀",
     "photoId": "spot-taihang-7",
     "sort": 7,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Taihang%20scenic%20viewpoint.jpg?width=960"
   },
   {
     "id": "spot-taihang-8",
@@ -1177,7 +1294,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "홍ya 입구 도보",
     "photoId": "spot-taihang-8",
     "sort": 8,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Taihang%20ridge%20trail.jpg?width=960"
   },
   {
     "id": "spot-taihang-9",
@@ -1187,7 +1305,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "린저우 방향 버스",
     "photoId": "spot-taihang-9",
     "sort": 9,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Shihui%20Cave%20Henan.jpg?width=960"
   },
   {
     "id": "spot-taihang-10",
@@ -1197,7 +1316,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "린저우 방향 버스",
     "photoId": "spot-taihang-10",
     "sort": 10,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Taihang%20forest.jpg?width=960"
   },
   {
     "id": "spot-taihang-11",
@@ -1207,7 +1327,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "郭chan 입구 버스",
     "photoId": "spot-taihang-11",
     "sort": 11,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Guoliang%20Village%20Taihang.jpg?width=960"
   },
   {
     "id": "spot-huangshan-1",
@@ -1217,7 +1338,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "탕kou 환승, yungu 케이블카",
     "photoId": "spot-huangshan-1",
     "sort": 1,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/18892-Huangshan%20(45065618964).jpg?width=960"
   },
   {
     "id": "spot-huangshan-2",
@@ -1227,7 +1349,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "탕kou 온천 마을",
     "photoId": "spot-huangshan-2",
     "sort": 2,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Huangshan%20hot%20spring.jpg?width=960"
   },
   {
     "id": "spot-huangshan-3",
@@ -1237,7 +1360,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "yungu·yuping 등산로",
     "photoId": "spot-huangshan-3",
     "sort": 3,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Huangshan%20pic%204.jpg?width=960"
   },
   {
     "id": "spot-huangshan-4",
@@ -1247,7 +1371,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "beihai·xihai 등산로",
     "photoId": "spot-huangshan-4",
     "sort": 4,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Huangshan%20sunrise.jpg?width=960"
   },
   {
     "id": "spot-huangshan-5",
@@ -1257,7 +1382,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "yuping 등산로",
     "photoId": "spot-huangshan-5",
     "sort": 5,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Huangshan%20Lotus%20Peak.jpg?width=960"
   },
   {
     "id": "spot-huangshan-6",
@@ -1267,7 +1393,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "beihai·xihai 등산로",
     "photoId": "spot-huangshan-6",
     "sort": 6,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Huangshan%20Sea%20of%20Clouds.jpg?width=960"
   },
   {
     "id": "spot-huangshan-7",
@@ -1277,7 +1404,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "xihai 등산로",
     "photoId": "spot-huangshan-7",
     "sort": 7,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Xihai%20Grand%20Canyon%20Huangshan.jpg?width=960"
   },
   {
     "id": "spot-huangshan-8",
@@ -1287,7 +1415,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "yungu 등산로",
     "photoId": "spot-huangshan-8",
     "sort": 8,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Huangshan%20Jinshan%20Temple.jpg?width=960"
   },
   {
     "id": "spot-huangshan-9",
@@ -1297,7 +1426,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "탕kou 도보",
     "photoId": "spot-huangshan-9",
     "sort": 9,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Honggu%20Valley%20Huangshan.jpg?width=960"
   },
   {
     "id": "spot-huangshan-10",
@@ -1307,7 +1437,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "탕kou 환승",
     "photoId": "spot-huangshan-10",
     "sort": 10,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Huangshan%20cable%20car.jpg?width=960"
   },
   {
     "id": "spot-huangshan-11",
@@ -1317,7 +1448,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "yuping 등산로",
     "photoId": "spot-huangshan-11",
     "sort": 11,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Huangshan%20Guest-Greeting%20Pine.jpg?width=960"
   },
   {
     "id": "spot-zhangjiajie-1",
@@ -1327,7 +1459,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "장가계 시내 버스, 공원 입구",
     "photoId": "spot-zhangjiajie-1",
     "sort": 1,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/1%20tianzishan%20wulingyuan%20zhangjiajie%202012.jpg?width=960"
   },
   {
     "id": "spot-zhangjiajie-2",
@@ -1337,7 +1470,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "wulingyuan 버스, bailong",
     "photoId": "spot-zhangjiajie-2",
     "sort": 2,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/%E6%B9%96%E5%8D%97_%E5%BC%A0%E5%AE%B6%E7%95%8C_%E7%99%BE%E9%BE%99%E5%A4%A9%E6%A2%AF_-_panoramio.jpg?width=960"
   },
   {
     "id": "spot-zhangjiajie-3",
@@ -1347,7 +1481,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "tianmen 케이블카",
     "photoId": "spot-zhangjiajie-3",
     "sort": 3,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Tianmen%2038330-Zhangjiajie%20(49047525877).jpg?width=960"
   },
   {
     "id": "spot-zhangjiajie-4",
@@ -1357,7 +1492,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "공원 입구 버스",
     "photoId": "spot-zhangjiajie-4",
     "sort": 4,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Golden%20Whip%20Stream%20Zhangjiajie.jpg?width=960"
   },
   {
     "id": "spot-zhangjiajie-5",
@@ -1367,7 +1503,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "wulingyuan 버스, 별도 ticket",
     "photoId": "spot-zhangjiajie-5",
     "sort": 5,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Zhangjiajie%20Glass%20Bridge.jpg?width=960"
   },
   {
     "id": "spot-zhangjiajie-6",
@@ -1377,7 +1514,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "공원 버스, 케이블카",
     "photoId": "spot-zhangjiajie-6",
     "sort": 6,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Huangshizhai%20Zhangjiajie.jpg?width=960"
   },
   {
     "id": "spot-zhangjiajie-7",
@@ -1387,7 +1525,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "공원 버스",
     "photoId": "spot-zhangjiajie-7",
     "sort": 7,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Xiaohekou%20Valley%20Zhangjiajie.jpg?width=960"
   },
   {
     "id": "spot-zhangjiajie-8",
@@ -1397,7 +1536,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "wulingyuan 버스",
     "photoId": "spot-zhangjiajie-8",
     "sort": 8,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Bailong%20Elevator%20Zhangjiajie.jpg?width=960"
   },
   {
     "id": "spot-zhangjiajie-9",
@@ -1407,7 +1547,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "공원 버스",
     "photoId": "spot-zhangjiajie-9",
     "sort": 9,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Shili%20Gallery%20Zhangjiajie.jpg?width=960"
   },
   {
     "id": "spot-zhangjiajie-10",
@@ -1417,7 +1558,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "장가계 버스",
     "photoId": "spot-zhangjiajie-10",
     "sort": 10,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Furong%20Town%20Zhangjiajie.jpg?width=960"
   },
   {
     "id": "spot-zhangjiajie-11",
@@ -1427,7 +1569,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "wulingyuan 버스, 케이블카",
     "photoId": "spot-zhangjiajie-11",
     "sort": 11,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Tianzi%20Mountain%20Zhangjiajie.jpg?width=960"
   },
   {
     "id": "spot-yunnan-1",
@@ -1437,7 +1580,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "昆明 버스, shilin train",
     "photoId": "spot-yunnan-1",
     "sort": 1,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Shilin%2C%20Yunnan%2024740.jpg?width=960"
   },
   {
     "id": "spot-yunnan-2",
@@ -1447,7 +1591,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "昆明 train·bus, 다리",
     "photoId": "spot-yunnan-2",
     "sort": 2,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Chongsheng%20Temple%20(11050634113).jpg?width=960"
   },
   {
     "id": "spot-yunnan-3",
@@ -1457,7 +1602,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "리장 버스, old town walk",
     "photoId": "spot-yunnan-3",
     "sort": 3,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Lijiang%20-%20panoramio%20(6).jpg?width=960"
   },
   {
     "id": "spot-yunnan-4",
@@ -1467,7 +1613,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "다리 버스, lake road",
     "photoId": "spot-yunnan-4",
     "sort": 4,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Erhai%20lake%2C%20Yunnan%2C%20China.jpg?width=960"
   },
   {
     "id": "spot-yunnan-5",
@@ -1477,7 +1624,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "普洱 버스",
     "photoId": "spot-yunnan-5",
     "sort": 5,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Pu'er%20tea%20plantation.jpg?width=960"
   },
   {
     "id": "spot-yunnan-6",
@@ -1487,7 +1635,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "昆明 버스 44·73",
     "photoId": "spot-yunnan-6",
     "sort": 6,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Dianchi%20Lake%20Kunming.jpg?width=960"
   },
   {
     "id": "spot-yunnan-7",
@@ -1497,7 +1646,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "리장 버스, 香格里拉",
     "photoId": "spot-yunnan-7",
     "sort": 7,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Shangri-La%20Old%20Town.jpg?width=960"
   },
   {
     "id": "spot-yunnan-8",
@@ -1507,7 +1657,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "德钦 버스",
     "photoId": "spot-yunnan-8",
     "sort": 8,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Meili%20Snow%20Mountain.jpg?width=960"
   },
   {
     "id": "spot-yunnan-9",
@@ -1517,7 +1668,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "리장 버스, 케이블카",
     "photoId": "spot-yunnan-9",
     "sort": 9,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Yulong%20xue%20shan.jpg?width=960"
   },
   {
     "id": "spot-yunnan-10",
@@ -1527,7 +1679,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "리장 버스, gorge trail",
     "photoId": "spot-yunnan-10",
     "sort": 10,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Tiger%20Leaping%20Gorge.jpg?width=960"
   },
   {
     "id": "spot-yunnan-11",
@@ -1537,7 +1690,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "다리 버스, 케이블카",
     "photoId": "spot-yunnan-11",
     "sort": 11,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Cangshan%20Mountain%20Dali.jpg?width=960"
   },
   {
     "id": "spot-guizhou-1",
@@ -1547,7 +1701,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "贵阳 버스, 黄果树",
     "photoId": "spot-guizhou-1",
     "sort": 1,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/%E9%BB%84%E6%9E%9C%E6%A0%91%E7%80%91%E5%B8%83_2026-07-31_01.jpg?width=960"
   },
   {
     "id": "spot-guizhou-2",
@@ -1557,7 +1712,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "黄果树 park 버스",
     "photoId": "spot-guizhou-2",
     "sort": 2,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Tianxing%20Bridge%20Guizhou.jpg?width=960"
   },
   {
     "id": "spot-guizhou-3",
@@ -1567,7 +1723,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "安顺 버스",
     "photoId": "spot-guizhou-3",
     "sort": 3,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Longgong%20Cave%20Guizhou.jpg?width=960"
   },
   {
     "id": "spot-guizhou-4",
@@ -1577,7 +1734,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "兴义 버스",
     "photoId": "spot-guizhou-4",
     "sort": 4,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Maling%20River%20Canyon.jpg?width=960"
   },
   {
     "id": "spot-guizhou-5",
@@ -1587,7 +1745,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "安顺 버스",
     "photoId": "spot-guizhou-5",
     "sort": 5,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Tianzhu%20Ancient%20Town.jpg?width=960"
   },
   {
     "id": "spot-guizhou-6",
@@ -1597,7 +1756,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "荔波 버스",
     "photoId": "spot-guizhou-6",
     "sort": 6,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Libo%20Karst%20Geopark.jpg?width=960"
   },
   {
     "id": "spot-guizhou-7",
@@ -1607,7 +1767,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "荔波 버스",
     "photoId": "spot-guizhou-7",
     "sort": 7,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Xiaoqikong.JPG?width=960"
   },
   {
     "id": "spot-guizhou-8",
@@ -1617,7 +1778,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "安顺 버스",
     "photoId": "spot-guizhou-8",
     "sort": 8,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Pipa%20Cave%20Waterfall%20Guizhou.jpg?width=960"
   },
   {
     "id": "spot-guizhou-9",
@@ -1627,7 +1789,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "兴义 버스",
     "photoId": "spot-guizhou-9",
     "sort": 9,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Wanfenglin%20Xingyi.jpg?width=960"
   },
   {
     "id": "spot-guizhou-10",
@@ -1637,7 +1800,8 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "贵阳 train·bus",
     "photoId": "spot-guizhou-10",
     "sort": 10,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Anshun%20city%20Guizhou.jpg?width=960"
   },
   {
     "id": "spot-guizhou-11",
@@ -1647,6 +1811,7 @@ export const TRAVEL_SPOT_CATALOG = [
     "tip": "贵阳 버스 210·220",
     "photoId": "spot-guizhou-11",
     "sort": 11,
-    "catalog": true
+    "catalog": true,
+    "src": "https://commons.wikimedia.org/wiki/Special:FilePath/Qingyan%20Ancient%20Town.jpg?width=960"
   }
 ]

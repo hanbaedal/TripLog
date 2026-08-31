@@ -87,9 +87,7 @@ export async function seedTravelInfo() {
     await TravelSpot.updateOne(
       { spotId: row.id },
       {
-        $setOnInsert: {
-          spotId: row.id,
-          cityId: row.cityId,
+        $set: {
           name: row.name,
           body: row.body,
           tip: row.tip,
@@ -97,6 +95,10 @@ export async function seedTravelInfo() {
           src: row.src || '',
           sort: row.sort,
           catalog: true,
+        },
+        $setOnInsert: {
+          spotId: row.id,
+          cityId: row.cityId,
           ownerName: '',
           at: new Date(),
         },

@@ -96,7 +96,13 @@ export function photoTaxonomyLabel(photo: GalleryPhoto): string {
 }
 
 export function photoCategoryLabel(photo: GalleryPhoto): string {
-  const bits = [galleryCategoryLabel(photo.category)]
-  if (photo.category === 'sight' && photo.sightType) bits.push(sightTypeLabel(photo.sightType))
+  const category = normalizeGalleryCategory(photo.category || 'other')
+  const bits = [galleryCategoryLabel(category)]
+  if (category === 'sight') {
+    const sight =
+      photo.sightType ||
+      normalizeSightType(guessSightType(photo.title), category)
+    if (sight) bits.push(sightTypeLabel(sight))
+  }
   return bits.filter(Boolean).join(' · ')
 }

@@ -38,7 +38,7 @@ export async function seedGallery() {
 
   for (const spot of TRAVEL_SPOT_CATALOG) {
     const city = normalizeCity(cityGalleryId(spot.cityId))
-    const src = srcById.get(city) || ''
+    const src = spot.src || srcById.get(city) || ''
     if (!src) continue
     const category = 'sight'
     const sightType = normalizeSightType(guessSightType(spot.name), category)
