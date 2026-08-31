@@ -55,6 +55,7 @@ export type FlightOffer = {
   cabin: string
   price: number
   seats: number
+  detail?: string
 }
 
 export type HotelOffer = {

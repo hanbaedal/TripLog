@@ -6,6 +6,7 @@ import express from 'express'
 import mongoose from 'mongoose'
 import { authRouter } from './routes/auth.js'
 import { tripsRouter } from './routes/trips.js'
+import { flightsRouter } from './routes/flights.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const app = express()
@@ -30,6 +31,7 @@ app.get('/api/health', (_req, res) => {
 
 app.use('/api/auth', authRouter)
 app.use('/api/trips', tripsRouter)
+app.use('/api/flights', flightsRouter)
 
 const dist = path.join(__dirname, '..', 'dist')
 app.use(express.static(dist))

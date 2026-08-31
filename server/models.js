@@ -27,5 +27,20 @@ const tripSchema = new mongoose.Schema(
 
 tripSchema.index({ ownerId: 1, tripId: 1 }, { unique: true })
 
+const flightSnapSchema = new mongoose.Schema(
+  {
+    key: { type: String, required: true, unique: true },
+    date: { type: String, required: true },
+    sourceDate: { type: String, required: true },
+    live: { type: Boolean, default: false },
+    flights: { type: Array, default: [] },
+    fetchedAt: { type: Date, default: Date.now },
+    expireAt: { type: Date, required: true },
+  },
+  { timestamps: false },
+)
+flightSnapSchema.index({ expireAt: 1 }, { expireAfterSeconds: 0 })
+
 export const User = mongoose.models.User || mongoose.model('User', userSchema)
 export const Trip = mongoose.models.Trip || mongoose.model('Trip', tripSchema)
+export const FlightSnap = mongoose.models.FlightSnap || mongoose.model('FlightSnap', flightSnapSchema)
