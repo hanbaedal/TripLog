@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { PageShell } from './PageShell'
 import { listGallery } from '../lib/community'
-import { photoTaxonomyLabel } from '../lib/galleryFilter'
+import { galleryCityLabel, photoCategoryLabel, photoTaxonomyLabel } from '../lib/galleryFilter'
 import { GALLERY_CATEGORIES, GALLERY_CITIES } from '../data/galleryTaxonomy.js'
 import type { GalleryCategory, GalleryPhoto } from '../types'
 import type { SiteNav } from '../lib/siteNav'
@@ -12,12 +12,18 @@ type Props = SiteNav & {
 
 type ViewMode = 'list' | 'slide'
 
+type CityGroup = {
+  slug: string
+  label: string
+  photos: GalleryPhoto[]
+}
+
 export function GalleryPage({ focusId, ...nav }: Props) {
   const track = useRef<HTMLDivElement>(null)
   const [photos, setPhotos] = useState<GalleryPhoto[]>([])
   const [mode, setMode] = useState<ViewMode>(() => (focusId ? 'slide' : 'list'))
   const [activeId, setActiveId] = useState<string | null>(() => focusId ?? null)
-  const [cityFilter, setCityFilter] = useState('')
+  const [slideCity, setSlideCity] = useState('')
   const [categoryFilter, setCategoryFilter] = useState<GalleryCategory | ''>('')
 
   useEffect(() => {
@@ -26,28 +32,67 @@ export function GalleryPage({ focusId, ...nav }: Props) {
 
   useEffect(() => {
     if (!focusId) return
+    const photo = photos.find((row) => row.id === focusId)
+    setSlideCity(photo?.city || '')
     setMode('slide')
     setActiveId(focusId)
-  }, [focusId])
+  }, [focusId, photos])
 
-  const items = useMemo(() => {
+  const filtered = useMemo(() => {
     return photos.filter((photo) => {
-      if (cityFilter && photo.city !== cityFilter) return false
       if (categoryFilter && photo.category !== categoryFilter) return false
       return true
     })
-  }, [photos, cityFilter, categoryFilter])
+  }, [photos, categoryFilter])
+
+  const cityGroups = useMemo((): CityGroup[] => {
+    const buckets = new Map<string, GalleryPhoto[]>()
+    for (const photo of filtered) {
+      const slug = photo.city || 'other'
+      const list = buckets.get(slug) || []
+      list.push(photo)
+      buckets.set(slug, list)
+    }
+
+    const groups: CityGroup[] = []
+    for (const city of GALLERY_CITIES) {
+      const rows = buckets.get(city.slug)
+      if (!rows?.length) continue
+      groups.push({
+        slug: city.slug,
+        label: city.label,
+        photos: rows,
+      })
+      buckets.delete(city.slug)
+    }
+
+    for (const [slug, rows] of buckets) {
+      if (!rows.length) continue
+      groups.push({
+        slug,
+        label: galleryCityLabel(slug) || slug,
+        photos: rows,
+      })
+    }
+
+    return groups
+  }, [filtered])
+
+  const slideItems = useMemo(() => {
+    if (!slideCity) return filtered
+    return filtered.filter((photo) => (photo.city || 'other') === slideCity)
+  }, [filtered, slideCity])
 
   const activeIndex = useMemo(
-    () => (activeId ? items.findIndex((row) => row.id === activeId) : -1),
-    [activeId, items],
+    () => (activeId ? slideItems.findIndex((row) => row.id === activeId) : -1),
+    [activeId, slideItems],
   )
 
   useEffect(() => {
     if (mode !== 'slide' || activeIndex < 0) return
-    const el = document.getElementById(`gallery-${items[activeIndex]?.id}`)
+    const el = document.getElementById(`gallery-${slideItems[activeIndex]?.id}`)
     el?.scrollIntoView({ behavior: 'auto', inline: 'start', block: 'nearest' })
-  }, [mode, activeIndex, items])
+  }, [mode, activeIndex, slideItems])
 
   useEffect(() => {
     if (mode !== 'slide') return
@@ -61,14 +106,16 @@ export function GalleryPage({ focusId, ...nav }: Props) {
     }
     scroller.addEventListener('wheel', onWheel, { passive: false })
     return () => scroller.removeEventListener('wheel', onWheel)
-  }, [mode, items.length])
+  }, [mode, slideItems.length])
 
-  function openSlide(id: string) {
+  function openSlide(id: string, city?: string) {
+    setSlideCity(city || photos.find((row) => row.id === id)?.city || '')
     setActiveId(id)
     setMode('slide')
   }
 
   function backToList() {
+    setSlideCity('')
     setMode('list')
   }
 
@@ -94,17 +141,6 @@ export function GalleryPage({ focusId, ...nav }: Props) {
           </div>
           <div className="gallery-list-filters">
             <label>
-              도시
-              <select value={cityFilter} onChange={(e) => setCityFilter(e.target.value)}>
-                <option value="">전체</option>
-                {GALLERY_CITIES.map((row) => (
-                  <option key={row.slug} value={row.slug}>
-                    {row.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
               분류
               <select
                 value={categoryFilter}
@@ -119,33 +155,43 @@ export function GalleryPage({ focusId, ...nav }: Props) {
               </select>
             </label>
           </div>
-          <div className="gallery-grid">
-            {items.map((photo) => (
-              <button
-                type="button"
-                className="gallery-card"
-                key={photo.id}
-                onClick={() => openSlide(photo.id)}
-              >
-                <img src={photo.src} alt={photo.title} loading="lazy" />
-                <span>{photo.title}</span>
-                <small>{photoTaxonomyLabel(photo)}</small>
-              </button>
-            ))}
-          </div>
+
+          {cityGroups.map((group) => (
+            <div className="gallery-city-group" key={group.slug}>
+              <div className="section-head gallery-city-head">
+                <h3>{group.label}</h3>
+                <span className="muted">{group.photos.length}장</span>
+              </div>
+              <div className="gallery-grid">
+                {group.photos.map((photo) => (
+                  <button
+                    type="button"
+                    className="gallery-card"
+                    key={photo.id}
+                    onClick={() => openSlide(photo.id, group.slug)}
+                  >
+                    <img src={photo.src} alt={photo.title} loading="lazy" />
+                    <span>{photo.title}</span>
+                    <small>{photoCategoryLabel(photo)}</small>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
         </section>
       ) : (
         <div className="gallery-page">
-          <div className="gallery-tools">
+          <div className="gallery-tools gallery-slide-tools">
             <button className="btn ghost" type="button" onClick={backToList}>
               돌아가기
             </button>
+            {slideCity ? <span className="gallery-slide-city">{galleryCityLabel(slideCity)}</span> : null}
           </div>
           <button className="gallery-arrow prev" type="button" aria-label="이전 사진" onClick={() => step(-1)}>
             ‹
           </button>
           <div className="gallery-track" ref={track}>
-            {items.map((photo) => (
+            {slideItems.map((photo) => (
               <figure className="gallery-frame" id={`gallery-${photo.id}`} key={photo.id}>
                 <img
                   src={photo.src}

@@ -1426,6 +1426,35 @@ p {
   min-width: 120px;
 }
 
+.gallery-city-group {
+  margin-top: 20px;
+}
+
+.gallery-city-group:first-of-type {
+  margin-top: 8px;
+}
+
+.gallery-city-head {
+  margin-bottom: 10px;
+}
+
+.gallery-city-head h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.gallery-slide-tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.gallery-slide-city {
+  color: var(--cream);
+  font-size: 0.9rem;
+  opacity: 0.92;
+}
+
 .gallery-write-form label select {
   width: 100%;
 }
