@@ -14,11 +14,17 @@ const app = express()
 const port = Number(process.env.PORT) || 3001
 const mongoUri = process.env.MONGODB_URI
 const origin = process.env.CORS_ORIGIN
+const corsOrigins = [
+  ...(origin ? origin.split(',').map((s) => s.trim()).filter(Boolean) : []),
+  'https://localhost',
+  'http://localhost',
+  'capacitor://localhost',
+]
 
 app.use(express.json({ limit: '2mb' }))
 app.use(
   cors({
-    origin: origin ? origin.split(',').map((s) => s.trim()) : true,
+    origin: origin ? corsOrigins : true,
   }),
 )
 

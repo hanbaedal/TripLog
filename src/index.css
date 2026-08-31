@@ -32,6 +32,10 @@ body,
   min-height: 100%;
 }
 
+html {
+  overflow-x: hidden;
+}
+
 body {
   margin: 0;
   color: var(--ink);
@@ -41,6 +45,7 @@ body {
   font-family: var(--sans);
   font-size: 15px;
   line-height: 1.55;
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 button,
@@ -76,7 +81,7 @@ p {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 22px 0 10px;
+  padding: max(12px, env(safe-area-inset-top)) 0 10px;
 }
 
 .brand {
@@ -292,10 +297,6 @@ p {
 
 .section {
   padding: 10px 0 64px;
-}
-
-.samples-home {
-  padding-top: 24px;
 }
 
 .section h2 {
@@ -1025,22 +1026,27 @@ p {
   margin: 4px 0;
 }
 
-.sample-group + .sample-group {
-  margin-top: 28px;
+.samples-home {
+  padding: 12px 0 28px;
 }
 
 .sample-slider {
   position: relative;
+  max-width: 1120px;
+  margin-inline: auto;
 }
 
 .sample-slider-track {
   display: flex;
-  gap: 14px;
+  gap: 12px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
-  scroll-padding-inline: 2px;
-  padding: 4px 2px 14px;
+  scroll-padding-inline: 16px;
+  padding: 4px 16px 16px;
   scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x;
 }
 
 .sample-slider-track::-webkit-scrollbar {
@@ -1048,13 +1054,13 @@ p {
 }
 
 .sample-card {
-  flex: 0 0 min(280px, 78vw);
+  flex: 0 0 min(72vw, 300px);
   background: var(--cream);
   border: 1px solid var(--line);
   border-radius: 18px;
   overflow: hidden;
   display: grid;
-  scroll-snap-align: start;
+  scroll-snap-align: center;
 }
 
 .sample-card-main {
@@ -1103,10 +1109,10 @@ p {
 
 .sample-slider-btn {
   position: absolute;
-  top: calc(50% - 28px);
+  top: calc(50% - 22px);
   z-index: 2;
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   border: 1px solid var(--line);
   border-radius: 50%;
   background: rgba(251, 248, 242, 0.96);
@@ -1117,16 +1123,44 @@ p {
 }
 
 .sample-slider-btn.prev {
-  left: -6px;
+  left: 8px;
 }
 
 .sample-slider-btn.next {
-  right: -6px;
+  right: 8px;
+}
+
+.sample-slider-btn.is-off,
+.sample-slider-btn:disabled {
+  opacity: 0.28;
+}
+
+@media (min-width: 721px) {
+  .sample-card {
+    flex-basis: min(42vw, 300px);
+    scroll-snap-align: start;
+  }
+}
+
+@media (min-width: 981px) {
+  .sample-card {
+    flex-basis: 280px;
+  }
+
+  .sample-slider-btn.prev {
+    left: -4px;
+  }
+
+  .sample-slider-btn.next {
+    right: -4px;
+  }
 }
 
 @media (max-width: 980px) {
-  .hero,
-  .mosaic,
+  .mosaic {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
   .steps,
   .planner-grid {
     grid-template-columns: 1fr;
@@ -1137,6 +1171,7 @@ p {
     display: flex;
     gap: 6px;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .day-btn {
@@ -1168,6 +1203,96 @@ p {
 
   .pass {
     transform: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .wrap {
+    width: calc(100% - 20px);
+  }
+
+  .topnav {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .nav-actions {
+    width: 100%;
+  }
+
+  .nav-actions .btn {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .brand-name small {
+    display: none;
+  }
+
+  .section {
+    padding: 4px 0 36px;
+  }
+
+  .section h2 {
+    font-size: 1.4rem;
+  }
+
+  .section-head {
+    margin-bottom: 14px;
+  }
+
+  .tile {
+    min-height: 108px;
+    padding: 14px;
+  }
+
+  .tile h3 {
+    font-size: 1.1rem;
+  }
+
+  .sample-card {
+    flex-basis: calc(100vw - 88px);
+  }
+
+  .chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .chip {
+    flex: 0 0 auto;
+  }
+
+  .modal-back {
+    place-items: end center;
+    padding: 0;
+  }
+
+  .modal {
+    width: 100%;
+    border-radius: 20px 20px 0 0;
+    max-height: 92dvh;
+    padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
+  }
+
+  .planner-bar-inner,
+  .planner-grid {
+    width: calc(100% - 16px);
+  }
+
+  .slot-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .search-form {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .flight-search-form > label:not(.check-row) {
+    flex: 1 1 100%;
+    min-width: 0;
   }
 }
 

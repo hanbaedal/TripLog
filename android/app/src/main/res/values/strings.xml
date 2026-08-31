@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">TripLog</string>
+    <string name="title_activity_main">TripLog</string>
+    <string name="package_name">my.triplog.app</string>
+    <string name="custom_url_scheme">my.triplog.app</string>
+</resources>

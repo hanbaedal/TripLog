@@ -18,6 +18,18 @@ dist-ssr
 .env.*
 !.env.example
 
+# Android
+android/.gradle
+android/build
+android/app/build
+android/app/.cxx
+android/local.properties
+android/captures
+*.apk
+*.aab
+*.ap_
+release/
+
 # Editor
 .vscode/*
 !.vscode/extensions.json

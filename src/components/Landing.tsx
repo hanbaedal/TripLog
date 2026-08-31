@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { BrandMark } from './Icons'
 import { SampleSlider } from './SampleSlider'
 import type { SampleRecord, User } from '../types'
-import { SAMPLE_GROUPS, SAMPLE_CATALOG } from '../data/sampleCatalog.js'
+import { SAMPLE_CATALOG } from '../data/sampleCatalog.js'
 import { listSamples } from '../data/samples'
 
 type Props = {
@@ -46,12 +46,10 @@ export function Landing({
     void listSamples().then(setRows)
   }, [])
 
-  const groups = useMemo(() => {
-    return SAMPLE_GROUPS.map((group: { nights: number; label: string }) => ({
-      ...group,
-      items: rows.filter((row) => row.nights === group.nights).sort((a, b) => a.sort - b.sort),
-    })).filter((group) => group.items.length > 0)
-  }, [rows])
+  const samples = useMemo(
+    () => [...rows].sort((a, b) => a.sort - b.sort || a.nights - b.nights),
+    [rows],
+  )
 
   return (
     <div>
@@ -93,15 +91,8 @@ export function Landing({
         </div>
       </header>
 
-      <section className="wrap section samples-home">
-        {groups.map((group) => (
-          <div className="sample-group" key={group.nights}>
-            <div className="section-head">
-              <h2>{group.label}</h2>
-            </div>
-            <SampleSlider items={group.items} onPick={onPickSample} />
-          </div>
-        ))}
+      <section className="samples-home">
+        <SampleSlider items={samples} onPick={onPickSample} />
       </section>
 
       <section className="wrap section">

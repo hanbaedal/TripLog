@@ -5,6 +5,7 @@ import {
   groupedAirports as groupAirports,
 } from '../../data/airports'
 import type { FlightOffer, HotelOffer } from '../../types'
+import { apiUrl } from '../remote'
 
 export type FlightSearchResult = {
   offers: FlightOffer[]
@@ -99,7 +100,7 @@ export async function searchFlights(query: FlightQuery): Promise<FlightSearchRes
       date: query.date,
       leg: query.leg,
     })
-    const res = await fetch(`/api/flights/search?${params}`, { cache: 'no-store' })
+    const res = await fetch(apiUrl(`/api/flights/search?${params}`), { cache: 'no-store' })
     const data = (await res.json()) as FlightSearchResult & { error?: string }
     if (!res.ok) throw new Error(data.error || '검색에 실패했습니다.')
     return {

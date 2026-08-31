@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { BrandMark } from './Icons'
 import { SampleSlider } from './SampleSlider'
 import type { SampleRecord, User } from '../types'
-import { SAMPLE_GROUPS, SAMPLE_CATALOG } from '../data/sampleCatalog.js'
-import { listSamples, nightsLabel, removeSample } from '../data/samples'
+import { SAMPLE_CATALOG } from '../data/sampleCatalog.js'
+import { listSamples, removeSample } from '../data/samples'
 import { isSupervisor } from '../lib/auth'
 
 type Props = {
@@ -22,21 +22,10 @@ export function SampleGallery({ user, onBack, onPick, onEdit, onCreate }: Props)
     void listSamples().then(setRows)
   }, [])
 
-  const groups = useMemo(() => {
-    const known = SAMPLE_GROUPS.map((group: { nights: number; label: string }) => ({
-      ...group,
-      items: rows.filter((row) => row.nights === group.nights).sort((a, b) => a.sort - b.sort),
-    }))
-    const extraNights = [...new Set(rows.map((row) => row.nights))]
-      .filter((n) => !SAMPLE_GROUPS.some((g: { nights: number }) => g.nights === n))
-      .sort((a, b) => a - b)
-    const extra = extraNights.map((nights) => ({
-      nights,
-      label: nightsLabel(nights),
-      items: rows.filter((row) => row.nights === nights).sort((a, b) => a.sort - b.sort),
-    }))
-    return [...known, ...extra].filter((group) => group.items.length > 0 || supervisor)
-  }, [rows, supervisor])
+  const samples = useMemo(
+    () => [...rows].sort((a, b) => a.sort - b.sort || a.nights - b.nights),
+    [rows],
+  )
 
   async function handleDelete(id: string) {
     if (!window.confirm('이 샘플을 삭제할까요?')) return
@@ -65,21 +54,14 @@ export function SampleGallery({ user, onBack, onPick, onEdit, onCreate }: Props)
         </div>
       </header>
 
-      <section className="wrap section">
-        {groups.map((group) => (
-          <div className="sample-group" key={group.nights}>
-            <div className="section-head">
-              <h2>{group.label}</h2>
-            </div>
-            <SampleSlider
-              items={group.items}
-              supervisor={supervisor}
-              onPick={onPick}
-              onEdit={onEdit}
-              onDelete={(id) => void handleDelete(id)}
-            />
-          </div>
-        ))}
+      <section className="samples-home">
+        <SampleSlider
+          items={samples}
+          supervisor={supervisor}
+          onPick={onPick}
+          onEdit={onEdit}
+          onDelete={(id) => void handleDelete(id)}
+        />
       </section>
     </div>
   )

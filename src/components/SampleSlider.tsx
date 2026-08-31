@@ -47,11 +47,15 @@ export function SampleSlider({ items, supervisor, onPick, onEdit, onDelete }: Pr
 
   return (
     <div className="sample-slider">
-      {canPrev ? (
-        <button className="sample-slider-btn prev" type="button" aria-label="이전" onClick={() => scroll(-1)}>
-          ‹
-        </button>
-      ) : null}
+      <button
+        className={`sample-slider-btn prev${canPrev ? '' : ' is-off'}`}
+        type="button"
+        aria-label="이전"
+        disabled={!canPrev}
+        onClick={() => scroll(-1)}
+      >
+        ‹
+      </button>
       <div className="sample-slider-track" ref={track}>
         {items.map((sample) => (
           <article className="sample-card" key={sample.id}>
@@ -74,11 +78,15 @@ export function SampleSlider({ items, supervisor, onPick, onEdit, onDelete }: Pr
           </article>
         ))}
       </div>
-      {canNext ? (
-        <button className="sample-slider-btn next" type="button" aria-label="다음" onClick={() => scroll(1)}>
-          ›
-        </button>
-      ) : null}
+      <button
+        className={`sample-slider-btn next${canNext ? '' : ' is-off'}`}
+        type="button"
+        aria-label="다음"
+        disabled={!canNext}
+        onClick={() => scroll(1)}
+      >
+        ›
+      </button>
     </div>
   )
 }
