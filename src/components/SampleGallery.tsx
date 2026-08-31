@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { BrandMark } from './Icons'
+import { SampleSlider } from './SampleSlider'
 import type { SampleRecord, User } from '../types'
-import { SAMPLE_GROUPS } from '../data/sampleCatalog.js'
+import { SAMPLE_GROUPS, SAMPLE_CATALOG } from '../data/sampleCatalog.js'
 import { listSamples, nightsLabel, removeSample } from '../data/samples'
 import { isSupervisor } from '../lib/auth'
 
@@ -14,7 +15,7 @@ type Props = {
 }
 
 export function SampleGallery({ user, onBack, onPick, onEdit, onCreate }: Props) {
-  const [rows, setRows] = useState<SampleRecord[]>([])
+  const [rows, setRows] = useState<SampleRecord[]>(() => SAMPLE_CATALOG as SampleRecord[])
   const supervisor = isSupervisor(user)
 
   useEffect(() => {
@@ -70,25 +71,13 @@ export function SampleGallery({ user, onBack, onPick, onEdit, onCreate }: Props)
             <div className="section-head">
               <h2>{group.label}</h2>
             </div>
-            <div className="sample-cards">
-              {group.items.map((sample) => (
-                <article className="sample-card" key={sample.id}>
-                  <button type="button" className="sample-card-main" onClick={() => onPick(sample)}>
-                    <h3>{sample.place}</h3>
-                  </button>
-                  {supervisor ? (
-                    <div className="sample-card-actions">
-                      <button className="btn ghost" type="button" onClick={() => onEdit(sample)}>
-                        수정
-                      </button>
-                      <button className="btn ghost" type="button" onClick={() => void handleDelete(sample.id)}>
-                        삭제
-                      </button>
-                    </div>
-                  ) : null}
-                </article>
-              ))}
-            </div>
+            <SampleSlider
+              items={group.items}
+              supervisor={supervisor}
+              onPick={onPick}
+              onEdit={onEdit}
+              onDelete={(id) => void handleDelete(id)}
+            />
           </div>
         ))}
       </section>

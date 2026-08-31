@@ -1,4 +1,5 @@
 import type { Trip } from '../types'
+import { isPersonalTrip } from '../data/samples'
 import { loadTrip as loadLegacyTrip } from './storage'
 import { api, isRemote } from './remote'
 
@@ -39,6 +40,10 @@ export function loadTrips(ownerId: string): Trip[] {
   return []
 }
 
+export function onlyPersonalTrips(trips: Trip[]): Trip[] {
+  return trips.filter(isPersonalTrip)
+}
+
 export function saveTrips(ownerId: string, trips: Trip[]): void {
   const all = readAll()
   all[ownerId] = trips
@@ -46,7 +51,7 @@ export function saveTrips(ownerId: string, trips: Trip[]): void {
 }
 
 export function upsertTrip(ownerId: string, trip: Trip): Trip {
-  const next = { ...trip, updatedAt: new Date().toISOString() }
+  const next = { ...trip, savedByUser: true, updatedAt: new Date().toISOString() }
   const trips = loadTrips(ownerId)
   const index = trips.findIndex((t) => t.id === next.id)
   if (index >= 0) trips[index] = next
@@ -66,7 +71,7 @@ export function importGuestTrips(userId: string): void {
   if (mine.length) return
   const guest = loadTrips('guest')
   if (!guest.length) return
-  saveTrips(userId, guest.map((trip) => ({ ...trip, updatedAt: new Date().toISOString() })))
+  saveTrips(userId, guest.filter(isPersonalTrip).map((trip) => ({ ...trip, savedByUser: true, updatedAt: new Date().toISOString() })))
 }
 
 export async function listTripsRemote(): Promise<Trip[]> {
@@ -77,9 +82,24 @@ export async function listTripsRemote(): Promise<Trip[]> {
 export async function upsertTripRemote(trip: Trip): Promise<Trip> {
   const data = await api<{ trip: Trip }>(`/trips/${encodeURIComponent(trip.id)}`, {
     method: 'PUT',
-    body: JSON.stringify(trip),
+    body: JSON.stringify({ ...trip, savedByUser: true }),
   })
   return data.trip
+}
+
+export async function purgeSampleCopies(trips: Trip[], remote: boolean, ownerId: string): Promise<Trip[]> {
+  const junk = trips.filter((trip) => !isPersonalTrip(trip))
+  if (!junk.length) return onlyPersonalTrips(trips)
+  if (!remote) {
+    const keep = onlyPersonalTrips(trips)
+    saveTrips(ownerId, keep)
+    return keep
+  }
+  let list = trips
+  for (const trip of junk) {
+    list = await deleteTripRemote(trip.id)
+  }
+  return onlyPersonalTrips(list)
 }
 
 export async function deleteTripRemote(tripId: string): Promise<Trip[]> {
@@ -94,7 +114,7 @@ export async function importGuestTripsRemote(): Promise<void> {
   const existing = await listTripsRemote()
   if (existing.length) return
   const guest = loadTrips('guest')
-  for (const trip of guest) {
-    await upsertTripRemote(trip)
+  for (const trip of guest.filter(isPersonalTrip)) {
+    await upsertTripRemote({ ...trip, savedByUser: true })
   }
 }

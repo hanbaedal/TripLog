@@ -15,6 +15,7 @@ function toTrip(doc) {
     adults: doc.adults,
     children: doc.children,
     items: doc.items || [],
+    savedByUser: typeof doc.savedByUser === 'boolean' ? doc.savedByUser : undefined,
     updatedAt: doc.updatedAt?.toISOString?.() ?? new Date().toISOString(),
   }
 }
@@ -43,6 +44,7 @@ tripsRouter.put('/:id', async (req, res) => {
       adults: Number(body.adults) || 1,
       children: Number(body.children) || 0,
       items: Array.isArray(body.items) ? body.items : [],
+      savedByUser: body.savedByUser === true,
       updatedAt: new Date(),
     },
     { upsert: true, new: true, setDefaultsOnInsert: true },

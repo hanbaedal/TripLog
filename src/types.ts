@@ -39,6 +39,7 @@ export type Trip = {
   children: number
   items: TripItem[]
   updatedAt?: string
+  savedByUser?: boolean
 }
 
 export type SampleRecord = {

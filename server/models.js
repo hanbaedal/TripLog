@@ -21,6 +21,7 @@ const tripSchema = new mongoose.Schema(
     adults: { type: Number, default: 2 },
     children: { type: Number, default: 0 },
     items: { type: Array, default: [] },
+    savedByUser: { type: Boolean },
     updatedAt: { type: Date, default: Date.now },
   },
   { timestamps: { createdAt: true, updatedAt: false } },

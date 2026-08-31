@@ -294,6 +294,10 @@ p {
   padding: 10px 0 64px;
 }
 
+.samples-home {
+  padding-top: 24px;
+}
+
 .section h2 {
   font-family: var(--serif);
   font-size: clamp(1.7rem, 3vw, 2.3rem);
@@ -1025,39 +1029,71 @@ p {
   margin-top: 28px;
 }
 
-.sample-cards {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
+.sample-slider {
+  position: relative;
+}
+
+.sample-slider-track {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: 2px;
+  padding: 4px 2px 14px;
+  scrollbar-width: none;
+}
+
+.sample-slider-track::-webkit-scrollbar {
+  display: none;
 }
 
 .sample-card {
+  flex: 0 0 min(280px, 78vw);
   background: var(--cream);
   border: 1px solid var(--line);
   border-radius: 18px;
-  padding: 16px;
+  overflow: hidden;
   display: grid;
-  gap: 10px;
-  min-height: 110px;
+  scroll-snap-align: start;
 }
 
 .sample-card-main {
+  position: relative;
+  display: block;
+  width: 100%;
   background: none;
   border: 0;
-  text-align: left;
   padding: 0;
-  min-height: 64px;
+  text-align: left;
+}
+
+.sample-card-photo {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  background: var(--paper-2);
+}
+
+.sample-card-label {
+  position: absolute;
+  inset: auto 0 0;
+  padding: 36px 14px 12px;
+  background: linear-gradient(180deg, transparent, rgba(23, 32, 51, 0.78));
+  color: var(--cream);
 }
 
 .sample-card-main h3 {
   font-family: var(--serif);
   font-size: 1.45rem;
   margin: 0;
+  color: var(--cream);
 }
 
 .sample-card-actions {
   display: flex;
   gap: 6px;
+  padding: 8px 10px 10px;
 }
 
 .sample-card-actions .btn {
@@ -1065,12 +1101,34 @@ p {
   font-size: 12px;
 }
 
+.sample-slider-btn {
+  position: absolute;
+  top: calc(50% - 28px);
+  z-index: 2;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: rgba(251, 248, 242, 0.96);
+  color: var(--ink);
+  font-size: 22px;
+  line-height: 1;
+  box-shadow: var(--shadow);
+}
+
+.sample-slider-btn.prev {
+  left: -6px;
+}
+
+.sample-slider-btn.next {
+  right: -6px;
+}
+
 @media (max-width: 980px) {
   .hero,
   .mosaic,
   .steps,
-  .planner-grid,
-  .sample-cards {
+  .planner-grid {
     grid-template-columns: 1fr;
   }
 

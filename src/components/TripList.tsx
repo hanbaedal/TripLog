@@ -26,7 +26,7 @@ export function TripList({ user, trips, onOpen, onNew, onDemo, onHome, onDelete 
         </button>
         <div className="nav-actions">
           <button className="btn ghost" type="button" onClick={onDemo}>
-            샘플 넣기
+            샘플 일정
           </button>
           <button className="btn" type="button" onClick={onNew}>
             새 여행

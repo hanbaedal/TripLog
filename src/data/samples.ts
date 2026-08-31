@@ -8,6 +8,24 @@ const SAMPLES_KEY = 'triplog.samples.v1'
 
 export { SAMPLE_CATALOG }
 
+const DEMO_SAMPLE_TITLE = '오사카, 네 끼를 따라 걷다'
+
+export function isKnownSampleTitle(title: string): boolean {
+  if (title === DEMO_SAMPLE_TITLE) return true
+  return SAMPLE_CATALOG.some((row) => row.title === title)
+}
+
+export function isBlankDraft(trip: Trip): boolean {
+  return !(trip.destination || '').trim() && (!trip.items || trip.items.length === 0)
+}
+
+export function isPersonalTrip(trip: Trip): boolean {
+  if (isBlankDraft(trip)) return false
+  if (trip.savedByUser === true) return true
+  if (trip.savedByUser === false) return false
+  return !isKnownSampleTitle(trip.title)
+}
+
 export function nightsLabel(nights: number): string {
   return `${nights}박 ${nights + 1}일`
 }
@@ -24,6 +42,7 @@ export function cloneSampleTrip(sample: SampleRecord): Trip {
     endDate: addDays(start, nights),
     items: (sample.trip.items || []).map((entry) => ({ ...entry, id: uid('item') })),
     updatedAt: new Date().toISOString(),
+    savedByUser: false,
   }
 }
 

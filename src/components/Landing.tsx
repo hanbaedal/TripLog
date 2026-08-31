@@ -1,10 +1,15 @@
+import { useEffect, useMemo, useState } from 'react'
 import { BrandMark } from './Icons'
-import type { User } from '../types'
+import { SampleSlider } from './SampleSlider'
+import type { SampleRecord, User } from '../types'
+import { SAMPLE_GROUPS, SAMPLE_CATALOG } from '../data/sampleCatalog.js'
+import { listSamples } from '../data/samples'
 
 type Props = {
   user: User | null
   tripCount: number
   onOpenSamples: () => void
+  onPickSample: (sample: SampleRecord) => void
   onNewTrip: () => void
   onContinue: () => void
   onTrips: () => void
@@ -28,12 +33,26 @@ export function Landing({
   user,
   tripCount,
   onOpenSamples,
+  onPickSample,
   onNewTrip,
   onContinue,
   onTrips,
   onAuth,
   onLogout,
 }: Props) {
+  const [rows, setRows] = useState<SampleRecord[]>(() => SAMPLE_CATALOG as SampleRecord[])
+
+  useEffect(() => {
+    void listSamples().then(setRows)
+  }, [])
+
+  const groups = useMemo(() => {
+    return SAMPLE_GROUPS.map((group: { nights: number; label: string }) => ({
+      ...group,
+      items: rows.filter((row) => row.nights === group.nights).sort((a, b) => a.sort - b.sort),
+    })).filter((group) => group.items.length > 0)
+  }, [rows])
+
   return (
     <div>
       <header className="wrap topnav">
@@ -74,69 +93,15 @@ export function Landing({
         </div>
       </header>
 
-      <section className="wrap hero">
-        <div>
-          <h1>
-            일정을 그리면
-            <br />
-            비용과 안내서가
-            <br />
-            따라옵니다.
-          </h1>
-          <div className="hero-ctas">
-            <button className="btn stamp" type="button" onClick={onOpenSamples}>
-              샘플 일정 열기
-            </button>
-            <button className="btn ghost" type="button" onClick={onNewTrip}>
-              빈 일정으로 시작
-            </button>
-          </div>
-        </div>
-
-        <aside className="pass" aria-hidden="true">
-          <div className="pass-top">
-            <b>BOARDING PASS</b>
-            <span>TRIPLOG</span>
-          </div>
-          <div className="pass-body">
-            <div className="pass-route">
-              <div>
-                <small className="muted">From</small>
-                <strong>ICN</strong>
-              </div>
-              <div className="dash-line" />
-              <div>
-                <small className="muted">To</small>
-                <strong>KIX</strong>
-              </div>
+      <section className="wrap section samples-home">
+        {groups.map((group) => (
+          <div className="sample-group" key={group.nights}>
+            <div className="section-head">
+              <h2>{group.label}</h2>
             </div>
-            <div className="pass-meta">
-              <div>
-                여행
-                <b>오사카 4박 5일</b>
-              </div>
-              <div>
-                인원
-                <b>성인 2</b>
-              </div>
-              <div>
-                항공
-                <b>KE723 / KE728</b>
-              </div>
-              <div>
-                숙소
-                <b>난바 오리엔탈</b>
-              </div>
-            </div>
-            <div className="stamp-seal">
-              MAP
-              <br />
-              MY
-              <br />
-              JOURNEY
-            </div>
+            <SampleSlider items={group.items} onPick={onPickSample} />
           </div>
-        </aside>
+        ))}
       </section>
 
       <section className="wrap section">
