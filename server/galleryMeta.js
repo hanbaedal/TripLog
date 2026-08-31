@@ -2,7 +2,7 @@ import {
   normalizeCity,
   normalizeGalleryCategory,
   normalizeSightType,
-} from '../../src/data/galleryTaxonomy.js'
+} from '../src/data/galleryTaxonomy.js'
 
 export function parseGalleryMeta(body) {
   const category = normalizeGalleryCategory(body?.category)
