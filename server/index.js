@@ -9,6 +9,7 @@ import { tripsRouter } from './routes/trips.js'
 import { flightsRouter } from './routes/flights.js'
 import { samplesRouter, seedSamples } from './routes/samples.js'
 import { boardRouter, galleryRouter, inquiryRouter } from './routes/community.js'
+import { seedGallery } from './seedGallery.js'
 import { seedTravelInfo, travelInfoRouter } from './routes/travelInfo.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -63,6 +64,7 @@ async function start() {
   }
   await mongoose.connect(mongoUri, { dbName: process.env.MONGODB_DB || 'triplog' })
   await seedSamples()
+  await seedGallery()
   await seedTravelInfo()
   app.listen(port, () => {
     console.log(`TripLog listening on ${port}`)

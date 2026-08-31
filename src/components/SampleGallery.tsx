@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { PageShell } from './PageShell'
-import type { SampleRecord } from '../types'
+import { loadGalleryPhotos } from '../lib/galleryResolve'
+import type { GalleryPhoto, SampleRecord } from '../types'
 import { SAMPLE_GROUPS, SAMPLE_CATALOG } from '../data/sampleCatalog.js'
 import { sampleCover } from '../data/sampleCovers'
 import { canManageSample, listSamples, nightsLabel, removeSample } from '../data/samples'
@@ -16,10 +17,12 @@ type Props = SiteNav & {
 
 export function SampleGallery({ onPick, onEdit, onCreate, onUnpublish, ...nav }: Props) {
   const [rows, setRows] = useState<SampleRecord[]>(() => SAMPLE_CATALOG as SampleRecord[])
+  const [photos, setPhotos] = useState<GalleryPhoto[]>([])
   const supervisor = isSupervisor(nav.user)
 
   useEffect(() => {
     void listSamples().then(setRows)
+    void loadGalleryPhotos().then(setPhotos)
   }, [])
 
   const groups = useMemo(() => {
@@ -63,7 +66,7 @@ export function SampleGallery({ onPick, onEdit, onCreate, onUnpublish, ...nav }:
               {group.items.map((sample) => (
                 <article className="sample-card" key={sample.id}>
                   <button type="button" className="sample-card-main" onClick={() => onPick(sample)}>
-                    <img className="sample-card-photo" src={sampleCover(sample)} alt="" />
+                    <img className="sample-card-photo" src={sampleCover(sample, photos)} alt="" />
                     <span className="sample-card-label">
                       <h3>{sample.place}</h3>
                       {sample.ownerName ? <small>{sample.ownerName}</small> : null}

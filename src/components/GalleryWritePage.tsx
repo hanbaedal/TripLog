@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import { PageShell } from './PageShell'
+import { ImagePicker } from './ImagePicker'
 import { isSupervisor } from '../lib/auth'
 import { canEditGallery, listGallery, removeGalleryPhoto, saveGalleryPhoto } from '../lib/community'
-import { compressImage } from '../lib/imageFile'
+import { loadGalleryPhotos, resolvePhotoSrc } from '../lib/galleryResolve'
 import type { GalleryPhoto } from '../types'
 import type { SiteNav } from '../lib/siteNav'
 
@@ -11,7 +12,7 @@ export function GalleryWritePage(nav: SiteNav) {
   const [photos, setPhotos] = useState<GalleryPhoto[]>([])
   const [editing, setEditing] = useState<GalleryPhoto | null>(null)
   const [title, setTitle] = useState('')
-  const [src, setSrc] = useState('')
+  const [photoId, setPhotoId] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
 
@@ -20,7 +21,7 @@ export function GalleryWritePage(nav: SiteNav) {
       nav.go.auth()
       return
     }
-    void listGallery().then(setPhotos)
+    void loadGalleryPhotos().then(setPhotos)
   }, [nav.user])
 
   const mine = useMemo(
@@ -31,28 +32,15 @@ export function GalleryWritePage(nav: SiteNav) {
   function startEdit(photo: GalleryPhoto) {
     setEditing(photo)
     setTitle(photo.title)
-    setSrc(photo.src)
+    setPhotoId(photo.id)
     setError('')
   }
 
   function reset() {
     setEditing(null)
     setTitle('')
-    setSrc('')
+    setPhotoId('')
     setError('')
-  }
-
-  async function onFile(file: File | undefined) {
-    if (!file) return
-    setBusy(true)
-    setError('')
-    try {
-      setSrc(await compressImage(file))
-    } catch (err) {
-      setError(err instanceof Error ? err.message : '사진을 읽지 못했습니다.')
-    } finally {
-      setBusy(false)
-    }
   }
 
   async function submit(e: FormEvent) {
@@ -61,15 +49,20 @@ export function GalleryWritePage(nav: SiteNav) {
       nav.go.auth()
       return
     }
-    if (!title.trim() || !src) {
+    if (!title.trim() || !photoId) {
       setError('제목과 사진이 필요합니다.')
       return
     }
     setBusy(true)
     setError('')
     try {
+      const src = resolvePhotoSrc(photoId, photos)
+      if (!src) {
+        setError('갤러리에서 사진을 선택해 주세요.')
+        return
+      }
       const saved = await saveGalleryPhoto({
-        id: editing?.id ?? '',
+        id: editing?.id || photoId,
         title: title.trim(),
         src,
         ownerId: nav.user.id,
@@ -104,12 +97,14 @@ export function GalleryWritePage(nav: SiteNav) {
         </div>
         <form className="board-form" onSubmit={(e) => void submit(e)}>
           <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="사진 제목" required />
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => void onFile(e.target.files?.[0])}
+          <ImagePicker
+            photoId={photoId}
+            onChange={setPhotoId}
+            user={nav.user}
+            defaultTitle={title}
+            disabled={busy}
+            scope="mine"
           />
-          {src ? <img className="gallery-preview" src={src} alt="" /> : null}
           <div className="nav-actions">
             <button className="btn" type="submit" disabled={busy}>
               {editing ? '수정' : '등록'}

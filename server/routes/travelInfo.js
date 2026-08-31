@@ -1,9 +1,10 @@
 import { Router } from 'express'
 import crypto from 'node:crypto'
-import { TravelInfo, TravelSpot } from '../models.js'
+import { GalleryPhoto, TravelInfo, TravelSpot } from '../models.js'
 import { requireUser, isSupervisorUser } from '../auth.js'
 import { TRAVEL_INFO_CATALOG } from '../../src/data/travelInfoCatalog.js'
 import { TRAVEL_SPOT_CATALOG } from '../../src/data/travelSpotCatalog.js'
+import { cityGalleryId } from '../../src/data/galleryCatalog.js'
 
 export const travelInfoRouter = Router()
 
@@ -17,7 +18,8 @@ function toInfo(doc) {
     place: doc.place,
     title: doc.title,
     body: doc.body,
-    src: doc.src,
+    photoId: doc.photoId || '',
+    src: doc.src || '',
     sort: doc.sort,
     catalog: Boolean(doc.catalog),
     ownerId: doc.ownerId ? String(doc.ownerId) : undefined,
@@ -33,7 +35,8 @@ function toSpot(doc) {
     name: doc.name,
     body: doc.body,
     tip: doc.tip || '',
-    src: doc.src,
+    photoId: doc.photoId || '',
+    src: doc.src || '',
     sort: doc.sort,
     catalog: Boolean(doc.catalog),
     ownerId: doc.ownerId ? String(doc.ownerId) : undefined,
@@ -49,8 +52,17 @@ function canManage(user, doc) {
   return Boolean(doc.ownerId && String(doc.ownerId) === String(user._id))
 }
 
+async function requirePhotoId(photoId) {
+  const id = String(photoId || '').trim()
+  if (!id) return null
+  const photo = await GalleryPhoto.findOne({ photoId: id })
+  if (!photo) return null
+  return { photoId: id, src: photo.src }
+}
+
 export async function seedTravelInfo() {
   for (const row of TRAVEL_INFO_CATALOG) {
+    const photoId = row.photoId || cityGalleryId(row.id)
     await TravelInfo.updateOne(
       { infoId: row.id },
       {
@@ -59,7 +71,8 @@ export async function seedTravelInfo() {
           place: row.place,
           title: row.title,
           body: row.body,
-          src: row.src,
+          photoId,
+          src: row.src || '',
           sort: row.sort,
           catalog: true,
           ownerName: '',
@@ -70,6 +83,7 @@ export async function seedTravelInfo() {
     )
   }
   for (const row of TRAVEL_SPOT_CATALOG) {
+    const photoId = row.photoId || row.id
     await TravelSpot.updateOne(
       { spotId: row.id },
       {
@@ -79,7 +93,8 @@ export async function seedTravelInfo() {
           name: row.name,
           body: row.body,
           tip: row.tip,
-          src: row.src,
+          photoId,
+          src: row.src || '',
           sort: row.sort,
           catalog: true,
           ownerName: '',
@@ -106,13 +121,9 @@ travelInfoRouter.post('/:cityId/spots', requireUser, async (req, res) => {
   const name = String(req.body?.name || '').trim()
   const body = String(req.body?.body || '').trim()
   const tip = String(req.body?.tip || '').trim()
-  const src = String(req.body?.src || '').trim()
-  if (!cityId || !name || !body || !src) {
-    res.status(400).json({ error: '이름, 설명, 사진이 필요합니다.' })
-    return
-  }
-  if (src.length > 4_500_000) {
-    res.status(400).json({ error: '사진이 너무 큽니다.' })
+  const photo = await requirePhotoId(req.body?.photoId)
+  if (!cityId || !name || !body || !photo) {
+    res.status(400).json({ error: '이름, 설명, 갤러리 사진이 필요합니다.' })
     return
   }
   const doc = await TravelSpot.create({
@@ -121,7 +132,8 @@ travelInfoRouter.post('/:cityId/spots', requireUser, async (req, res) => {
     name,
     body,
     tip,
-    src,
+    photoId: photo.photoId,
+    src: photo.src,
     sort: Number(req.body?.sort) || 80,
     catalog: false,
     ownerId: req.user._id,
@@ -140,19 +152,16 @@ travelInfoRouter.put('/spots/:id', requireUser, async (req, res) => {
   const name = String(req.body?.name || '').trim()
   const body = String(req.body?.body || '').trim()
   const tip = String(req.body?.tip || '').trim()
-  const src = String(req.body?.src || '').trim()
-  if (!name || !body || !src) {
-    res.status(400).json({ error: '이름, 설명, 사진이 필요합니다.' })
-    return
-  }
-  if (src.length > 4_500_000) {
-    res.status(400).json({ error: '사진이 너무 큽니다.' })
+  const photo = await requirePhotoId(req.body?.photoId)
+  if (!name || !body || !photo) {
+    res.status(400).json({ error: '이름, 설명, 갤러리 사진이 필요합니다.' })
     return
   }
   doc.name = name
   doc.body = body
   doc.tip = tip
-  doc.src = src
+  doc.photoId = photo.photoId
+  doc.src = photo.src
   if (req.body?.sort != null) doc.sort = Number(req.body.sort) || doc.sort
   await doc.save()
   res.json({ spot: toSpot(doc) })
@@ -172,13 +181,9 @@ travelInfoRouter.post('/', requireUser, async (req, res) => {
   const place = String(req.body?.place || '').trim()
   const title = String(req.body?.title || place).trim()
   const body = String(req.body?.body || '').trim()
-  const src = String(req.body?.src || '').trim()
-  if (!place || !title || !body || !src) {
-    res.status(400).json({ error: '도시, 제목, 설명, 사진이 필요합니다.' })
-    return
-  }
-  if (src.length > 4_500_000) {
-    res.status(400).json({ error: '사진이 너무 큽니다.' })
+  const photo = await requirePhotoId(req.body?.photoId)
+  if (!place || !title || !body || !photo) {
+    res.status(400).json({ error: '도시, 제목, 설명, 갤러리 사진이 필요합니다.' })
     return
   }
   const doc = await TravelInfo.create({
@@ -186,7 +191,8 @@ travelInfoRouter.post('/', requireUser, async (req, res) => {
     place,
     title,
     body,
-    src,
+    photoId: photo.photoId,
+    src: photo.src,
     sort: Number(req.body?.sort) || 80,
     catalog: false,
     ownerId: req.user._id,
@@ -205,19 +211,16 @@ travelInfoRouter.put('/:id', requireUser, async (req, res) => {
   const place = String(req.body?.place || '').trim()
   const title = String(req.body?.title || place).trim()
   const body = String(req.body?.body || '').trim()
-  const src = String(req.body?.src || '').trim()
-  if (!place || !title || !body || !src) {
-    res.status(400).json({ error: '도시, 제목, 설명, 사진이 필요합니다.' })
-    return
-  }
-  if (src.length > 4_500_000) {
-    res.status(400).json({ error: '사진이 너무 큽니다.' })
+  const photo = await requirePhotoId(req.body?.photoId)
+  if (!place || !title || !body || !photo) {
+    res.status(400).json({ error: '도시, 제목, 설명, 갤러리 사진이 필요합니다.' })
     return
   }
   doc.place = place
   doc.title = title
   doc.body = body
-  doc.src = src
+  doc.photoId = photo.photoId
+  doc.src = photo.src
   if (req.body?.sort != null) doc.sort = Number(req.body.sort) || doc.sort
   await doc.save()
   res.json({ item: toInfo(doc) })

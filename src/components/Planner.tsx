@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react'
-import type { ItemKind, MealSlot, Trip, TripItem, User } from '../types'
+import { useEffect, useMemo, useState } from 'react'
+import type { ItemKind, MealSlot, Trip, TripItem, User, GalleryPhoto } from '../types'
 import { AppNav } from './AppNav'
 import { FlightSearch } from './FlightSearch'
 import { HotelSearch } from './HotelSearch'
@@ -8,6 +8,7 @@ import { attachFlight, attachHotel } from '../lib/connect/attach'
 import { KIND_LABEL, MEAL_LABEL, TRANSPORT_LABEL, krw, summarize } from '../lib/costs'
 import { dateOn, dayCount, formatRange, formatShort } from '../lib/dates'
 import { hasItemPhoto, resolveItemPhoto } from '../data/sightPhotos'
+import { loadGalleryPhotos } from '../lib/galleryResolve'
 import type { SiteNav } from '../lib/siteNav'
 
 type Props = {
@@ -85,8 +86,13 @@ export function Planner({
   const [preset, setPreset] = useState<{ kind: ItemKind; mealSlot?: MealSlot } | null>(null)
   const [search, setSearch] = useState<null | 'flight' | 'hotel'>(null)
   const [lightbox, setLightbox] = useState<{ src: string; title: string } | null>(null)
+  const [galleryPhotos, setGalleryPhotos] = useState<GalleryPhoto[]>([])
   const open = editing !== null || preset !== null
   const locked = !user
+
+  useEffect(() => {
+    void loadGalleryPhotos().then(setGalleryPhotos)
+  }, [])
 
   const summary = useMemo(() => summarize(trip), [trip])
   const selected = Math.min(day, Math.max(0, days - 1))
@@ -287,7 +293,7 @@ export function Planner({
           {dayItems.length === 0 ? null : (
             dayItems.map((item) => {
               const pictured = hasItemPhoto(item.kind)
-              const photo = pictured ? resolveItemPhoto(item, trip.destination) : undefined
+              const photo = pictured ? resolveItemPhoto(item, trip.destination, galleryPhotos) : undefined
               const copy = (
                 <>
                   <span className={`badge ${item.kind}`}>{badgeText(item)}</span>
@@ -422,6 +428,7 @@ export function Planner({
           dayIndex={selected}
           initial={editing ?? undefined}
           preset={editing ? undefined : preset ?? undefined}
+          user={user}
           onClose={() => {
             setEditing(null)
             setPreset(null)

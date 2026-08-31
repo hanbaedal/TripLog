@@ -1,44 +1,41 @@
-const BY_ID: Record<string, string> = {
-  dalian: '/samples/dalian.jpg',
-  yantai: '/samples/yantai.jpg',
-  qingdao: '/samples/qingdao.jpg',
-  harbin: '/samples/harbin.jpg',
-  beijing: '/samples/beijing.jpg',
-  shanghai: '/samples/shanghai.jpg',
-  hongkong: '/samples/hongkong.jpg',
-  baekdusan: '/samples/baekdusan.jpg',
-  xian: `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent("Terracotta Army.jpg")}?width=960`,
-  chengdu: '/samples/chengdu.jpg',
-  taihang: '/samples/taihang.jpg',
-  huangshan: '/samples/huangshan.jpg',
-  zhangjiajie: '/samples/zhangjiajie.jpg',
-  yunnan: '/samples/yunnan.jpg',
-  guizhou: '/samples/guizhou.jpg',
-}
+import type { GalleryPhoto } from '../types'
+import { GALLERY_PHOTOS } from './galleryCatalog.js'
 
 const BY_PLACE: Record<string, string> = {
-  대련: BY_ID.dalian,
-  연태: BY_ID.yantai,
-  청도: BY_ID.qingdao,
-  하얼빈: BY_ID.harbin,
-  북경: BY_ID.beijing,
-  상하이: BY_ID.shanghai,
-  홍콩: BY_ID.hongkong,
-  백두산: BY_ID.baekdusan,
-  서안: BY_ID.xian,
-  시안: BY_ID.xian,
-  청두: BY_ID.chengdu,
-  태항산: BY_ID.taihang,
-  황산: BY_ID.huangshan,
-  장가계: BY_ID.zhangjiajie,
-  운남: BY_ID.yunnan,
-  귀주: BY_ID.guizhou,
+  대련: 'dalian',
+  연태: 'yantai',
+  청도: 'qingdao',
+  하얼빈: 'harbin',
+  북경: 'beijing',
+  상하이: 'shanghai',
+  홍콩: 'hongkong',
+  백두산: 'baekdusan',
+  서안: 'xian',
+  시안: 'xian',
+  청두: 'chengdu',
+  태항산: 'taihang',
+  황산: 'huangshan',
+  장가계: 'zhangjiajie',
+  운남: 'yunnan',
+  귀주: 'guizhou',
 }
 
-export function sampleCover(sample: { id?: string; place?: string }): string {
+const CATALOG = GALLERY_PHOTOS as GalleryPhoto[]
+
+export function sampleCoverPhotoId(sample: { id?: string; place?: string }): string {
   const id = (sample.id || '').trim()
-  if (id && BY_ID[id]) return BY_ID[id]
+  if (id && CATALOG.some((row) => row.id === id)) return id
   const place = (sample.place || '').split(/[·,]/)[0].trim()
   if (place && BY_PLACE[place]) return BY_PLACE[place]
-  return BY_ID.shanghai
+  return 'shanghai'
+}
+
+export function sampleCover(sample: { id?: string; place?: string }, photos?: GalleryPhoto[]): string {
+  const photoId = sampleCoverPhotoId(sample)
+  if (photos?.length) {
+    const found = photos.find((row) => row.id === photoId)
+    if (found?.src) return found.src
+  }
+  const catalog = CATALOG.find((row) => row.id === photoId)
+  return catalog?.src || CATALOG.find((row) => row.id === 'shanghai')?.src || ''
 }

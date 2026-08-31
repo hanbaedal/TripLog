@@ -1,3 +1,8 @@
+import type { GalleryPhoto } from '../types'
+import { GALLERY_PHOTOS } from './galleryCatalog.js'
+
+const CATALOG = GALLERY_PHOTOS as GalleryPhoto[]
+
 function clean(url: string): string {
   return url.split('?')[0]
 }
@@ -320,9 +325,22 @@ export function hasItemPhoto(kind?: string): boolean {
 }
 
 export function resolveItemPhoto(
-  item: { kind?: string; title?: string; photo?: string; place?: string; transportMode?: string },
+  item: {
+    kind?: string
+    title?: string
+    photo?: string
+    photoId?: string
+    place?: string
+    transportMode?: string
+  },
   destination?: string,
+  photos?: GalleryPhoto[],
 ): string | undefined {
+  const photoId = item.photoId?.trim()
+  if (photoId) {
+    const fromGallery = photos?.find((row) => row.id === photoId)?.src || CATALOG.find((row) => row.id === photoId)?.src
+    if (fromGallery) return fromGallery
+  }
   const custom = item.photo?.trim()
   if (custom) return custom
   const title = (item.title || '').trim()

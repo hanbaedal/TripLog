@@ -23,6 +23,7 @@ export type TripItem = {
   place?: string
   note?: string
   photo?: string
+  photoId?: string
   cost: number
   mealSlot?: MealSlot
   transportMode?: TransportMode
@@ -98,7 +99,8 @@ export type TravelInfo = {
   place: string
   title: string
   body: string
-  src: string
+  photoId?: string
+  src?: string
   sort?: number
   catalog?: boolean
   ownerId?: string
@@ -112,7 +114,8 @@ export type TravelSpot = {
   name: string
   body: string
   tip: string
-  src: string
+  photoId?: string
+  src?: string
   sort?: number
   catalog?: boolean
   ownerId?: string

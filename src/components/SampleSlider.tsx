@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-import type { SampleRecord } from '../types'
+import type { SampleRecord, GalleryPhoto } from '../types'
 import { sampleCover } from '../data/sampleCovers'
+import { loadGalleryPhotos } from '../lib/galleryResolve'
 
 type Props = {
   items: SampleRecord[]
@@ -15,6 +16,11 @@ export function SampleSlider({ items, auto, supervisor, onPick, onEdit, onDelete
   const track = useRef<HTMLDivElement>(null)
   const [canPrev, setCanPrev] = useState(false)
   const [canNext, setCanNext] = useState(false)
+  const [photos, setPhotos] = useState<GalleryPhoto[]>([])
+
+  useEffect(() => {
+    void loadGalleryPhotos().then(setPhotos)
+  }, [])
 
   function updateArrows() {
     const el = track.current
@@ -75,7 +81,7 @@ export function SampleSlider({ items, auto, supervisor, onPick, onEdit, onDelete
         {items.map((sample) => (
           <article className="sample-card" key={sample.id}>
             <button type="button" className="sample-card-main" onClick={() => onPick(sample)}>
-              <img className="sample-card-photo" src={sampleCover(sample)} alt="" />
+              <img className="sample-card-photo" src={sampleCover(sample, photos)} alt="" />
               <span className="sample-card-label">
                 <h3>{sample.place}</h3>
               </span>

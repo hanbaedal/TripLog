@@ -1,6 +1,7 @@
 export const TRAVEL_INFO_CATALOG = [
   {
     id: 'info-dalian',
+    photoId: 'dalian',
     place: '대련',
     title: '대련',
     body: '발해 바닷바람과 러시아풍 거리가 겹치는 항구 도시입니다. 싱하이광장, 후탄, 동산관 일대를 천천히 걷기 좋습니다.',
@@ -10,6 +11,7 @@ export const TRAVEL_INFO_CATALOG = [
   },
   {
     id: 'info-yantai',
+    photoId: 'yantai',
     place: '연태',
     title: '연태',
     body: '펑라이 각과 바닷가 산책로가 잘 알려진 산둥의 항구입니다. 해산물과 와인, 해변 일몰이 일정에 잘 맞습니다.',
@@ -19,6 +21,7 @@ export const TRAVEL_INFO_CATALOG = [
   },
   {
     id: 'info-qingdao',
+    photoId: 'qingdao',
     place: '청도',
     title: '청도',
     body: '잔차오와 석기 해변, 맥주 거리로 유명한 바다 도시입니다. 독일풍 거리와 라오산을 하루 일정으로 묶기 쉽습니다.',
@@ -28,6 +31,7 @@ export const TRAVEL_INFO_CATALOG = [
   },
   {
     id: 'info-harbin',
+    photoId: 'harbin',
     place: '하얼빈',
     title: '하얼빈',
     body: '겨울 빙설과 소피아 성당, 중앙대가 대표입니다. 러시아 거리 음식과 송화강 변을 같이 보면 도시의 결이 잘 드러납니다.',
@@ -37,6 +41,7 @@ export const TRAVEL_INFO_CATALOG = [
   },
   {
     id: 'info-beijing',
+    photoId: 'beijing',
     place: '북경',
     title: '북경',
     body: '자금성, 만리장성, 이화원이 겹치는 수도입니다. 후퉁과 찻집, 왕부정 일대를 섞으면 궁궐만 보는 일정과 균형이 납니다.',
@@ -46,6 +51,7 @@ export const TRAVEL_INFO_CATALOG = [
   },
   {
     id: 'info-shanghai',
+    photoId: 'shanghai',
     place: '상하이',
     title: '상하이',
     body: '외탄의 야경과 푸둥 스카이라인, 예원 골목이 한 도시에 있습니다. 황푸강 유람과 프랑스 조계를 나누어 보기 좋습니다.',
@@ -55,6 +61,7 @@ export const TRAVEL_INFO_CATALOG = [
   },
   {
     id: 'info-hongkong',
+    photoId: 'hongkong',
     place: '홍콩',
     title: '홍콩',
     body: '빅토리아피크와 스타 페리, 야시장이 가까운 섬 도시입니다. 낮에는 섬 트레일, 밤에는 빅토리아 항 야경이 잘 맞습니다.',
@@ -64,6 +71,7 @@ export const TRAVEL_INFO_CATALOG = [
   },
   {
     id: 'info-baekdusan',
+    photoId: 'baekdusan',
     place: '백두산',
     title: '백두산',
     body: '천지를 오르는 고원 일정입니다. 날씨와 셔틀, 입산 시간에 따라 하루가 달라지니 여유 날을 두는 편이 안전합니다.',
@@ -73,6 +81,7 @@ export const TRAVEL_INFO_CATALOG = [
   },
   {
     id: 'info-xian',
+    photoId: 'xian',
     place: '서안',
     title: '서안',
     body: '병마용과 성벽, 회민가가 남아 있는 옛 수도입니다. 자전거로 성벽을 한 바퀴 돌고 야시장을 보는 구성이 흔합니다.',
@@ -82,6 +91,7 @@ export const TRAVEL_INFO_CATALOG = [
   },
   {
     id: 'info-chengdu',
+    photoId: 'chengdu',
     place: '청두',
     title: '청두',
     body: '판다 기지와 쓰촨 요리가 먼저 떠오르는 분지 도시입니다. 쿠안자이상, 진리, 차관을 여유 있게 넣는 일정이 잘 맞습니다.',
@@ -91,6 +101,7 @@ export const TRAVEL_INFO_CATALOG = [
   },
   {
     id: 'info-taihang',
+    photoId: 'taihang',
     place: '태항산',
     title: '태항산',
     body: '절벽 도로와 협곡 전망이 이어지는 산악 지대입니다. 이동 시간이 길어서 숙소를 능선 가까이에 두는 편이 편합니다.',
@@ -100,6 +111,7 @@ export const TRAVEL_INFO_CATALOG = [
   },
   {
     id: 'info-huangshan',
+    photoId: 'huangshan',
     place: '황산',
     title: '황산',
     body: '운해와 기암, 일출을 보러 오르는 산입니다. 케이블카와 산상 숙박을 넣으면 새벽 일정을 무리 없이 짤 수 있습니다.',
@@ -109,6 +121,7 @@ export const TRAVEL_INFO_CATALOG = [
   },
   {
     id: 'info-zhangjiajie',
+    photoId: 'zhangjiajie',
     place: '장가계',
     title: '장가계',
     body: '기둥 같은 봉우리와 유리 다리를 보는 산림 공원입니다. 바이롱 엘리베이터와 텐먼산은 줄을 감안해 날짜를 나누는 것이 좋습니다.',
@@ -118,6 +131,7 @@ export const TRAVEL_INFO_CATALOG = [
   },
   {
     id: 'info-yunnan',
+    photoId: 'yunnan',
     place: '운남',
     title: '운남',
     body: '석림과 고원 호수, 소수민족 마을이 넓게 퍼진 성입니다. 쿤밍·다리·리장을 이으면 고도와 날씨 차이를 일정에 반영해야 합니다.',
@@ -127,6 +141,7 @@ export const TRAVEL_INFO_CATALOG = [
   },
   {
     id: 'info-guizhou',
+    photoId: 'guizhou',
     place: '귀주',
     title: '귀주',
     body: '황과수 대폭포와 카르스트 지형이 대표입니다. 폭포 주변 산책과 소수민족 마을을 하루씩 나누면 이동이 덜 지칩니다.',

@@ -209,7 +209,7 @@ for (const city of TRAVEL_INFO_CATALOG) {
       name,
       body,
       tip,
-      src: city.src,
+      photoId: `spot-${city.id.replace('info-', '')}-${index + 1}`,
       sort: index + 1,
       catalog: true,
     })

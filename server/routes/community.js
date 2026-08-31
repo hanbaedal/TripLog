@@ -12,10 +12,17 @@ function toPhoto(doc) {
     id: doc.photoId,
     title: doc.title,
     src: doc.src,
-    ownerId: String(doc.ownerId),
+    catalog: Boolean(doc.catalog),
+    ownerId: doc.ownerId ? String(doc.ownerId) : undefined,
     ownerName: doc.ownerName || '',
     at: doc.at?.toISOString?.() ?? new Date().toISOString(),
   }
+}
+
+function canManageGallery(user, doc) {
+  if (!doc) return false
+  if (doc.catalog) return isSupervisor(user)
+  return canManageOwned(user, doc.ownerId)
 }
 
 function toComment(row) {
@@ -103,7 +110,7 @@ galleryRouter.put('/:id', requireUser, async (req, res) => {
     return
   }
   const doc = await GalleryPhoto.findOne({ photoId: req.params.id })
-  if (!doc || !canManageOwned(req.user, doc.ownerId)) {
+  if (!doc || !canManageGallery(req.user, doc)) {
     res.status(404).json({ error: '사진을 찾지 못했습니다.' })
     return
   }
@@ -115,7 +122,7 @@ galleryRouter.put('/:id', requireUser, async (req, res) => {
 
 galleryRouter.delete('/:id', requireUser, async (req, res) => {
   const doc = await GalleryPhoto.findOne({ photoId: req.params.id })
-  if (!doc || !canManageOwned(req.user, doc.ownerId)) {
+  if (!doc || !canManageGallery(req.user, doc)) {
     res.status(404).json({ error: '사진을 찾지 못했습니다.' })
     return
   }

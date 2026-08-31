@@ -1,27 +1,31 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import { PageShell } from './PageShell'
+import { ImagePicker } from './ImagePicker'
 import { TRAVEL_INFO_CATALOG } from '../data/travelInfoCatalog.js'
+import { cityGalleryId } from '../data/galleryCatalog.js'
 import { canEditTravelInfo, listTravelInfo, removeTravelInfo, saveTravelInfo } from '../lib/community'
-import { compressImage } from '../lib/imageFile'
-import type { TravelInfo } from '../types'
+import { resolvePhotoSrc, loadGalleryPhotos } from '../lib/galleryResolve'
+import type { GalleryPhoto, TravelInfo } from '../types'
 import type { SiteNav } from '../lib/siteNav'
 
 export function InfoPage(nav: SiteNav) {
   const [items, setItems] = useState<TravelInfo[]>(() =>
     (TRAVEL_INFO_CATALOG as TravelInfo[]).map((row) => ({ ...row, catalog: true })),
   )
+  const [photos, setPhotos] = useState<GalleryPhoto[]>([])
   const [editing, setEditing] = useState<TravelInfo | null>(null)
   const [writing, setWriting] = useState(false)
   const [place, setPlace] = useState('')
   const [title, setTitle] = useState('')
   const [body, setBody] = useState('')
-  const [src, setSrc] = useState('')
+  const [photoId, setPhotoId] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
 
   useEffect(() => {
     void listTravelInfo().then(setItems)
+    void loadGalleryPhotos().then(setPhotos)
   }, [])
 
   const cards = useMemo(
@@ -39,7 +43,7 @@ export function InfoPage(nav: SiteNav) {
     setPlace('')
     setTitle('')
     setBody('')
-    setSrc('')
+    setPhotoId('')
     setError('')
   }
 
@@ -49,7 +53,7 @@ export function InfoPage(nav: SiteNav) {
     setPlace(item.place)
     setTitle(item.title)
     setBody(item.body)
-    setSrc(item.src)
+    setPhotoId(item.photoId || cityGalleryId(item.id))
     setError('')
   }
 
@@ -59,21 +63,8 @@ export function InfoPage(nav: SiteNav) {
     setPlace('')
     setTitle('')
     setBody('')
-    setSrc('')
+    setPhotoId('')
     setError('')
-  }
-
-  async function onFile(file: File | undefined) {
-    if (!file) return
-    setBusy(true)
-    setError('')
-    try {
-      setSrc(await compressImage(file))
-    } catch (err) {
-      setError(err instanceof Error ? err.message : '사진을 읽지 못했습니다.')
-    } finally {
-      setBusy(false)
-    }
   }
 
   async function submit(e: FormEvent) {
@@ -82,7 +73,7 @@ export function InfoPage(nav: SiteNav) {
       nav.go.auth()
       return
     }
-    if (!place.trim() || !title.trim() || !body.trim() || !src) {
+    if (!place.trim() || !title.trim() || !body.trim() || !photoId) {
       setError('도시, 제목, 설명, 사진이 필요합니다.')
       return
     }
@@ -94,7 +85,7 @@ export function InfoPage(nav: SiteNav) {
         place: place.trim(),
         title: title.trim(),
         body: body.trim(),
-        src,
+        photoId,
         sort: editing?.sort,
         ownerId: nav.user.id,
         ownerName: nav.user.name,
@@ -147,8 +138,13 @@ export function InfoPage(nav: SiteNav) {
             <input value={place} onChange={(e) => setPlace(e.target.value)} placeholder="도시·관광지" required />
             <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="제목" required />
             <textarea value={body} onChange={(e) => setBody(e.target.value)} rows={5} placeholder="설명" required />
-            <input type="file" accept="image/*" onChange={(e) => void onFile(e.target.files?.[0])} />
-            {src ? <img className="gallery-preview" src={src} alt="" /> : null}
+            <ImagePicker
+              photoId={photoId}
+              onChange={setPhotoId}
+              user={nav.user}
+              defaultTitle={title || place}
+              disabled={busy}
+            />
             <div className="nav-actions">
               <button className="btn" type="submit" disabled={busy}>
                 {editing ? '수정' : '등록'}
@@ -165,7 +161,7 @@ export function InfoPage(nav: SiteNav) {
           {cards.map((item) => (
             <article className="travel-card" key={item.id}>
               <button type="button" className="travel-card-open" onClick={() => nav.go.infoPlace(item.id)}>
-                <img src={item.src} alt="" />
+                <img src={resolvePhotoSrc(item.photoId || cityGalleryId(item.id), photos, item.src)} alt="" />
                 <div className="travel-card-body">
                   <p className="kicker">{item.place}</p>
                   <h3>{item.title}</h3>

@@ -1,4 +1,5 @@
 import { GALLERY_PHOTOS, mergeGallery } from '../data/galleryPhotos'
+import { invalidateGalleryCache } from './galleryResolve'
 import { TRAVEL_INFO_CATALOG } from '../data/travelInfoCatalog.js'
 import { TRAVEL_SPOT_CATALOG } from '../data/travelSpotCatalog.js'
 import type { BoardPost, GalleryPhoto, Inquiry, TravelInfo, TravelSpot, User } from '../types'
@@ -114,10 +115,12 @@ export async function saveGalleryPhoto(photo: GalleryPhoto): Promise<GalleryPhot
   const rows = localGallery()
   if (photo.id) {
     writeJson(GALLERY_KEY, rows.map((row) => (row.id === photo.id ? photo : row)))
+    invalidateGalleryCache()
     return photo
   }
   const saved = { ...photo, id: uid('gal'), at: new Date().toISOString() }
   writeJson(GALLERY_KEY, [saved, ...rows])
+  invalidateGalleryCache()
   return saved
 }
 
@@ -127,10 +130,12 @@ export async function removeGalleryPhoto(id: string): Promise<void> {
     return
   }
   writeJson(GALLERY_KEY, localGallery().filter((row) => row.id !== id))
+  invalidateGalleryCache()
 }
 
 export function canEditGallery(photo: GalleryPhoto, user?: User | null): boolean {
-  if (!user || photo.catalog) return false
+  if (!user) return false
+  if (photo.catalog) return isSupervisor(user)
   return isSupervisor(user) || photo.ownerId === user.id
 }
 

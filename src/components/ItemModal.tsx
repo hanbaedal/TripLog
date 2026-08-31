@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import type { ItemKind, MealSlot, TransportMode, TripItem } from '../types'
+import type { ItemKind, MealSlot, TransportMode, TripItem, User } from '../types'
+import { ImagePicker } from './ImagePicker'
 import { KIND_LABEL, MEAL_LABEL, TRANSPORT_LABEL } from '../lib/costs'
 import { composeFlightItem, parseFlightForm } from '../lib/flightFields'
 
@@ -8,6 +9,7 @@ type Props = {
   dayIndex: number
   initial?: TripItem
   preset?: { kind: ItemKind; mealSlot?: MealSlot }
+  user?: User | null
   onClose: () => void
   onSave: (item: TripItem) => void
   onDelete?: () => void
@@ -34,7 +36,7 @@ function uid(): string {
   return crypto.randomUUID()
 }
 
-export function ItemModal({ dayIndex, initial, preset, onClose, onSave, onDelete }: Props) {
+export function ItemModal({ dayIndex, initial, preset, user, onClose, onSave, onDelete }: Props) {
   const [kind, setKind] = useState<ItemKind>(initial?.kind ?? preset?.kind ?? 'sight')
   const [mealSlot, setMealSlot] = useState<MealSlot>(
     initial?.mealSlot ?? preset?.mealSlot ?? 'lunch',
@@ -49,7 +51,7 @@ export function ItemModal({ dayIndex, initial, preset, onClose, onSave, onDelete
   const [place, setPlace] = useState(initial?.place ?? '')
   const [subtitle, setSubtitle] = useState(initial?.subtitle ?? '')
   const [note, setNote] = useState(initial?.note ?? '')
-  const [photo, setPhoto] = useState(initial?.photo ?? '')
+  const [photoId, setPhotoId] = useState(initial?.photoId ?? initial?.photo ?? '')
   const [cost, setCost] = useState(initial ? String(initial.cost) : '')
   const parsed = parseFlightForm(initial?.kind === 'flight' ? initial : undefined)
   const [departTerminal, setDepartTerminal] = useState(parsed.departTerminal)
@@ -111,9 +113,9 @@ export function ItemModal({ dayIndex, initial, preset, onClose, onSave, onDelete
       cost: Number(cost) || 0,
       mealSlot: kind === 'meal' ? mealSlot : undefined,
       transportMode: kind === 'transport' ? transportMode : undefined,
-      photo:
+      photoId:
         kind === 'sight' || kind === 'meal' || kind === 'hotel' || kind === 'transport'
-          ? photo.trim() || undefined
+          ? photoId.trim() || undefined
           : undefined,
     }
     onSave(item)
@@ -277,14 +279,9 @@ export function ItemModal({ dayIndex, initial, preset, onClose, onSave, onDelete
             />
           </label>
           {kind === 'sight' || kind === 'meal' || kind === 'hotel' || kind === 'transport' ? (
-            <label className="span-2">
-              사진 주소
-              <input
-                value={photo}
-                onChange={(e) => setPhoto(e.target.value)}
-                placeholder="https://..."
-              />
-            </label>
+            <div className="span-2">
+              <ImagePicker photoId={photoId} onChange={setPhotoId} user={user ?? null} defaultTitle={title} scope="all" />
+            </div>
           ) : null}
           <label className={kind === 'flight' ? 'span-2' : undefined}>
             메모

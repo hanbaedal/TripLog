@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import { PageShell } from './PageShell'
+import { ImagePicker } from './ImagePicker'
 import {
   canEditTravelSpot,
   findTravelInfo,
@@ -8,9 +9,10 @@ import {
   removeTravelSpot,
   saveTravelSpot,
 } from '../lib/community'
-import { compressImage } from '../lib/imageFile'
+import { cityGalleryId } from '../data/galleryCatalog.js'
+import { loadGalleryPhotos, resolvePhotoSrc } from '../lib/galleryResolve'
 import { mapSearchLinks } from '../lib/mapLinks'
-import type { TravelInfo, TravelSpot } from '../types'
+import type { GalleryPhoto, TravelInfo, TravelSpot } from '../types'
 import type { SiteNav } from '../lib/siteNav'
 
 type Props = SiteNav & {
@@ -20,18 +22,20 @@ type Props = SiteNav & {
 export function InfoPlacePage({ cityId, ...nav }: Props) {
   const [city, setCity] = useState<TravelInfo | null>(null)
   const [spots, setSpots] = useState<TravelSpot[]>([])
+  const [photos, setPhotos] = useState<GalleryPhoto[]>([])
   const [writing, setWriting] = useState(false)
   const [editing, setEditing] = useState<TravelSpot | null>(null)
   const [name, setName] = useState('')
   const [body, setBody] = useState('')
   const [tip, setTip] = useState('')
-  const [src, setSrc] = useState('')
+  const [photoId, setPhotoId] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
 
   useEffect(() => {
     void findTravelInfo(cityId).then((row) => setCity(row ?? null))
     void listTravelSpots(cityId).then(setSpots)
+    void loadGalleryPhotos().then(setPhotos)
   }, [cityId])
 
   const cards = useMemo(
@@ -45,7 +49,7 @@ export function InfoPlacePage({ cityId, ...nav }: Props) {
     setName('')
     setBody('')
     setTip('')
-    setSrc('')
+    setPhotoId('')
     setError('')
   }
 
@@ -59,7 +63,7 @@ export function InfoPlacePage({ cityId, ...nav }: Props) {
     setName('')
     setBody('')
     setTip('')
-    setSrc(city?.src || '')
+    setPhotoId(city?.photoId || cityGalleryId(cityId))
     setError('')
   }
 
@@ -69,21 +73,8 @@ export function InfoPlacePage({ cityId, ...nav }: Props) {
     setName(spot.name)
     setBody(spot.body)
     setTip(spot.tip)
-    setSrc(spot.src)
+    setPhotoId(spot.photoId || spot.id)
     setError('')
-  }
-
-  async function onFile(file: File | undefined) {
-    if (!file) return
-    setBusy(true)
-    setError('')
-    try {
-      setSrc(await compressImage(file))
-    } catch (err) {
-      setError(err instanceof Error ? err.message : '사진을 읽지 못했습니다.')
-    } finally {
-      setBusy(false)
-    }
   }
 
   async function submit(e: FormEvent) {
@@ -92,7 +83,7 @@ export function InfoPlacePage({ cityId, ...nav }: Props) {
       nav.go.auth()
       return
     }
-    if (!name.trim() || !body.trim() || !src) {
+    if (!name.trim() || !body.trim() || !photoId) {
       setError('이름, 설명, 사진이 필요합니다.')
       return
     }
@@ -105,7 +96,7 @@ export function InfoPlacePage({ cityId, ...nav }: Props) {
         name: name.trim(),
         body: body.trim(),
         tip: tip.trim(),
-        src,
+        photoId,
         sort: editing?.sort,
         ownerId: nav.user.id,
         ownerName: nav.user.name,
@@ -147,6 +138,7 @@ export function InfoPlacePage({ cityId, ...nav }: Props) {
   }
 
   const place = city.place
+  const cityPhoto = resolvePhotoSrc(city.photoId || cityGalleryId(cityId), photos, city.src)
 
   return (
     <PageShell {...nav}>
@@ -166,7 +158,7 @@ export function InfoPlacePage({ cityId, ...nav }: Props) {
         </div>
 
         <article className="info-card travel-city-intro">
-          <img className="gallery-preview" src={city.src} alt="" />
+          <img className="gallery-preview" src={cityPhoto} alt="" />
           <h3>{city.title}</h3>
           <p>{city.body}</p>
         </article>
@@ -176,8 +168,13 @@ export function InfoPlacePage({ cityId, ...nav }: Props) {
             <input value={name} onChange={(e) => setName(e.target.value)} placeholder="관광지 이름" required />
             <textarea value={body} onChange={(e) => setBody(e.target.value)} rows={4} placeholder="설명" required />
             <textarea value={tip} onChange={(e) => setTip(e.target.value)} rows={2} placeholder="찾아가는 힌트" />
-            <input type="file" accept="image/*" onChange={(e) => void onFile(e.target.files?.[0])} />
-            {src ? <img className="gallery-preview" src={src} alt="" /> : null}
+            <ImagePicker
+              photoId={photoId}
+              onChange={setPhotoId}
+              user={nav.user}
+              defaultTitle={name || place}
+              disabled={busy}
+            />
             <div className="nav-actions">
               <button className="btn" type="submit" disabled={busy}>
                 {editing ? '수정' : '등록'}
@@ -193,9 +190,10 @@ export function InfoPlacePage({ cityId, ...nav }: Props) {
         <div className="travel-cards">
           {cards.map((spot) => {
             const maps = mapSearchLinks(place, spot.name)
+            const spotPhoto = resolvePhotoSrc(spot.photoId || spot.id, photos, spot.src)
             return (
               <article className="travel-card" key={spot.id}>
-                <img src={spot.src} alt="" />
+                <img src={spotPhoto} alt="" />
                 <div className="travel-card-body">
                   <h3>{spot.name}</h3>
                   <p>{spot.body}</p>

@@ -1,7 +1,8 @@
 import type { SampleRecord, Trip, User } from '../types'
 import { isSupervisor } from '../lib/auth'
 import { SAMPLE_CATALOG } from './sampleCatalog.js'
-import { hasItemPhoto, resolveItemPhoto } from './sightPhotos'
+import { hasItemPhoto } from './sightPhotos'
+import { sampleCoverPhotoId } from './sampleCovers'
 import { addDays, dayCount, todayIso } from '../lib/dates'
 import { uid } from '../lib/id'
 import { api, isRemote, probeRemote } from '../lib/remote'
@@ -45,10 +46,11 @@ export function cloneSampleTrip(sample: SampleRecord): Trip {
     items: (sample.trip.items || []).map((entry) => ({
       ...entry,
       id: uid('item'),
-      photo:
+      photoId:
         hasItemPhoto(entry.kind)
-          ? entry.photo || resolveItemPhoto(entry, sample.destination || sample.place)
-          : entry.photo,
+          ? entry.photoId || entry.photo || sampleCoverPhotoId(sample)
+          : entry.photoId,
+      photo: undefined,
     })),
     updatedAt: new Date().toISOString(),
     savedByUser: false,
