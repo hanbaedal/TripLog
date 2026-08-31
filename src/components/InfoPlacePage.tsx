@@ -232,18 +232,12 @@ export function InfoPlacePage({ cityId, ...nav }: Props) {
                   {spot.addressZh ? <p className="travel-address">{spot.addressZh}</p> : null}
                   <p>{spot.body}</p>
                   {spot.tip ? <p className="muted">{spot.tip}</p> : null}
-                  <div className="nav-actions">
-                    <a className="btn ghost" href={maps.baidu} target="_blank" rel="noreferrer">
+                  <div className="travel-map-links">
+                    <a className="travel-map-link" href={maps.baidu} target="_blank" rel="noreferrer">
                       百度地图
                     </a>
-                    <a className="btn ghost" href={maps.amap} target="_blank" rel="noreferrer">
-                      高德地图
-                    </a>
-                    <a className="btn ghost" href={maps.google} target="_blank" rel="noreferrer">
-                      구글 지도
-                    </a>
-                    <a className="btn ghost" href={maps.naver} target="_blank" rel="noreferrer">
-                      네이버 지도
+                    <a className="travel-map-link" href={maps.google} target="_blank" rel="noreferrer">
+                      Google Map
                     </a>
                   </div>
                   {canEditTravelSpot(spot, nav.user) ? (

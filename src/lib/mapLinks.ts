@@ -18,9 +18,7 @@ export function mapSearchLinks(input: MapSearchInput) {
   const q = encodeURIComponent(mapQuery(input))
   return {
     baidu: `https://map.baidu.com/search/${q}`,
-    amap: `https://uri.amap.com/search?query=${q}`,
     google: `https://www.google.com/maps/search/?api=1&query=${q}`,
-    naver: `https://map.naver.com/v5/search/${q}`,
   }
 }
 
