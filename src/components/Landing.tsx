@@ -14,7 +14,6 @@ type Props = SiteNav & {
 
 export function Landing({ onPickSample, ...nav }: Props) {
   const [rows, setRows] = useState<SampleRecord[]>(() => SAMPLE_CATALOG as SampleRecord[])
-  const [brushOk, setBrushOk] = useState(true)
 
   useEffect(() => {
     void listSamples().then(setRows)
@@ -32,13 +31,6 @@ export function Landing({ onPickSample, ...nav }: Props) {
         <SideMenu {...nav} />
         <div className="home-main">
           <GalleryHero onOpen={(id) => nav.go.gallery(id)} />
-          <figure className={`brush-banner${brushOk ? '' : ' is-fallback'}`}>
-            {brushOk ? (
-              <img src="/brand/header-brush.png" alt="나만의 맞춤 여행 일지" onError={() => setBrushOk(false)} />
-            ) : (
-              <figcaption className="brush-title">나만의 맞춤 여행 일지</figcaption>
-            )}
-          </figure>
           <section className="samples-home">
             <SampleSlider items={samples} auto onPick={onPickSample} />
           </section>
