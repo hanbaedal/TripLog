@@ -33,6 +33,8 @@ function toSpot(doc) {
     id: doc.spotId,
     cityId: doc.cityId,
     name: doc.name,
+    nameZh: doc.nameZh || '',
+    addressZh: doc.addressZh || '',
     body: doc.body,
     tip: doc.tip || '',
     photoId: doc.photoId || '',
@@ -89,6 +91,8 @@ export async function seedTravelInfo() {
       {
         $set: {
           name: row.name,
+          nameZh: row.nameZh || '',
+          addressZh: row.addressZh || '',
           body: row.body,
           tip: row.tip,
           photoId,
@@ -121,6 +125,8 @@ travelInfoRouter.get('/:cityId/spots', async (req, res) => {
 travelInfoRouter.post('/:cityId/spots', requireUser, async (req, res) => {
   const cityId = String(req.params.cityId || '').trim()
   const name = String(req.body?.name || '').trim()
+  const nameZh = String(req.body?.nameZh || '').trim()
+  const addressZh = String(req.body?.addressZh || '').trim()
   const body = String(req.body?.body || '').trim()
   const tip = String(req.body?.tip || '').trim()
   const photo = await requirePhotoId(req.body?.photoId)
@@ -132,6 +138,8 @@ travelInfoRouter.post('/:cityId/spots', requireUser, async (req, res) => {
     spotId: nid('spot'),
     cityId,
     name,
+    nameZh,
+    addressZh,
     body,
     tip,
     photoId: photo.photoId,
@@ -152,6 +160,8 @@ travelInfoRouter.put('/spots/:id', requireUser, async (req, res) => {
     return
   }
   const name = String(req.body?.name || '').trim()
+  const nameZh = String(req.body?.nameZh || '').trim()
+  const addressZh = String(req.body?.addressZh || '').trim()
   const body = String(req.body?.body || '').trim()
   const tip = String(req.body?.tip || '').trim()
   const photo = await requirePhotoId(req.body?.photoId)
@@ -160,6 +170,8 @@ travelInfoRouter.put('/spots/:id', requireUser, async (req, res) => {
     return
   }
   doc.name = name
+  doc.nameZh = nameZh
+  doc.addressZh = addressZh
   doc.body = body
   doc.tip = tip
   doc.photoId = photo.photoId

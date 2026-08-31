@@ -1743,6 +1743,14 @@ p {
   margin-top: 4px;
 }
 
+.travel-address {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--ink);
+  font-family: 'Noto Sans SC', 'PingFang SC', sans-serif;
+}
+
 .comment-list {
   display: grid;
   gap: 10px;

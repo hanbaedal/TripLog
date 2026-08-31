@@ -146,6 +146,8 @@ const travelSpotSchema = new mongoose.Schema(
     spotId: { type: String, required: true, unique: true },
     cityId: { type: String, required: true, index: true },
     name: { type: String, required: true, trim: true },
+    nameZh: { type: String, default: '', trim: true },
+    addressZh: { type: String, default: '', trim: true },
     body: { type: String, required: true, trim: true },
     tip: { type: String, default: '', trim: true },
     photoId: { type: String, default: '', trim: true },

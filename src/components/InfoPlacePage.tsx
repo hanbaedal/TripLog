@@ -10,9 +10,10 @@ import {
   saveTravelSpot,
 } from '../lib/community'
 import { cityGalleryId } from '../data/galleryCatalog.js'
+import { CITY_REGION_ZH } from '../data/spotLocale.js'
 import { guessSightType } from '../data/galleryTaxonomy.js'
 import { loadGalleryPhotos, resolvePhotoSrc, type GalleryUploadMeta } from '../lib/galleryResolve'
-import { mapSearchLinks } from '../lib/mapLinks'
+import { formatSpotLabel, mapSearchLinks } from '../lib/mapLinks'
 import type { GalleryPhoto, TravelInfo, TravelSpot } from '../types'
 import type { SiteNav } from '../lib/siteNav'
 
@@ -27,6 +28,8 @@ export function InfoPlacePage({ cityId, ...nav }: Props) {
   const [writing, setWriting] = useState(false)
   const [editing, setEditing] = useState<TravelSpot | null>(null)
   const [name, setName] = useState('')
+  const [nameZh, setNameZh] = useState('')
+  const [addressZh, setAddressZh] = useState('')
   const [body, setBody] = useState('')
   const [tip, setTip] = useState('')
   const [photoId, setPhotoId] = useState('')
@@ -56,6 +59,8 @@ export function InfoPlacePage({ cityId, ...nav }: Props) {
     setWriting(false)
     setEditing(null)
     setName('')
+    setNameZh('')
+    setAddressZh('')
     setBody('')
     setTip('')
     setPhotoId('')
@@ -70,6 +75,8 @@ export function InfoPlacePage({ cityId, ...nav }: Props) {
     setWriting(true)
     setEditing(null)
     setName('')
+    setNameZh('')
+    setAddressZh('')
     setBody('')
     setTip('')
     setPhotoId(city?.photoId || cityGalleryId(cityId))
@@ -80,6 +87,8 @@ export function InfoPlacePage({ cityId, ...nav }: Props) {
     setWriting(true)
     setEditing(spot)
     setName(spot.name)
+    setNameZh(spot.nameZh || '')
+    setAddressZh(spot.addressZh || '')
     setBody(spot.body)
     setTip(spot.tip)
     setPhotoId(spot.photoId || spot.id)
@@ -103,6 +112,8 @@ export function InfoPlacePage({ cityId, ...nav }: Props) {
         id: editing?.id,
         cityId,
         name: name.trim(),
+        nameZh: nameZh.trim(),
+        addressZh: addressZh.trim(),
         body: body.trim(),
         tip: tip.trim(),
         photoId,
@@ -174,9 +185,15 @@ export function InfoPlacePage({ cityId, ...nav }: Props) {
 
         {writing ? (
           <form className="board-form" onSubmit={(e) => void submit(e)}>
-            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="관광지 이름" required />
+            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="관광지 이름 (한글)" required />
+            <input value={nameZh} onChange={(e) => setNameZh(e.target.value)} placeholder="中文名称 (선택)" />
+            <input
+              value={addressZh}
+              onChange={(e) => setAddressZh(e.target.value)}
+              placeholder="中文地址 (지도 검색용, 선택)"
+            />
             <textarea value={body} onChange={(e) => setBody(e.target.value)} rows={4} placeholder="설명" required />
-            <textarea value={tip} onChange={(e) => setTip(e.target.value)} rows={2} placeholder="찾아가는 힌트" />
+            <textarea value={tip} onChange={(e) => setTip(e.target.value)} rows={2} placeholder="찾아가는 힌트 (교통·입구 등)" />
             <ImagePicker
               photoId={photoId}
               onChange={setPhotoId}
@@ -199,21 +216,34 @@ export function InfoPlacePage({ cityId, ...nav }: Props) {
 
         <div className="travel-cards">
           {cards.map((spot) => {
-            const maps = mapSearchLinks(place, spot.name)
+            const maps = mapSearchLinks({
+              cityKo: place,
+              spotKo: spot.name,
+              cityZh: CITY_REGION_ZH[cityId as keyof typeof CITY_REGION_ZH],
+              nameZh: spot.nameZh,
+              addressZh: spot.addressZh,
+            })
             const spotPhoto = resolvePhotoSrc(spot.photoId || spot.id, photos, spot.src)
             return (
               <article className="travel-card" key={spot.id}>
                 <img src={spotPhoto} alt="" />
                 <div className="travel-card-body">
-                  <h3>{spot.name}</h3>
+                  <h3>{formatSpotLabel(spot)}</h3>
+                  {spot.addressZh ? <p className="travel-address">{spot.addressZh}</p> : null}
                   <p>{spot.body}</p>
                   {spot.tip ? <p className="muted">{spot.tip}</p> : null}
                   <div className="nav-actions">
-                    <a className="btn ghost" href={maps.naver} target="_blank" rel="noreferrer">
-                      네이버 지도
+                    <a className="btn ghost" href={maps.baidu} target="_blank" rel="noreferrer">
+                      百度地图
+                    </a>
+                    <a className="btn ghost" href={maps.amap} target="_blank" rel="noreferrer">
+                      高德地图
                     </a>
                     <a className="btn ghost" href={maps.google} target="_blank" rel="noreferrer">
                       구글 지도
+                    </a>
+                    <a className="btn ghost" href={maps.naver} target="_blank" rel="noreferrer">
+                      네이버 지도
                     </a>
                   </div>
                   {canEditTravelSpot(spot, nav.user) ? (

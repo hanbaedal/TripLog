@@ -221,3 +221,4 @@ writeFileSync(new URL('../src/data/travelSpotCatalog.js', import.meta.url), out)
 console.log(`Generated ${rows.length} spots for ${TRAVEL_INFO_CATALOG.length} cities`)
 
 await import('./patch-spot-photos.mjs')
+await import('./patch-spot-locale.mjs')

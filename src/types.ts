@@ -119,6 +119,8 @@ export type TravelSpot = {
   id: string
   cityId: string
   name: string
+  nameZh?: string
+  addressZh?: string
   body: string
   tip: string
   photoId?: string
