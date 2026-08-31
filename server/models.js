@@ -56,7 +56,48 @@ const sampleSchema = new mongoose.Schema(
   { timestamps: true },
 )
 
+const gallerySchema = new mongoose.Schema(
+  {
+    photoId: { type: String, required: true, unique: true },
+    ownerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+    ownerName: { type: String, default: '' },
+    title: { type: String, required: true, trim: true },
+    src: { type: String, required: true },
+    at: { type: Date, default: Date.now },
+  },
+  { timestamps: true },
+)
+
+const boardSchema = new mongoose.Schema(
+  {
+    postId: { type: String, required: true, unique: true },
+    ownerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null, index: true },
+    name: { type: String, required: true, trim: true },
+    title: { type: String, required: true, trim: true },
+    body: { type: String, required: true, trim: true },
+    at: { type: Date, default: Date.now },
+  },
+  { timestamps: true },
+)
+
+const inquirySchema = new mongoose.Schema(
+  {
+    inquiryId: { type: String, required: true, unique: true },
+    ownerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null, index: true },
+    name: { type: String, required: true, trim: true },
+    email: { type: String, required: true, trim: true },
+    message: { type: String, required: true, trim: true },
+    at: { type: Date, default: Date.now },
+    reply: { type: String, default: '' },
+    replyAt: { type: Date },
+  },
+  { timestamps: true },
+)
+
 export const User = mongoose.models.User || mongoose.model('User', userSchema)
 export const Trip = mongoose.models.Trip || mongoose.model('Trip', tripSchema)
 export const FlightSnap = mongoose.models.FlightSnap || mongoose.model('FlightSnap', flightSnapSchema)
 export const Sample = mongoose.models.Sample || mongoose.model('Sample', sampleSchema)
+export const GalleryPhoto = mongoose.models.GalleryPhoto || mongoose.model('GalleryPhoto', gallerySchema)
+export const BoardPost = mongoose.models.BoardPost || mongoose.model('BoardPost', boardSchema)
+export const Inquiry = mongoose.models.Inquiry || mongoose.model('Inquiry', inquirySchema)

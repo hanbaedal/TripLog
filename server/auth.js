@@ -7,6 +7,23 @@ export function signToken(userId) {
   return jwt.sign({ sub: userId }, secret(), { expiresIn: '30d' })
 }
 
+export async function optionalUser(req, res, next) {
+  const header = req.headers.authorization || ''
+  const token = header.startsWith('Bearer ') ? header.slice(7) : ''
+  if (!token) {
+    next()
+    return
+  }
+  try {
+    const payload = jwt.verify(token, secret())
+    const user = await User.findById(payload.sub)
+    if (user) req.user = user
+  } catch {
+    /* guest */
+  }
+  next()
+}
+
 export async function requireUser(req, res, next) {
   const header = req.headers.authorization || ''
   const token = header.startsWith('Bearer ') ? header.slice(7) : ''

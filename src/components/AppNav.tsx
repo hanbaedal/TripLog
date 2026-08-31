@@ -1,70 +1,57 @@
-import type { ReactNode } from 'react'
+import { useLayoutEffect, useRef } from 'react'
 import { BrandMark } from './Icons'
-import type { User } from '../types'
+import { SITE_LINKS, goSite, type SiteNav } from '../lib/siteNav'
 
-export type AppView = 'home' | 'samples' | 'trips' | 'planner' | 'guide'
+type Props = SiteNav
 
-type Props = {
-  view: AppView
-  user: User | null
-  onHome: () => void
-  onSamples: () => void
-  onTrips: () => void
-  onNewTrip: () => void
-  onAuth: () => void
-  onLogout?: () => void
-  extra?: ReactNode
-}
+export function AppNav({ view, user, go }: Props) {
+  const header = useRef<HTMLElement>(null)
 
-export function AppNav({
-  view,
-  user,
-  onHome,
-  onSamples,
-  onTrips,
-  onNewTrip,
-  onAuth,
-  onLogout,
-  extra,
-}: Props) {
+  useLayoutEffect(() => {
+    const el = header.current
+    if (!el) return
+    const apply = () => {
+      const height = Math.min(Math.max(el.offsetHeight, 48), 96)
+      document.documentElement.style.setProperty('--nav-h', `${height}px`)
+    }
+    apply()
+    const ro = new ResizeObserver(apply)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+
   return (
-    <header className="wrap topnav">
-      <button className="brand" type="button" onClick={onHome}>
-        <BrandMark className="brand-mark" />
-        <span className="brand-name">
-          triplog.my
-          <small>private travel log</small>
-        </span>
-      </button>
-      <nav className="nav-actions" aria-label="주요 메뉴">
-        <button className={`btn ghost${view === 'home' ? ' is-on' : ''}`} type="button" onClick={onHome}>
-          메뉴
+    <header className="site-header" ref={header}>
+      <div className="wrap topnav">
+        <button className="brand" type="button" onClick={go.home}>
+          <BrandMark className="brand-mark" />
+          <span className="brand-name">
+            triplog.my
+            <small>private travel log</small>
+          </span>
         </button>
-        <button className={`btn ghost${view === 'samples' ? ' is-on' : ''}`} type="button" onClick={onSamples}>
-          샘플 일정
-        </button>
-        <button className={`btn ghost${view === 'trips' ? ' is-on' : ''}`} type="button" onClick={onTrips}>
-          내 여행
-        </button>
-        <button className="btn ghost" type="button" onClick={onNewTrip}>
-          새 여행
-        </button>
-        {user ? (
-          <>
-            <span className="who">{user.name}</span>
-            {onLogout ? (
-              <button className="btn ghost" type="button" onClick={onLogout}>
-                로그아웃
-              </button>
-            ) : null}
-          </>
-        ) : (
-          <button className="btn ghost" type="button" onClick={onAuth}>
-            로그인
-          </button>
-        )}
-        {extra}
-      </nav>
+        <nav className="nav-actions" aria-label="주요 메뉴">
+          {SITE_LINKS.map((link) => (
+            <button
+              key={link.id}
+              className={`btn ghost${view === link.id ? ' is-on' : ''}`}
+              type="button"
+              onClick={() => goSite({ view, user, go }, link.id)}
+            >
+              {link.label}
+            </button>
+          ))}
+          {user ? (
+            <button className="btn ghost" type="button" onClick={go.logout}>
+              로그아웃
+            </button>
+          ) : (
+            <button className="btn ghost" type="button" onClick={go.auth}>
+              로그인
+            </button>
+          )}
+        </nav>
+      </div>
     </header>
   )
 }

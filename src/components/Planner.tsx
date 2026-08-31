@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import type { ItemKind, MealSlot, Trip, TripItem, User } from '../types'
-import { BrandMark } from './Icons'
+import { AppNav } from './AppNav'
 import { FlightSearch } from './FlightSearch'
 import { HotelSearch } from './HotelSearch'
 import { ItemModal } from './ItemModal'
@@ -8,6 +8,7 @@ import { attachFlight, attachHotel } from '../lib/connect/attach'
 import { KIND_LABEL, MEAL_LABEL, TRANSPORT_LABEL, krw, summarize } from '../lib/costs'
 import { dateOn, dayCount, formatRange, formatShort } from '../lib/dates'
 import { hasItemPhoto, resolveItemPhoto } from '../data/sightPhotos'
+import type { SiteNav } from '../lib/siteNav'
 
 type Props = {
   trip: Trip
@@ -15,11 +16,8 @@ type Props = {
   copyingSample?: boolean
   onChange: (trip: Trip) => void
   onSaveCopy?: () => void
-  onHome: () => void
-  onSamples: () => void
-  onTrips: () => void
+  nav: SiteNav
   onGuide: () => void
-  onAuth: () => void
 }
 
 const ADD_CHIPS: { label: string; kind: ItemKind; mealSlot?: MealSlot }[] = [
@@ -74,11 +72,8 @@ export function Planner({
   copyingSample,
   onChange,
   onSaveCopy,
-  onHome,
-  onSamples,
-  onTrips,
+  nav,
   onGuide,
-  onAuth,
 }: Props) {
   const days = dayCount(trip.startDate, trip.endDate)
   const [day, setDay] = useState(0)
@@ -140,16 +135,11 @@ export function Planner({
   }
 
   return (
+    <div>
+      <AppNav {...nav} />
     <div className={`planner-shell${locked ? ' is-locked' : ''}`}>
       <header className="planner-bar">
         <div className="planner-bar-inner">
-          <button className="brand" type="button" onClick={onHome} style={{ background: 'none', border: 0, padding: 0 }}>
-            <BrandMark className="brand-mark" />
-            <span className="brand-name">
-              triplog.my
-              <small>planner</small>
-            </span>
-          </button>
           <div className="trip-fields">
             <label className="field title">
               <span>Title</span>
@@ -214,34 +204,16 @@ export function Planner({
             </div>
           </div>
           <div className="nav-actions">
-            <button className="btn ghost" type="button" onClick={onHome}>
-              메뉴
-            </button>
-            <button className="btn ghost" type="button" onClick={onSamples}>
-              샘플 일정
-            </button>
-            <button className="btn ghost" type="button" onClick={onTrips}>
-              내 여행
-            </button>
             {user && copyingSample && onSaveCopy ? (
               <button className="btn stamp" type="button" onClick={onSaveCopy}>
                 내 여행에 저장
               </button>
             ) : null}
             {!user && copyingSample ? (
-              <button className="btn stamp" type="button" onClick={onAuth}>
+              <button className="btn stamp" type="button" onClick={nav.go.auth}>
                 로그인하고 내 일정으로
               </button>
             ) : null}
-            {user ? (
-              <button className="btn ghost" type="button" onClick={onTrips}>
-                {user.name}
-              </button>
-            ) : copyingSample ? null : (
-              <button className="btn ghost" type="button" onClick={onAuth}>
-                로그인
-              </button>
-            )}
             <button className="btn forest" type="button" onClick={onGuide}>
               안내서 만들기
             </button>
@@ -485,6 +457,7 @@ export function Planner({
           <img src={lightbox.src} alt={lightbox.title} onClick={(e) => e.stopPropagation()} />
         </div>
       ) : null}
+    </div>
     </div>
   )
 }

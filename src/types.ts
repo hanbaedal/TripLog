@@ -60,6 +60,36 @@ export type User = {
   role?: 'user' | 'supervisor'
 }
 
+export type GalleryPhoto = {
+  id: string
+  title: string
+  src: string
+  ownerId?: string
+  ownerName?: string
+  at?: string
+  catalog?: boolean
+}
+
+export type BoardPost = {
+  id: string
+  name: string
+  title: string
+  body: string
+  at: string
+  ownerId?: string
+}
+
+export type Inquiry = {
+  id: string
+  name: string
+  email: string
+  message: string
+  at: string
+  ownerId?: string
+  reply?: string
+  replyAt?: string
+}
+
 export type FlightOffer = {
   id: string
   airline: string

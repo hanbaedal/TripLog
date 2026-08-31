@@ -1,37 +1,25 @@
-import { AppNav } from './AppNav'
-import type { Trip, User } from '../types'
+import { PageShell } from './PageShell'
+import type { Trip } from '../types'
 import { formatRange } from '../lib/dates'
 import { krw, summarize } from '../lib/costs'
+import type { SiteNav } from '../lib/siteNav'
 
-type Props = {
-  user: User | null
+type Props = SiteNav & {
   trips: Trip[]
   onOpen: (trip: Trip) => void
   onNew: () => void
-  onDemo: () => void
-  onHome: () => void
-  onAuth: () => void
-  onLogout: () => void
   onDelete: (id: string) => void
 }
 
-export function TripList({ user, trips, onOpen, onNew, onDemo, onHome, onAuth, onLogout, onDelete }: Props) {
+export function TripList({ trips, onOpen, onNew, onDelete, ...nav }: Props) {
   return (
-    <div>
-      <AppNav
-        view="trips"
-        user={user}
-        onHome={onHome}
-        onSamples={onDemo}
-        onTrips={() => undefined}
-        onNewTrip={onNew}
-        onAuth={onAuth}
-        onLogout={onLogout}
-      />
-
+    <PageShell {...nav}>
       <section className="wrap section">
         <div className="section-head">
-          <h2>{user ? `${user.name}의 여행` : '저장된 여행'}</h2>
+          <h2>{nav.user ? `${nav.user.name}의 여행` : '저장된 여행'}</h2>
+          <button className="btn" type="button" onClick={onNew}>
+            새 여행
+          </button>
         </div>
 
         {trips.length === 0 ? null : (
@@ -60,6 +48,6 @@ export function TripList({ user, trips, onOpen, onNew, onDemo, onHome, onAuth, o
           </div>
         )}
       </section>
-    </div>
+    </PageShell>
   )
 }

@@ -1,9 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
 import { AuthModal } from './components/AuthModal'
+import { BoardPage } from './components/BoardPage'
+import { GalleryPage } from './components/GalleryPage'
+import { GalleryWritePage } from './components/GalleryWritePage'
 import { Guidebook } from './components/Guidebook'
+import { InfoPage } from './components/InfoPage'
+import { InquiryPage } from './components/InquiryPage'
 import { Landing } from './components/Landing'
 import { Planner } from './components/Planner'
 import { SampleGallery } from './components/SampleGallery'
+import { SitemapPage } from './components/SitemapPage'
 import { TripList } from './components/TripList'
 import { emptyTrip } from './data/demo'
 import { cloneSampleTrip, isBlankDraft, sampleFromTrip, saveSample } from './data/samples'
@@ -22,12 +28,12 @@ import {
   upsertTrip,
   upsertTripRemote,
 } from './lib/trips'
+import type { AppView, SiteNav } from './lib/siteNav'
 import type { SampleRecord, Trip, User } from './types'
 
-type View = 'home' | 'trips' | 'planner' | 'guide' | 'samples'
-
 export default function App() {
-  const [view, setView] = useState<View>('home')
+  const [view, setView] = useState<AppView>('home')
+  const [galleryFocus, setGalleryFocus] = useState<string | null>(null)
   const [user, setUser] = useState<User | null>(() => currentUser())
   const owner = ownerIdOf(user?.id)
   const [trips, setTrips] = useState<Trip[]>(() => onlyPersonalTrips(loadTrips(owner)))
@@ -36,7 +42,7 @@ export default function App() {
   const [sampleEditId, setSampleEditId] = useState<string | null>(null)
   const [editingSample, setEditingSample] = useState<SampleRecord | null>(null)
   const [samplePreview, setSamplePreview] = useState(false)
-  const authIntent = useRef<null | 'newTrip' | 'claimSample' | 'trips'>(null)
+  const authIntent = useRef<null | 'newTrip' | 'claimSample' | 'trips' | 'galleryWrite'>(null)
 
   useEffect(() => {
     void (async () => {
@@ -108,7 +114,7 @@ export default function App() {
     setTrip(next)
   }
 
-  function askAuth(intent: null | 'newTrip' | 'claimSample' | 'trips' = null) {
+  function askAuth(intent: null | 'newTrip' | 'claimSample' | 'trips' | 'galleryWrite' = null) {
     authIntent.current = intent
     setAuthOpen(true)
   }
@@ -150,6 +156,10 @@ export default function App() {
       setView('trips')
       return
     }
+    if (intent === 'galleryWrite') {
+      setView('galleryWrite')
+      return
+    }
     if (samplePreview && !sampleEditId) {
       if (intent === 'claimSample') {
         await saveSampleCopy(next)
@@ -184,22 +194,43 @@ export default function App() {
     setView('trips')
   }
 
+  function goGallery(photoId?: string) {
+    setGalleryFocus(photoId ?? null)
+    setView('gallery')
+  }
+
+  const nav: SiteNav = {
+    view,
+    user,
+    go: {
+      home: goHome,
+      samples: goSamples,
+      trips: goTrips,
+      info: () => setView('info'),
+      gallery: goGallery,
+      galleryWrite: () => {
+        if (!user) {
+          askAuth('galleryWrite')
+          return
+        }
+        setView('galleryWrite')
+      },
+      board: () => setView('board'),
+      inquiry: () => setView('inquiry'),
+      sitemap: () => setView('sitemap'),
+      auth: () => askAuth(samplePreview && !sampleEditId ? 'claimSample' : null),
+      logout: handleLogout,
+    },
+  }
+
   return (
     <>
       {view === 'home' ? (
-        <Landing
-          user={user}
-          onOpenSamples={goSamples}
-          onPickSample={(sample) => openPlanner(cloneSampleTrip(sample), 'preview')}
-          onNewTrip={startNewTrip}
-          onTrips={goTrips}
-          onAuth={() => askAuth()}
-          onLogout={handleLogout}
-        />
+        <Landing {...nav} onPickSample={(sample) => openPlanner(cloneSampleTrip(sample), 'preview')} />
       ) : null}
       {view === 'trips' ? (
         <TripList
-          user={user}
+          {...nav}
           trips={trips}
           onOpen={(next) => {
             if (!user) {
@@ -209,10 +240,6 @@ export default function App() {
             openPlanner(next)
           }}
           onNew={startNewTrip}
-          onDemo={goSamples}
-          onHome={goHome}
-          onAuth={() => askAuth()}
-          onLogout={handleLogout}
           onDelete={(id) => {
             void (async () => {
               const next = user && isRemote()
@@ -226,12 +253,7 @@ export default function App() {
       ) : null}
       {view === 'samples' ? (
         <SampleGallery
-          user={user}
-          onBack={goHome}
-          onTrips={goTrips}
-          onNewTrip={startNewTrip}
-          onAuth={() => askAuth()}
-          onLogout={handleLogout}
+          {...nav}
           onPick={(sample) => openPlanner(cloneSampleTrip(sample), 'preview')}
           onEdit={(sample) => {
             setSamplePreview(false)
@@ -249,6 +271,12 @@ export default function App() {
           }}
         />
       ) : null}
+      {view === 'info' ? <InfoPage {...nav} /> : null}
+      {view === 'gallery' ? <GalleryPage {...nav} focusId={galleryFocus} /> : null}
+      {view === 'galleryWrite' ? <GalleryWritePage {...nav} /> : null}
+      {view === 'board' ? <BoardPage {...nav} /> : null}
+      {view === 'inquiry' ? <InquiryPage {...nav} /> : null}
+      {view === 'sitemap' ? <SitemapPage {...nav} /> : null}
       {view === 'planner' ? (
         <Planner
           trip={trip}
@@ -256,21 +284,12 @@ export default function App() {
           copyingSample={samplePreview && !sampleEditId}
           onChange={handleTripChange}
           onSaveCopy={() => void saveSampleCopy()}
-          onHome={goHome}
-          onSamples={goSamples}
-          onTrips={goTrips}
+          nav={nav}
           onGuide={() => setView('guide')}
-          onAuth={() => askAuth(samplePreview && !sampleEditId ? 'claimSample' : null)}
         />
       ) : null}
       {view === 'guide' ? (
-        <Guidebook
-          trip={trip}
-          onBack={() => setView('planner')}
-          onHome={goHome}
-          onSamples={goSamples}
-          onTrips={goTrips}
-        />
+        <Guidebook {...nav} trip={trip} onBack={() => setView('planner')} />
       ) : null}
       {authOpen ? (
         <AuthModal onClose={() => setAuthOpen(false)} onAuthed={(next) => void handleAuthed(next)} />

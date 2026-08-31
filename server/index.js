@@ -8,6 +8,7 @@ import { authRouter } from './routes/auth.js'
 import { tripsRouter } from './routes/trips.js'
 import { flightsRouter } from './routes/flights.js'
 import { samplesRouter, seedSamples } from './routes/samples.js'
+import { boardRouter, galleryRouter, inquiryRouter } from './routes/community.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const app = express()
@@ -21,7 +22,7 @@ const corsOrigins = [
   'capacitor://localhost',
 ]
 
-app.use(express.json({ limit: '2mb' }))
+app.use(express.json({ limit: '6mb' }))
 app.use(
   cors({
     origin: origin ? corsOrigins : true,
@@ -40,6 +41,9 @@ app.use('/api/auth', authRouter)
 app.use('/api/trips', tripsRouter)
 app.use('/api/flights', flightsRouter)
 app.use('/api/samples', samplesRouter)
+app.use('/api/gallery', galleryRouter)
+app.use('/api/board', boardRouter)
+app.use('/api/inquiries', inquiryRouter)
 
 const dist = path.join(__dirname, '..', 'dist')
 app.use(express.static(dist))

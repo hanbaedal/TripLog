@@ -1,36 +1,21 @@
 import { useEffect, useMemo, useState } from 'react'
-import { AppNav } from './AppNav'
-import type { SampleRecord, User } from '../types'
+import { PageShell } from './PageShell'
+import type { SampleRecord } from '../types'
 import { SAMPLE_GROUPS, SAMPLE_CATALOG } from '../data/sampleCatalog.js'
 import { sampleCover } from '../data/sampleCovers'
 import { listSamples, nightsLabel, removeSample } from '../data/samples'
 import { isSupervisor } from '../lib/auth'
+import type { SiteNav } from '../lib/siteNav'
 
-type Props = {
-  user: User | null
-  onBack: () => void
-  onTrips: () => void
-  onNewTrip: () => void
-  onAuth: () => void
-  onLogout: () => void
+type Props = SiteNav & {
   onPick: (sample: SampleRecord) => void
   onEdit: (sample: SampleRecord) => void
   onCreate: () => void
 }
 
-export function SampleGallery({
-  user,
-  onBack,
-  onTrips,
-  onNewTrip,
-  onAuth,
-  onLogout,
-  onPick,
-  onEdit,
-  onCreate,
-}: Props) {
+export function SampleGallery({ onPick, onEdit, onCreate, ...nav }: Props) {
   const [rows, setRows] = useState<SampleRecord[]>(() => SAMPLE_CATALOG as SampleRecord[])
-  const supervisor = isSupervisor(user)
+  const supervisor = isSupervisor(nav.user)
 
   useEffect(() => {
     void listSamples().then(setRows)
@@ -58,26 +43,16 @@ export function SampleGallery({
   }
 
   return (
-    <div>
-      <AppNav
-        view="samples"
-        user={user}
-        onHome={onBack}
-        onSamples={() => undefined}
-        onTrips={onTrips}
-        onNewTrip={onNewTrip}
-        onAuth={onAuth}
-        onLogout={onLogout}
-        extra={
-          supervisor ? (
+    <PageShell {...nav}>
+      <section className="wrap section">
+        {supervisor ? (
+          <div className="section-head">
+            <h2>추천 일정</h2>
             <button className="btn ghost" type="button" onClick={onCreate}>
               새 샘플
             </button>
-          ) : null
-        }
-      />
-
-      <section className="wrap section">
+          </div>
+        ) : null}
         {groups.map((group) => (
           <div className="sample-group" key={group.nights}>
             <div className="section-head">
@@ -108,6 +83,6 @@ export function SampleGallery({
           </div>
         ))}
       </section>
-    </div>
+    </PageShell>
   )
 }

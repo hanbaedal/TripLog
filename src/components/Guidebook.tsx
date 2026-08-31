@@ -1,39 +1,22 @@
-import { BrandMark } from './Icons'
+import { AppNav } from './AppNav'
 import type { Trip } from '../types'
 import { buildGuidebook } from '../lib/guide'
+import type { SiteNav } from '../lib/siteNav'
 
-type Props = {
+type Props = SiteNav & {
   trip: Trip
   onBack: () => void
-  onHome: () => void
-  onSamples: () => void
-  onTrips: () => void
 }
 
-export function Guidebook({ trip, onBack, onHome, onSamples, onTrips }: Props) {
+export function Guidebook({ trip, onBack, ...nav }: Props) {
   const book = buildGuidebook(trip)
 
   return (
     <div className="guide-page">
+      <AppNav {...nav} />
       <div className="guide-toolbar no-print">
-        <div className="wrap" style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
-          <button className="brand" type="button" onClick={onBack} style={{ background: 'none', border: 0, padding: 0 }}>
-            <BrandMark className="brand-mark" />
-            <span className="brand-name">
-              triplog.my
-              <small>guidebook</small>
-            </span>
-          </button>
+        <div className="wrap" style={{ display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
           <div className="nav-actions">
-            <button className="btn ghost" type="button" onClick={onHome}>
-              메뉴
-            </button>
-            <button className="btn ghost" type="button" onClick={onSamples}>
-              샘플 일정
-            </button>
-            <button className="btn ghost" type="button" onClick={onTrips}>
-              내 여행
-            </button>
             <button className="btn ghost" type="button" onClick={onBack}>
               일정으로
             </button>

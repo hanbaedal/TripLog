@@ -4,13 +4,14 @@ import { sampleCover } from '../data/sampleCovers'
 
 type Props = {
   items: SampleRecord[]
+  auto?: boolean
   supervisor?: boolean
   onPick: (sample: SampleRecord) => void
   onEdit?: (sample: SampleRecord) => void
   onDelete?: (id: string) => void
 }
 
-export function SampleSlider({ items, supervisor, onPick, onEdit, onDelete }: Props) {
+export function SampleSlider({ items, auto, supervisor, onPick, onEdit, onDelete }: Props) {
   const track = useRef<HTMLDivElement>(null)
   const [canPrev, setCanPrev] = useState(false)
   const [canNext, setCanNext] = useState(false)
@@ -34,6 +35,20 @@ export function SampleSlider({ items, supervisor, onPick, onEdit, onDelete }: Pr
       ro.disconnect()
     }
   }, [items])
+
+  useEffect(() => {
+    if (!auto || items.length < 2) return
+    const timer = window.setInterval(() => {
+      const el = track.current
+      if (!el) return
+      const card = el.querySelector<HTMLElement>('.sample-card')
+      const step = card ? card.offsetWidth + 14 : 240
+      const atEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 16
+      if (atEnd) el.scrollTo({ left: 0, behavior: 'smooth' })
+      else el.scrollBy({ left: step, behavior: 'smooth' })
+    }, 3800)
+    return () => window.clearInterval(timer)
+  }, [auto, items.length])
 
   function scroll(dir: -1 | 1) {
     const el = track.current
