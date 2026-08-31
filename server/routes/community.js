@@ -18,6 +18,16 @@ function toPhoto(doc) {
   }
 }
 
+function toComment(row) {
+  return {
+    id: row.commentId,
+    name: row.name,
+    body: row.body,
+    ownerId: row.ownerId ? String(row.ownerId) : undefined,
+    at: row.at?.toISOString?.() ?? new Date().toISOString(),
+  }
+}
+
 function toPost(doc) {
   return {
     id: doc.postId,
@@ -26,7 +36,16 @@ function toPost(doc) {
     body: doc.body,
     ownerId: doc.ownerId ? String(doc.ownerId) : undefined,
     at: doc.at?.toISOString?.() ?? new Date().toISOString(),
+    comments: (doc.comments || []).map(toComment),
   }
+}
+
+function owns(user, ownerId) {
+  return Boolean(user && ownerId && String(ownerId) === String(user._id))
+}
+
+function canManageOwned(user, ownerId) {
+  return isSupervisor(user) || owns(user, ownerId)
 }
 
 function toInquiry(doc) {
@@ -83,8 +102,8 @@ galleryRouter.put('/:id', requireUser, async (req, res) => {
     res.status(400).json({ error: '제목과 사진이 필요합니다.' })
     return
   }
-  const doc = await GalleryPhoto.findOne({ photoId: req.params.id, ownerId: req.user._id })
-  if (!doc) {
+  const doc = await GalleryPhoto.findOne({ photoId: req.params.id })
+  if (!doc || !canManageOwned(req.user, doc.ownerId)) {
     res.status(404).json({ error: '사진을 찾지 못했습니다.' })
     return
   }
@@ -95,11 +114,12 @@ galleryRouter.put('/:id', requireUser, async (req, res) => {
 })
 
 galleryRouter.delete('/:id', requireUser, async (req, res) => {
-  const result = await GalleryPhoto.deleteOne({ photoId: req.params.id, ownerId: req.user._id })
-  if (!result.deletedCount) {
+  const doc = await GalleryPhoto.findOne({ photoId: req.params.id })
+  if (!doc || !canManageOwned(req.user, doc.ownerId)) {
     res.status(404).json({ error: '사진을 찾지 못했습니다.' })
     return
   }
+  await doc.deleteOne()
   res.json({ ok: true })
 })
 
@@ -126,6 +146,86 @@ boardRouter.post('/', optionalUser, async (req, res) => {
     body,
     at: new Date(),
   })
+  res.json({ post: toPost(doc) })
+})
+
+boardRouter.put('/:id', requireUser, async (req, res) => {
+  const doc = await BoardPost.findOne({ postId: req.params.id })
+  if (!doc || !canManageOwned(req.user, doc.ownerId)) {
+    res.status(404).json({ error: '글을 찾지 못했습니다.' })
+    return
+  }
+  const title = String(req.body?.title || '').trim()
+  const body = String(req.body?.body || '').trim()
+  if (!title || !body) {
+    res.status(400).json({ error: '제목과 내용이 필요합니다.' })
+    return
+  }
+  doc.title = title
+  doc.body = body
+  await doc.save()
+  res.json({ post: toPost(doc) })
+})
+
+boardRouter.delete('/:id', requireUser, async (req, res) => {
+  const doc = await BoardPost.findOne({ postId: req.params.id })
+  if (!doc || !canManageOwned(req.user, doc.ownerId)) {
+    res.status(404).json({ error: '글을 찾지 못했습니다.' })
+    return
+  }
+  await doc.deleteOne()
+  res.json({ ok: true })
+})
+
+boardRouter.post('/:id/comments', requireUser, async (req, res) => {
+  const body = String(req.body?.body || '').trim()
+  if (!body) {
+    res.status(400).json({ error: '댓글을 적어 주세요.' })
+    return
+  }
+  const doc = await BoardPost.findOne({ postId: req.params.id })
+  if (!doc) {
+    res.status(404).json({ error: '글을 찾지 못했습니다.' })
+    return
+  }
+  doc.comments = doc.comments || []
+  doc.comments.push({
+    commentId: nid('cmt'),
+    ownerId: req.user._id,
+    name: req.user.name,
+    body,
+    at: new Date(),
+  })
+  await doc.save()
+  res.json({ post: toPost(doc) })
+})
+
+boardRouter.put('/:id/comments/:commentId', requireUser, async (req, res) => {
+  const body = String(req.body?.body || '').trim()
+  if (!body) {
+    res.status(400).json({ error: '댓글을 적어 주세요.' })
+    return
+  }
+  const doc = await BoardPost.findOne({ postId: req.params.id })
+  const comment = doc?.comments?.find((row) => row.commentId === req.params.commentId)
+  if (!doc || !comment || !canManageOwned(req.user, comment.ownerId)) {
+    res.status(404).json({ error: '댓글을 찾지 못했습니다.' })
+    return
+  }
+  comment.body = body
+  await doc.save()
+  res.json({ post: toPost(doc) })
+})
+
+boardRouter.delete('/:id/comments/:commentId', requireUser, async (req, res) => {
+  const doc = await BoardPost.findOne({ postId: req.params.id })
+  const comment = doc?.comments?.find((row) => row.commentId === req.params.commentId)
+  if (!doc || !comment || !canManageOwned(req.user, comment.ownerId)) {
+    res.status(404).json({ error: '댓글을 찾지 못했습니다.' })
+    return
+  }
+  doc.comments = doc.comments.filter((row) => row.commentId !== req.params.commentId)
+  await doc.save()
   res.json({ post: toPost(doc) })
 })
 
@@ -189,4 +289,37 @@ inquiryRouter.patch('/:id/reply', requireSupervisor, async (req, res) => {
   doc.replyAt = new Date()
   await doc.save()
   res.json({ inquiry: toInquiry(doc) })
+})
+
+inquiryRouter.put('/:id', requireSupervisor, async (req, res) => {
+  const doc = await Inquiry.findOne({ inquiryId: req.params.id })
+  if (!doc) {
+    res.status(404).json({ error: '문의를 찾지 못했습니다.' })
+    return
+  }
+  const name = String(req.body?.name || doc.name).trim()
+  const email = String(req.body?.email || doc.email).trim()
+  const message = String(req.body?.message || '').trim()
+  const reply = String(req.body?.reply ?? doc.reply ?? '').trim()
+  if (!name || !email || !message) {
+    res.status(400).json({ error: '이름, 이메일, 문의 내용이 필요합니다.' })
+    return
+  }
+  doc.name = name
+  doc.email = email
+  doc.message = message
+  doc.reply = reply
+  if (reply && !doc.replyAt) doc.replyAt = new Date()
+  if (!reply) doc.replyAt = undefined
+  await doc.save()
+  res.json({ inquiry: toInquiry(doc) })
+})
+
+inquiryRouter.delete('/:id', requireSupervisor, async (req, res) => {
+  const result = await Inquiry.deleteOne({ inquiryId: req.params.id })
+  if (!result.deletedCount) {
+    res.status(404).json({ error: '문의를 찾지 못했습니다.' })
+    return
+  }
+  res.json({ ok: true })
 })

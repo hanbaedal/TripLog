@@ -18,6 +18,8 @@ type Props = {
   onSaveCopy?: () => void
   nav: SiteNav
   onGuide: () => void
+  onPublish?: () => void
+  onUnpublish?: () => void
 }
 
 const ADD_CHIPS: { label: string; kind: ItemKind; mealSlot?: MealSlot }[] = [
@@ -74,6 +76,8 @@ export function Planner({
   onSaveCopy,
   nav,
   onGuide,
+  onPublish,
+  onUnpublish,
 }: Props) {
   const days = dayCount(trip.startDate, trip.endDate)
   const [day, setDay] = useState(0)
@@ -212,6 +216,15 @@ export function Planner({
             {!user && copyingSample ? (
               <button className="btn stamp" type="button" onClick={nav.go.auth}>
                 로그인하고 내 일정으로
+              </button>
+            ) : null}
+            {user && !copyingSample && onPublish && onUnpublish ? (
+              <button
+                className="btn ghost"
+                type="button"
+                onClick={trip.publishedSampleId ? onUnpublish : onPublish}
+              >
+                {trip.publishedSampleId ? '공개 취소' : '추천 일정에 공개'}
               </button>
             ) : null}
             <button className="btn forest" type="button" onClick={onGuide}>

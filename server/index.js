@@ -9,6 +9,7 @@ import { tripsRouter } from './routes/trips.js'
 import { flightsRouter } from './routes/flights.js'
 import { samplesRouter, seedSamples } from './routes/samples.js'
 import { boardRouter, galleryRouter, inquiryRouter } from './routes/community.js'
+import { seedTravelInfo, travelInfoRouter } from './routes/travelInfo.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const app = express()
@@ -44,6 +45,7 @@ app.use('/api/samples', samplesRouter)
 app.use('/api/gallery', galleryRouter)
 app.use('/api/board', boardRouter)
 app.use('/api/inquiries', inquiryRouter)
+app.use('/api/travel-info', travelInfoRouter)
 
 const dist = path.join(__dirname, '..', 'dist')
 app.use(express.static(dist))
@@ -61,6 +63,7 @@ async function start() {
   }
   await mongoose.connect(mongoUri, { dbName: process.env.MONGODB_DB || 'triplog' })
   await seedSamples()
+  await seedTravelInfo()
   app.listen(port, () => {
     console.log(`TripLog listening on ${port}`)
   })

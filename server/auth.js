@@ -50,6 +50,7 @@ export function publicUser(user) {
     id: String(user._id),
     email: user.email,
     name: user.name,
+    phone: user.phone || '',
     role: user.role || 'user',
   }
 }
@@ -76,6 +77,11 @@ export async function applySupervisorRole(user) {
     await user.save()
   }
   return user
+}
+
+export function isSupervisorUser(user) {
+  if (!user) return false
+  return user.role === 'supervisor' || supervisorRole(user.name, user.email) === 'supervisor'
 }
 
 export function requireSupervisor(req, res, next) {

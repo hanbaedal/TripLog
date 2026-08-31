@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { Trip } from '../models.js'
+import { Sample, Trip } from '../models.js'
 import { requireUser } from '../auth.js'
 
 export const tripsRouter = Router()
@@ -16,6 +16,7 @@ function toTrip(doc) {
     children: doc.children,
     items: doc.items || [],
     savedByUser: typeof doc.savedByUser === 'boolean' ? doc.savedByUser : undefined,
+    publishedSampleId: doc.publishedSampleId || undefined,
     updatedAt: doc.updatedAt?.toISOString?.() ?? new Date().toISOString(),
   }
 }
@@ -45,6 +46,7 @@ tripsRouter.put('/:id', async (req, res) => {
       children: Number(body.children) || 0,
       items: Array.isArray(body.items) ? body.items : [],
       savedByUser: body.savedByUser === true,
+      publishedSampleId: String(body.publishedSampleId || ''),
       updatedAt: new Date(),
     },
     { upsert: true, new: true, setDefaultsOnInsert: true },
@@ -53,6 +55,10 @@ tripsRouter.put('/:id', async (req, res) => {
 })
 
 tripsRouter.delete('/:id', async (req, res) => {
+  const existing = await Trip.findOne({ ownerId: req.user._id, tripId: req.params.id })
+  if (existing?.publishedSampleId) {
+    await Sample.deleteOne({ sampleId: existing.publishedSampleId, ownerId: String(req.user._id) })
+  }
   await Trip.deleteOne({ ownerId: req.user._id, tripId: req.params.id })
   const rows = await Trip.find({ ownerId: req.user._id }).sort({ updatedAt: -1 })
   res.json({ trips: rows.map(toTrip) })

@@ -1,6 +1,5 @@
 import { useLayoutEffect, useRef } from 'react'
-import { BrandMark } from './Icons'
-import { SITE_LINKS, goSite, type SiteNav } from '../lib/siteNav'
+import { goSite, visibleSiteLinks, type SiteNav } from '../lib/siteNav'
 
 type Props = SiteNav
 
@@ -24,14 +23,10 @@ export function AppNav({ view, user, go }: Props) {
     <header className="site-header" ref={header}>
       <div className="wrap topnav">
         <button className="brand" type="button" onClick={go.home}>
-          <BrandMark className="brand-mark" />
-          <span className="brand-name">
-            triplog.my
-            <small>private travel log</small>
-          </span>
+          <img className="brand-title" src="/brand/header-brush.png" alt="나만의 맞춤 여행 일지" />
         </button>
         <nav className="nav-actions" aria-label="주요 메뉴">
-          {SITE_LINKS.map((link) => (
+          {visibleSiteLinks(user).map((link) => (
             <button
               key={link.id}
               className={`btn ghost${view === link.id ? ' is-on' : ''}`}

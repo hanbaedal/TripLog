@@ -102,6 +102,14 @@ p {
   flex: 0 0 auto;
 }
 
+.brand-title {
+  display: block;
+  height: 38px;
+  width: auto;
+  max-width: min(260px, 46vw);
+  object-fit: contain;
+}
+
 .site-header .nav-actions {
   flex-wrap: nowrap;
   overflow-x: auto;
@@ -978,11 +986,46 @@ p {
   padding: 9px 10px;
 }
 
+.email-row,
+.pw-field {
+  display: block;
+  position: relative;
+}
+
+.email-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.pw-field input {
+  width: 100%;
+  padding-right: 42px;
+}
+
+.pw-toggle {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 0;
+  background: transparent;
+  color: var(--ink-soft);
+  padding: 6px;
+  line-height: 0;
+}
+
 .modal-actions {
   display: flex;
-  justify-content: space-between;
+  flex-wrap: wrap;
+  align-items: center;
   gap: 8px;
   margin-top: 16px;
+}
+
+.modal-actions .btn.ghost:first-child {
+  margin-right: auto;
 }
 
 .guide-page {
@@ -1304,8 +1347,8 @@ p {
 
 .brush-banner img {
   display: block;
-  width: min(920px, 100%);
-  max-height: 220px;
+  width: min(720px, 100%);
+  max-height: 88px;
   margin-inline: auto;
   object-fit: contain;
 }
@@ -1462,12 +1505,68 @@ p {
   margin-bottom: 22px;
 }
 
+.board-form label {
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
 .board-form input,
 .board-form textarea {
   background: var(--cream);
   border: 1px solid var(--line);
   border-radius: 12px;
   padding: 10px 12px;
+}
+
+.travel-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+}
+
+.travel-card {
+  background: var(--cream);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  overflow: hidden;
+  display: grid;
+}
+
+.travel-card img {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  background: #ddd;
+}
+
+.travel-card-body {
+  padding: 14px 16px 16px;
+  display: grid;
+  gap: 8px;
+}
+
+.travel-card-body .nav-actions {
+  margin-top: 4px;
+}
+
+.comment-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.comment-item,
+.comment-write {
+  display: grid;
+  gap: 6px;
+}
+
+.comment-write .btn {
+  justify-self: start;
 }
 
 .sitemap-list {
@@ -1538,6 +1637,13 @@ p {
   font-size: 1.45rem;
   margin: 0;
   color: var(--cream);
+}
+
+.sample-card-label small {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  opacity: 0.85;
 }
 
 .sample-card-actions {

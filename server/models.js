@@ -4,6 +4,7 @@ const userSchema = new mongoose.Schema(
   {
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
     name: { type: String, required: true, trim: true },
+    phone: { type: String, default: '', trim: true, index: true },
     passwordHash: { type: String, required: true },
     role: { type: String, enum: ['user', 'supervisor'], default: 'user' },
   },
@@ -22,6 +23,7 @@ const tripSchema = new mongoose.Schema(
     children: { type: Number, default: 0 },
     items: { type: Array, default: [] },
     savedByUser: { type: Boolean },
+    publishedSampleId: { type: String, default: '' },
     updatedAt: { type: Date, default: Date.now },
   },
   { timestamps: { createdAt: true, updatedAt: false } },
@@ -52,6 +54,9 @@ const sampleSchema = new mongoose.Schema(
     title: { type: String, required: true },
     destination: { type: String, default: '' },
     trip: { type: Object, required: true },
+    ownerId: { type: String, default: '', index: true },
+    ownerName: { type: String, default: '' },
+    sourceTripId: { type: String, default: '' },
   },
   { timestamps: true },
 )
@@ -75,6 +80,34 @@ const boardSchema = new mongoose.Schema(
     name: { type: String, required: true, trim: true },
     title: { type: String, required: true, trim: true },
     body: { type: String, required: true, trim: true },
+    at: { type: Date, default: Date.now },
+    comments: {
+      type: [
+        {
+          commentId: { type: String, required: true },
+          ownerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+          name: { type: String, required: true, trim: true },
+          body: { type: String, required: true, trim: true },
+          at: { type: Date, default: Date.now },
+        },
+      ],
+      default: [],
+    },
+  },
+  { timestamps: true },
+)
+
+const travelInfoSchema = new mongoose.Schema(
+  {
+    infoId: { type: String, required: true, unique: true },
+    place: { type: String, required: true, trim: true },
+    title: { type: String, required: true, trim: true },
+    body: { type: String, required: true, trim: true },
+    src: { type: String, required: true },
+    sort: { type: Number, default: 80 },
+    catalog: { type: Boolean, default: false },
+    ownerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null, index: true },
+    ownerName: { type: String, default: '' },
     at: { type: Date, default: Date.now },
   },
   { timestamps: true },
@@ -101,3 +134,4 @@ export const Sample = mongoose.models.Sample || mongoose.model('Sample', sampleS
 export const GalleryPhoto = mongoose.models.GalleryPhoto || mongoose.model('GalleryPhoto', gallerySchema)
 export const BoardPost = mongoose.models.BoardPost || mongoose.model('BoardPost', boardSchema)
 export const Inquiry = mongoose.models.Inquiry || mongoose.model('Inquiry', inquirySchema)
+export const TravelInfo = mongoose.models.TravelInfo || mongoose.model('TravelInfo', travelInfoSchema)

@@ -3,7 +3,7 @@ import { PageShell } from './PageShell'
 import type { SampleRecord } from '../types'
 import { SAMPLE_GROUPS, SAMPLE_CATALOG } from '../data/sampleCatalog.js'
 import { sampleCover } from '../data/sampleCovers'
-import { listSamples, nightsLabel, removeSample } from '../data/samples'
+import { canManageSample, listSamples, nightsLabel, removeSample } from '../data/samples'
 import { isSupervisor } from '../lib/auth'
 import type { SiteNav } from '../lib/siteNav'
 
@@ -11,9 +11,10 @@ type Props = SiteNav & {
   onPick: (sample: SampleRecord) => void
   onEdit: (sample: SampleRecord) => void
   onCreate: () => void
+  onUnpublish: (sample: SampleRecord) => void
 }
 
-export function SampleGallery({ onPick, onEdit, onCreate, ...nav }: Props) {
+export function SampleGallery({ onPick, onEdit, onCreate, onUnpublish, ...nav }: Props) {
   const [rows, setRows] = useState<SampleRecord[]>(() => SAMPLE_CATALOG as SampleRecord[])
   const supervisor = isSupervisor(nav.user)
 
@@ -65,6 +66,7 @@ export function SampleGallery({ onPick, onEdit, onCreate, ...nav }: Props) {
                     <img className="sample-card-photo" src={sampleCover(sample)} alt="" />
                     <span className="sample-card-label">
                       <h3>{sample.place}</h3>
+                      {sample.ownerName ? <small>{sample.ownerName}</small> : null}
                     </span>
                   </button>
                   {supervisor ? (
@@ -74,6 +76,12 @@ export function SampleGallery({ onPick, onEdit, onCreate, ...nav }: Props) {
                       </button>
                       <button className="btn ghost" type="button" onClick={() => void handleDelete(sample.id)}>
                         삭제
+                      </button>
+                    </div>
+                  ) : canManageSample(sample, nav.user) ? (
+                    <div className="sample-card-actions">
+                      <button className="btn ghost" type="button" onClick={() => onUnpublish(sample)}>
+                        공개 취소
                       </button>
                     </div>
                   ) : null}

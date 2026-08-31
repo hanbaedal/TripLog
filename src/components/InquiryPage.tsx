@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import { PageShell } from './PageShell'
 import { isSupervisor } from '../lib/auth'
-import { guestInquiryIds, listInquiries, replyInquiry, saveInquiry } from '../lib/community'
+import { guestInquiryIds, listInquiries, removeInquiry, replyInquiry, saveInquiry, updateInquiry } from '../lib/community'
 import type { Inquiry } from '../types'
 import type { SiteNav } from '../lib/siteNav'
 
@@ -15,6 +15,7 @@ export function InquiryPage(nav: SiteNav) {
   const [error, setError] = useState('')
   const [rows, setRows] = useState<Inquiry[]>([])
   const [drafts, setDrafts] = useState<Record<string, string>>({})
+  const [editing, setEditing] = useState<Inquiry | null>(null)
 
   useEffect(() => {
     if (nav.user?.name) setName(nav.user.name)
@@ -58,10 +59,29 @@ export function InquiryPage(nav: SiteNav) {
   async function sendReply(row: Inquiry) {
     const reply = (drafts[row.id] ?? row.reply ?? '').trim()
     if (!reply) return
-    const id = row.id
-    const saved = await replyInquiry(id, reply)
-    setRows((cur) => cur.map((row) => (row.id === id ? saved : row)))
-    setDrafts((cur) => ({ ...cur, [id]: '' }))
+    const saved = await replyInquiry(row.id, reply)
+    setRows((cur) => cur.map((item) => (item.id === row.id ? saved : item)))
+    setDrafts((cur) => ({ ...cur, [row.id]: '' }))
+  }
+
+  async function saveEdit() {
+    if (!editing) return
+    const saved = await updateInquiry({
+      ...editing,
+      name: editing.name.trim(),
+      email: editing.email.trim(),
+      message: editing.message.trim(),
+      reply: (drafts[editing.id] ?? editing.reply ?? '').trim() || undefined,
+    })
+    setRows((cur) => cur.map((item) => (item.id === saved.id ? saved : item)))
+    setEditing(null)
+  }
+
+  async function drop(id: string) {
+    if (!window.confirm('이 문의를 삭제할까요?')) return
+    await removeInquiry(id)
+    setRows((cur) => cur.filter((row) => row.id !== id))
+    if (editing?.id === id) setEditing(null)
   }
 
   return (
@@ -88,17 +108,54 @@ export function InquiryPage(nav: SiteNav) {
         <div className="board-list">
           {rows.map((row) => (
             <article className="info-card" key={row.id}>
-              <h3>{row.name}</h3>
-              <p className="muted">
-                {row.email} · {row.at.slice(0, 10)}
-              </p>
-              <p>{row.message}</p>
-              {row.reply ? (
-                <p className="inquiry-reply">
-                  <b>해수</b> {row.reply}
-                </p>
-              ) : null}
-              {supervisor ? (
+              {editing?.id === row.id ? (
+                <div className="board-form" style={{ marginBottom: 0 }}>
+                  <input
+                    value={editing.name}
+                    onChange={(e) => setEditing({ ...editing, name: e.target.value })}
+                    placeholder="이름"
+                  />
+                  <input
+                    type="email"
+                    value={editing.email}
+                    onChange={(e) => setEditing({ ...editing, email: e.target.value })}
+                    placeholder="이메일"
+                  />
+                  <textarea
+                    rows={4}
+                    value={editing.message}
+                    onChange={(e) => setEditing({ ...editing, message: e.target.value })}
+                  />
+                  <textarea
+                    rows={3}
+                    value={drafts[row.id] ?? editing.reply ?? ''}
+                    onChange={(e) => setDrafts((cur) => ({ ...cur, [row.id]: e.target.value }))}
+                    placeholder="답변"
+                  />
+                  <div className="nav-actions">
+                    <button className="btn" type="button" onClick={() => void saveEdit()}>
+                      저장
+                    </button>
+                    <button className="btn ghost" type="button" onClick={() => setEditing(null)}>
+                      취소
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <h3>{row.name}</h3>
+                  <p className="muted">
+                    {row.email} · {row.at.slice(0, 10)}
+                  </p>
+                  <p>{row.message}</p>
+                  {row.reply ? (
+                    <p className="inquiry-reply">
+                      <b>해수</b> {row.reply}
+                    </p>
+                  ) : null}
+                </>
+              )}
+              {supervisor && editing?.id !== row.id ? (
                 <div className="board-form" style={{ marginTop: 12, marginBottom: 0 }}>
                   <textarea
                     rows={3}
@@ -106,9 +163,24 @@ export function InquiryPage(nav: SiteNav) {
                     onChange={(e) => setDrafts((cur) => ({ ...cur, [row.id]: e.target.value }))}
                     placeholder="답변"
                   />
-                  <button className="btn" type="button" onClick={() => void sendReply(row)}>
-                    답변
-                  </button>
+                  <div className="nav-actions">
+                    <button className="btn" type="button" onClick={() => void sendReply(row)}>
+                      답변
+                    </button>
+                    <button
+                      className="btn ghost"
+                      type="button"
+                      onClick={() => {
+                        setEditing(row)
+                        setDrafts((cur) => ({ ...cur, [row.id]: row.reply ?? '' }))
+                      }}
+                    >
+                      수정
+                    </button>
+                    <button className="btn ghost" type="button" onClick={() => void drop(row.id)}>
+                      삭제
+                    </button>
+                  </div>
                 </div>
               ) : null}
             </article>

@@ -34,7 +34,7 @@ export function Landing({ onPickSample, ...nav }: Props) {
           <GalleryHero onOpen={(id) => nav.go.gallery(id)} />
           <figure className={`brush-banner${brushOk ? '' : ' is-fallback'}`}>
             {brushOk ? (
-              <img src="/brand/title-brush.png" alt="나만의 맞춤 여행 일지" onError={() => setBrushOk(false)} />
+              <img src="/brand/header-brush.png" alt="나만의 맞춤 여행 일지" onError={() => setBrushOk(false)} />
             ) : (
               <figcaption className="brush-title">나만의 맞춤 여행 일지</figcaption>
             )}

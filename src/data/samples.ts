@@ -1,4 +1,5 @@
-import type { SampleRecord, Trip } from '../types'
+import type { SampleRecord, Trip, User } from '../types'
+import { isSupervisor } from '../lib/auth'
 import { SAMPLE_CATALOG } from './sampleCatalog.js'
 import { hasItemPhoto, resolveItemPhoto } from './sightPhotos'
 import { addDays, dayCount, todayIso } from '../lib/dates'
@@ -144,11 +145,24 @@ export function sampleFromTrip(trip: Trip, previous?: SampleRecord): SampleRecor
   const place = (trip.destination || previous?.place || '새 여행지').split(/[·,]/)[0].trim()
   return {
     id: previous?.id || uid('sample'),
-    sort: previous?.sort ?? 99,
+    sort: previous?.sort ?? 80,
     nights,
     place,
     title: trip.title || place,
     destination: trip.destination || place,
     trip,
+    ownerId: previous?.ownerId,
+    ownerName: previous?.ownerName,
+    sourceTripId: previous?.sourceTripId || trip.id,
   }
+}
+
+export function canManageSample(sample: SampleRecord, user: User | null): boolean {
+  if (!user) return false
+  if (isSupervisor(user)) return true
+  return Boolean(sample.ownerId && sample.ownerId === user.id)
+}
+
+export function isCatalogSample(sample: SampleRecord): boolean {
+  return SAMPLE_CATALOG.some((row) => row.id === sample.id)
 }

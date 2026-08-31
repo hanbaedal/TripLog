@@ -12,6 +12,7 @@ export type AppView =
   | 'board'
   | 'inquiry'
   | 'sitemap'
+  | 'profile'
 
 export type SiteGo = {
   home: () => void
@@ -23,6 +24,7 @@ export type SiteGo = {
   board: () => void
   inquiry: () => void
   sitemap: () => void
+  profile: () => void
   auth: () => void
   logout: () => void
 }
@@ -43,6 +45,10 @@ export const SITE_LINKS: { id: AppView; label: string }[] = [
   { id: 'sitemap', label: '사이트맵' },
 ]
 
+export function visibleSiteLinks(user: User | null) {
+  return SITE_LINKS.filter((link) => link.id !== 'trips' || Boolean(user))
+}
+
 export function goSite(nav: SiteNav, id: AppView) {
   if (id === 'home') nav.go.home()
   else if (id === 'samples') nav.go.samples()
@@ -52,4 +58,5 @@ export function goSite(nav: SiteNav, id: AppView) {
   else if (id === 'board') nav.go.board()
   else if (id === 'inquiry') nav.go.inquiry()
   else if (id === 'sitemap') nav.go.sitemap()
+  else if (id === 'profile') nav.go.profile()
 }

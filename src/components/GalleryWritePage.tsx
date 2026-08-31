@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import { PageShell } from './PageShell'
+import { isSupervisor } from '../lib/auth'
 import { canEditGallery, listGallery, removeGalleryPhoto, saveGalleryPhoto } from '../lib/community'
 import { compressImage } from '../lib/imageFile'
 import type { GalleryPhoto } from '../types'
@@ -23,7 +24,7 @@ export function GalleryWritePage(nav: SiteNav) {
   }, [nav.user])
 
   const mine = useMemo(
-    () => photos.filter((photo) => canEditGallery(photo, nav.user?.id)),
+    () => photos.filter((photo) => canEditGallery(photo, nav.user)),
     [photos, nav.user],
   )
 
@@ -123,7 +124,7 @@ export function GalleryWritePage(nav: SiteNav) {
         </form>
 
         <div className="section-head">
-          <h2>내가 올린 사진</h2>
+          <h2>{isSupervisor(nav.user) ? '회원 사진' : '내가 올린 사진'}</h2>
         </div>
         <div className="gallery-mine">
           {mine.map((photo) => (

@@ -1,4 +1,4 @@
-import { SITE_LINKS, goSite, type SiteNav } from '../lib/siteNav'
+import { goSite, visibleSiteLinks, type SiteNav } from '../lib/siteNav'
 
 export function SideMenu(nav: SiteNav) {
   return (
@@ -10,7 +10,7 @@ export function SideMenu(nav: SiteNav) {
       >
         홈
       </button>
-      {SITE_LINKS.map((link) => (
+      {visibleSiteLinks(nav.user).map((link) => (
         <button
           key={link.id}
           className={`side-menu-item${nav.view === link.id ? ' is-on' : ''}`}

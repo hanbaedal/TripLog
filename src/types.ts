@@ -41,6 +41,7 @@ export type Trip = {
   items: TripItem[]
   updatedAt?: string
   savedByUser?: boolean
+  publishedSampleId?: string
 }
 
 export type SampleRecord = {
@@ -51,12 +52,16 @@ export type SampleRecord = {
   title: string
   destination: string
   trip: Trip
+  ownerId?: string
+  ownerName?: string
+  sourceTripId?: string
 }
 
 export type User = {
   id: string
   email: string
   name: string
+  phone?: string
   role?: 'user' | 'supervisor'
 }
 
@@ -70,6 +75,14 @@ export type GalleryPhoto = {
   catalog?: boolean
 }
 
+export type BoardComment = {
+  id: string
+  name: string
+  body: string
+  at: string
+  ownerId?: string
+}
+
 export type BoardPost = {
   id: string
   name: string
@@ -77,6 +90,20 @@ export type BoardPost = {
   body: string
   at: string
   ownerId?: string
+  comments?: BoardComment[]
+}
+
+export type TravelInfo = {
+  id: string
+  place: string
+  title: string
+  body: string
+  src: string
+  sort?: number
+  catalog?: boolean
+  ownerId?: string
+  ownerName?: string
+  at?: string
 }
 
 export type Inquiry = {

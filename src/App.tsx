@@ -5,6 +5,7 @@ import { GalleryPage } from './components/GalleryPage'
 import { GalleryWritePage } from './components/GalleryWritePage'
 import { Guidebook } from './components/Guidebook'
 import { InfoPage } from './components/InfoPage'
+import { ProfilePage } from './components/ProfilePage'
 import { InquiryPage } from './components/InquiryPage'
 import { Landing } from './components/Landing'
 import { Planner } from './components/Planner'
@@ -12,7 +13,7 @@ import { SampleGallery } from './components/SampleGallery'
 import { SitemapPage } from './components/SitemapPage'
 import { TripList } from './components/TripList'
 import { emptyTrip } from './data/demo'
-import { cloneSampleTrip, isBlankDraft, sampleFromTrip, saveSample } from './data/samples'
+import { cloneSampleTrip, isBlankDraft, removeSample, sampleFromTrip, saveSample } from './data/samples'
 import { currentUser, isSupervisor, remoteMe, signOut } from './lib/auth'
 import { isRemote, probeRemote } from './lib/remote'
 import {
@@ -74,6 +75,10 @@ export default function App() {
     return () => window.clearTimeout(timer)
   }, [trip, view, user, sampleEditId, editingSample, samplePreview])
 
+  useEffect(() => {
+    if ((view === 'trips' || view === 'profile') && !user) setView('home')
+  }, [view, user])
+
   async function persistTrip(next: Trip, forceMine = false, actor: User | null = user) {
     if (sampleEditId && isSupervisor(actor) && !forceMine) {
       const record = sampleFromTrip(next, editingSample ?? undefined)
@@ -90,10 +95,58 @@ export default function App() {
     if (isRemote()) {
       await upsertTripRemote(owned)
       setTrips(onlyPersonalTrips(await listTripsRemote()))
-      return
+    } else {
+      upsertTrip(actor.id, owned)
+      setTrips(onlyPersonalTrips(loadTrips(actor.id)))
     }
-    upsertTrip(actor.id, owned)
-    setTrips(onlyPersonalTrips(loadTrips(actor.id)))
+    if (owned.publishedSampleId) {
+      await saveSample(
+        sampleFromTrip(owned, {
+          id: owned.publishedSampleId,
+          sort: 80,
+          nights: 1,
+          place: owned.destination || '여행',
+          title: owned.title,
+          destination: owned.destination,
+          trip: owned,
+          ownerId: actor.id,
+          ownerName: actor.name,
+          sourceTripId: owned.id,
+        }),
+      )
+    }
+  }
+
+  async function publishTrip(target: Trip) {
+    if (!user || isBlankDraft(target)) return
+    const saved = await saveSample(
+      sampleFromTrip(
+        { ...target, savedByUser: true },
+        {
+          id: target.publishedSampleId || '',
+          sort: 80,
+          nights: 1,
+          place: target.destination || '여행',
+          title: target.title,
+          destination: target.destination,
+          trip: target,
+          ownerId: user.id,
+          ownerName: user.name,
+          sourceTripId: target.id,
+        },
+      ),
+    )
+    const owned = { ...target, savedByUser: true, publishedSampleId: saved.id }
+    setTrip((cur) => (cur.id === owned.id ? owned : cur))
+    await persistTrip(owned, true)
+  }
+
+  async function unpublishTrip(target: Trip) {
+    if (!target.publishedSampleId) return
+    await removeSample(target.publishedSampleId)
+    const owned = { ...target, savedByUser: true, publishedSampleId: undefined }
+    setTrip((cur) => (cur.id === owned.id ? owned : cur))
+    await persistTrip(owned, true)
   }
 
   function openPlanner(next: Trip, mode: 'mine' | 'preview' = 'mine') {
@@ -218,6 +271,13 @@ export default function App() {
       board: () => setView('board'),
       inquiry: () => setView('inquiry'),
       sitemap: () => setView('sitemap'),
+      profile: () => {
+        if (!user) {
+          askAuth('trips')
+          return
+        }
+        setView('profile')
+      },
       auth: () => askAuth(samplePreview && !sampleEditId ? 'claimSample' : null),
       logout: handleLogout,
     },
@@ -228,20 +288,20 @@ export default function App() {
       {view === 'home' ? (
         <Landing {...nav} onPickSample={(sample) => openPlanner(cloneSampleTrip(sample), 'preview')} />
       ) : null}
-      {view === 'trips' ? (
+      {view === 'trips' && user ? (
         <TripList
           {...nav}
           trips={trips}
           onOpen={(next) => {
-            if (!user) {
-              askAuth()
-              return
-            }
             openPlanner(next)
           }}
           onNew={startNewTrip}
+          onPublish={(next) => void publishTrip(next)}
+          onUnpublish={(next) => void unpublishTrip(next)}
           onDelete={(id) => {
             void (async () => {
+              const target = trips.find((row) => row.id === id)
+              if (target?.publishedSampleId) await removeSample(target.publishedSampleId)
               const next = user && isRemote()
                 ? await deleteTripRemote(id)
                 : deleteTrip(owner, id)
@@ -269,9 +329,20 @@ export default function App() {
             setTrip(emptyTrip())
             setView('planner')
           }}
+          onUnpublish={(sample) => {
+            const found = trips.find((row) => row.publishedSampleId === sample.id || row.id === sample.sourceTripId)
+            if (found) {
+              void unpublishTrip(found)
+              return
+            }
+            void removeSample(sample.id)
+          }}
         />
       ) : null}
       {view === 'info' ? <InfoPage {...nav} /> : null}
+      {view === 'profile' && user ? (
+        <ProfilePage {...nav} onSaved={setUser} />
+      ) : null}
       {view === 'gallery' ? <GalleryPage {...nav} focusId={galleryFocus} /> : null}
       {view === 'galleryWrite' ? <GalleryWritePage {...nav} /> : null}
       {view === 'board' ? <BoardPage {...nav} /> : null}
@@ -286,6 +357,8 @@ export default function App() {
           onSaveCopy={() => void saveSampleCopy()}
           nav={nav}
           onGuide={() => setView('guide')}
+          onPublish={user && !samplePreview && !sampleEditId ? () => void publishTrip(trip) : undefined}
+          onUnpublish={user && !samplePreview && !sampleEditId ? () => void unpublishTrip(trip) : undefined}
         />
       ) : null}
       {view === 'guide' ? (
