@@ -36,18 +36,10 @@ export function TripList({ user, trips, onOpen, onNew, onDemo, onHome, onDelete 
 
       <section className="wrap section">
         <div className="section-head">
-          <div>
-            <div className="kicker">Library</div>
-            <h2>{user ? `${user.name}의 여행` : '저장된 여행'}</h2>
-          </div>
-          <p className="muted">{trips.length}개</p>
+          <h2>{user ? `${user.name}의 여행` : '저장된 여행'}</h2>
         </div>
 
-        {trips.length === 0 ? (
-          <div className="empty" style={{ margin: 0 }}>
-            아직 여행이 없습니다. 새 일정을 만들거나 오사카 샘플을 넣어 보세요.
-          </div>
-        ) : (
+        {trips.length === 0 ? null : (
           <div className="trip-grid">
             {trips.map((trip) => {
               const sum = summarize(trip)

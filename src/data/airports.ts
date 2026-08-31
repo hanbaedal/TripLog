@@ -64,6 +64,10 @@ export const DEST_AIRPORTS: Airport[] = [
   { code: 'RMQ', city: '타이중', name: '칭촨강', country: '대만' },
 ]
 
+export const CHINA_LOCAL_AIRPORTS: Airport[] = DEST_AIRPORTS.filter((a) => a.country === '중국')
+
+export const TRANSFER_AIRPORTS = CHINA_LOCAL_AIRPORTS
+
 export const AIRPORTS: Airport[] = [...ORIGIN_AIRPORTS, ...DEST_AIRPORTS]
 
 export const DEST_CODES = new Set(DEST_AIRPORTS.map((a) => a.code))

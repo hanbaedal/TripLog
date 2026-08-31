@@ -7,6 +7,7 @@ import mongoose from 'mongoose'
 import { authRouter } from './routes/auth.js'
 import { tripsRouter } from './routes/trips.js'
 import { flightsRouter } from './routes/flights.js'
+import { samplesRouter, seedSamples } from './routes/samples.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const app = express()
@@ -32,6 +33,7 @@ app.get('/api/health', (_req, res) => {
 app.use('/api/auth', authRouter)
 app.use('/api/trips', tripsRouter)
 app.use('/api/flights', flightsRouter)
+app.use('/api/samples', samplesRouter)
 
 const dist = path.join(__dirname, '..', 'dist')
 app.use(express.static(dist))
@@ -48,6 +50,7 @@ async function start() {
     process.exit(1)
   }
   await mongoose.connect(mongoUri, { dbName: process.env.MONGODB_DB || 'triplog' })
+  await seedSamples()
   app.listen(port, () => {
     console.log(`TripLog listening on ${port}`)
   })

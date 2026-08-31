@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import bcrypt from 'bcryptjs'
 import { User } from '../models.js'
-import { publicUser, requireUser, signToken } from '../auth.js'
+import { applySupervisorRole, publicUser, requireUser, signToken, supervisorRole } from '../auth.js'
 
 export const authRouter = Router()
 
@@ -27,7 +27,7 @@ authRouter.post('/signup', async (req, res) => {
     return
   }
   const passwordHash = await bcrypt.hash(password, 10)
-  const user = await User.create({ name, email, passwordHash })
+  const user = await User.create({ name, email, passwordHash, role: supervisorRole(name, email) })
   res.status(201).json({ token: signToken(user.id), user: publicUser(user) })
 })
 
@@ -39,9 +39,11 @@ authRouter.post('/login', async (req, res) => {
     res.status(401).json({ error: '이메일 또는 비밀번호가 맞지 않습니다.' })
     return
   }
+  await applySupervisorRole(user)
   res.json({ token: signToken(user.id), user: publicUser(user) })
 })
 
-authRouter.get('/me', requireUser, (req, res) => {
+authRouter.get('/me', requireUser, async (req, res) => {
+  await applySupervisorRole(req.user)
   res.json({ user: publicUser(req.user) })
 })

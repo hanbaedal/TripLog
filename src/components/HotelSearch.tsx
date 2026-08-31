@@ -46,11 +46,7 @@ export function HotelSearch({ trip, onClose, onManual, onPick }: Props) {
         aria-labelledby="hotel-search-title"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="kicker">Connect · Stay</div>
         <h2 id="hotel-search-title">호텔 검색</h2>
-        <p className="muted" style={{ margin: '6px 0 14px' }}>
-          Track My Stay — 고른 숙소는 체크인부터 밤마다 일정에 붙고, 숙박비는 자동으로 더해집니다.
-        </p>
         <form className="search-form" onSubmit={submit}>
           <label>
             도시
@@ -81,9 +77,7 @@ export function HotelSearch({ trip, onClose, onManual, onPick }: Props) {
         {rows ? (
           <div className="result-block">
             <div className="kicker">숙소</div>
-            {rows.length === 0 ? (
-              <p className="muted">이 도시 시범 숙소가 없습니다. 직접 입력해 주세요.</p>
-            ) : (
+            {rows.length === 0 ? null : (
               <div className="fare-list">
                 {rows.map((hotel) => (
                   <article className="fare-card" key={hotel.id}>

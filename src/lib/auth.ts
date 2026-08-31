@@ -5,7 +5,7 @@ import { api, getToken, isRemote, probeRemote, setToken } from './remote'
 const USERS_KEY = 'triplog.users.v1'
 const SESSION_KEY = 'triplog.session.v1'
 
-type StoredUser = User & { salt: string; hash: string }
+type StoredUser = User & { salt: string; hash: string; role?: 'user' | 'supervisor' }
 
 function readUsers(): StoredUser[] {
   try {
@@ -23,7 +23,16 @@ function writeUsers(users: StoredUser[]): void {
 }
 
 function publicUser(user: StoredUser): User {
-  return { id: user.id, email: user.email, name: user.name }
+  return {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    role: user.name.trim() === '해수' ? 'supervisor' : user.role || 'user',
+  }
+}
+
+export function isSupervisor(user: User | null): boolean {
+  return user?.role === 'supervisor' || user?.name.trim() === '해수'
 }
 
 async function digest(value: string): Promise<string> {
@@ -61,6 +70,7 @@ export async function signUp(name: string, email: string, password: string): Pro
     id: uid('user'),
     email: normalized,
     name: trimmedName,
+    role: trimmedName === '해수' ? 'supervisor' : 'user',
     salt,
     hash,
   }

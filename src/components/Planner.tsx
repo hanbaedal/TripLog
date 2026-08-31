@@ -230,9 +230,7 @@ export function Planner({ trip, user, onChange, onHome, onTrips, onGuide, onAuth
               </button>
             ))}
           </div>
-          {dayItems.length === 0 ? (
-            <div className="empty">이 날은 비어 있습니다. 항공·호텔은 검색으로, 끼니는 칩으로 넣어 보세요.</div>
-          ) : (
+          {dayItems.length === 0 ? null : (
             dayItems.map((item) => (
               <button
                 key={item.id}
@@ -306,9 +304,7 @@ export function Planner({ trip, user, onChange, onHome, onTrips, onGuide, onAuth
           <section>
             <div className="kicker">Today’s path</div>
             <h3 style={{ fontFamily: 'var(--serif)', margin: '6px 0 12px' }}>이날 동선</h3>
-            {dayItems.length === 0 ? (
-              <p className="muted">일정을 넣으면 점이 이어집니다.</p>
-            ) : (
+            {dayItems.length === 0 ? null : (
               <div className="route-list">
                 {dayItems.map((item) => (
                   <div className="route-item" key={item.id}>
@@ -326,9 +322,6 @@ export function Planner({ trip, user, onChange, onHome, onTrips, onGuide, onAuth
             )}
           </section>
           <section>
-            <p className="muted" style={{ marginBottom: 12 }}>
-              지금 적은 일정에서 여행 안내서를 바로 만듭니다.
-            </p>
             <button className="btn" type="button" onClick={onGuide} style={{ width: '100%' }}>
               안내서 미리보기
             </button>
@@ -352,6 +345,7 @@ export function Planner({ trip, user, onChange, onHome, onTrips, onGuide, onAuth
       {search === 'flight' ? (
         <FlightSearch
           trip={trip}
+          focusDate={dateOn(trip.startDate, selected)}
           onClose={() => setSearch(null)}
           onManual={() => {
             setSearch(null)

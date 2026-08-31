@@ -42,11 +42,7 @@ export function AuthModal({ onClose, onAuthed }: Props) {
         onClick={(e) => e.stopPropagation()}
         onSubmit={submit}
       >
-        <div className="kicker">Account</div>
         <h2 id="auth-title">{mode === 'up' ? '회원가입' : '로그인'}</h2>
-        <p className="muted" style={{ margin: '6px 0 14px' }}>
-          여행은 계정에 묶입니다. 같은 브라우저에서만 유지됩니다.
-        </p>
         <div className="slot-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
           <button type="button" className={mode === 'in' ? 'on' : ''} onClick={() => setMode('in')}>
             로그인

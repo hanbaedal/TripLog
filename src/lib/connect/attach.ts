@@ -24,20 +24,21 @@ function paxCost(unit: number, adults: number, children: number): number {
 export function attachFlight(trip: Trip, offer: FlightOffer): Trip {
   const placed = ensureDate(trip, offer.date)
   let next = placed.trip
-  if (!next.destination) next = { ...next, destination: offer.toCity }
-  if (next.title === '새로운 여행') next = { ...next, title: `${offer.toCity} 여행` }
+  const koreaBound = offer.to === 'ICN' || offer.to === 'GMP'
+  if (!next.destination && !koreaBound) next = { ...next, destination: offer.toCity }
+  if (next.title === '새로운 여행' && !koreaBound) next = { ...next, title: `${offer.toCity} 여행` }
 
   const item: TripItem = {
     id: uid('flight'),
     dayIndex: placed.dayIndex,
-    time: offer.depart,
+    time: koreaBound ? offer.arrive : offer.depart,
     kind: 'flight',
-    title: `${offer.airlineCode}${offer.flightNo} → ${offer.toCity}`,
+    title: `${offer.airlineCode}${offer.flightNo} ${offer.fromCity} → ${offer.toCity}`,
     subtitle: offer.airline,
     place: [
-      offer.toCity,
+      `${offer.from} → ${offer.to}`,
       `${offer.depart} → ${offer.arrive}${offer.plusDay ? ` +${offer.plusDay}` : ''}`,
-      offer.terminal ? `출발 ${offer.terminal}` : '',
+      offer.terminal ? `${koreaBound ? '도착' : '출발'} ${offer.terminal}` : '',
     ]
       .filter(Boolean)
       .join(' · '),
@@ -45,9 +46,10 @@ export function attachFlight(trip: Trip, offer: FlightOffer): Trip {
     cost: paxCost(offer.price, trip.adults, trip.children),
     source: 'connect',
     flight: {
-      departTerminal: offer.terminal || undefined,
+      departTerminal: koreaBound ? undefined : offer.terminal || undefined,
       destination: offer.toCity ? `${offer.toCity} (${offer.to})` : offer.to,
       arriveTime: offer.arrive,
+      arriveTerminal: koreaBound ? offer.terminal || undefined : undefined,
       flightNo: `${offer.airlineCode}${offer.flightNo}`,
       airline: offer.airline,
     },

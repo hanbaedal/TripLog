@@ -41,10 +41,21 @@ export type Trip = {
   updatedAt?: string
 }
 
+export type SampleRecord = {
+  id: string
+  sort: number
+  nights: number
+  place: string
+  title: string
+  destination: string
+  trip: Trip
+}
+
 export type User = {
   id: string
   email: string
   name: string
+  role?: 'user' | 'supervisor'
 }
 
 export type FlightOffer = {

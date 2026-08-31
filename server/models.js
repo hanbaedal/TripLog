@@ -5,6 +5,7 @@ const userSchema = new mongoose.Schema(
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
     name: { type: String, required: true, trim: true },
     passwordHash: { type: String, required: true },
+    role: { type: String, enum: ['user', 'supervisor'], default: 'user' },
   },
   { timestamps: true },
 )
@@ -41,6 +42,20 @@ const flightSnapSchema = new mongoose.Schema(
 )
 flightSnapSchema.index({ expireAt: 1 }, { expireAfterSeconds: 0 })
 
+const sampleSchema = new mongoose.Schema(
+  {
+    sampleId: { type: String, required: true, unique: true },
+    sort: { type: Number, default: 99 },
+    nights: { type: Number, required: true },
+    place: { type: String, required: true },
+    title: { type: String, required: true },
+    destination: { type: String, default: '' },
+    trip: { type: Object, required: true },
+  },
+  { timestamps: true },
+)
+
 export const User = mongoose.models.User || mongoose.model('User', userSchema)
 export const Trip = mongoose.models.Trip || mongoose.model('Trip', tripSchema)
 export const FlightSnap = mongoose.models.FlightSnap || mongoose.model('FlightSnap', flightSnapSchema)
+export const Sample = mongoose.models.Sample || mongoose.model('Sample', sampleSchema)

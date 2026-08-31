@@ -3,6 +3,7 @@
     "target": "es2023",
     "lib": ["ES2023", "DOM", "DOM.Iterable"],
     "types": ["vite/client"],
+    "allowJs": true,
     "skipLibCheck": true,
     "module": "esnext",
     "moduleResolution": "bundler",

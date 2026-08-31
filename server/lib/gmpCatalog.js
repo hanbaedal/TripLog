@@ -1,3 +1,5 @@
+import { CITY, addMinutes, durationMin } from './greaterChina.js'
+
 const GMP_ROWS = [
   { to: 'SHA', airline: '대한항공', airlineCode: 'KE', flightNo: '2117', depart: '08:00' },
   { to: 'SHA', airline: '대한항공', airlineCode: 'KE', flightNo: '2115', depart: '11:10' },
@@ -18,21 +20,43 @@ const GMP_ROWS = [
   { to: 'MFM', airline: '에어마카오', airlineCode: 'NX', flightNo: '822', depart: '11:40' },
 ]
 
-const CITY = {
-  SHA: '상하이',
-  PEK: '베이징',
-  TPE: '타이베이',
-  HKG: '홍콩',
-  MFM: '마카오',
+function inboundNo(flightNo) {
+  const n = Number(flightNo)
+  return Number.isFinite(n) ? String(n + 1) : flightNo
 }
 
 export function gmpFlights(to) {
   return GMP_ROWS.filter((row) => row.to === to).map((row) => ({
     ...row,
     from: 'GMP',
+    fromCity: '서울',
     toCity: CITY[row.to] || row.to,
     terminal: '',
     codeshare: false,
     status: '',
   }))
+}
+
+export function gmpArrivals(from) {
+  return GMP_ROWS.filter((row) => row.to === from).map((row) => {
+    const mins = durationMin(from)
+    const back = addMinutes(row.depart, -mins)
+    return {
+      airline: row.airline,
+      airlineCode: row.airlineCode,
+      flightNo: inboundNo(row.flightNo),
+      from,
+      to: 'GMP',
+      fromCity: CITY[from] || from,
+      toCity: '서울',
+      depart: back.time,
+      arrive: row.depart,
+      plusDay: 0,
+      prevDayDepart: back.plusDay < 0,
+      durationMin: mins,
+      terminal: '',
+      codeshare: false,
+      status: '',
+    }
+  })
 }

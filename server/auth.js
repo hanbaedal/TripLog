@@ -29,5 +29,45 @@ export async function requireUser(req, res, next) {
 }
 
 export function publicUser(user) {
-  return { id: String(user._id), email: user.email, name: user.name }
+  return {
+    id: String(user._id),
+    email: user.email,
+    name: user.name,
+    role: user.role || 'user',
+  }
+}
+
+export function supervisorRole(name = '', email = '') {
+  const names = String(process.env.SUPERVISOR_NAMES || '해수')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean)
+  const emails = String(process.env.SUPERVISOR_EMAILS || '')
+    .split(',')
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean)
+  if (names.includes(String(name).trim()) || emails.includes(String(email).trim().toLowerCase())) {
+    return 'supervisor'
+  }
+  return 'user'
+}
+
+export async function applySupervisorRole(user) {
+  const role = supervisorRole(user.name, user.email)
+  if (user.role !== role) {
+    user.role = role
+    await user.save()
+  }
+  return user
+}
+
+export function requireSupervisor(req, res, next) {
+  requireUser(req, res, () => {
+    const role = req.user.role || supervisorRole(req.user.name, req.user.email)
+    if (role !== 'supervisor') {
+      res.status(403).json({ error: '권한이 없습니다.' })
+      return
+    }
+    next()
+  })
 }

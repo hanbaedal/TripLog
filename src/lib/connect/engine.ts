@@ -1,4 +1,9 @@
-import { DEST_AIRPORTS, ORIGIN_AIRPORTS, groupedAirports as groupAirports } from '../../data/airports'
+import {
+  CHINA_LOCAL_AIRPORTS,
+  DEST_AIRPORTS,
+  ORIGIN_AIRPORTS,
+  groupedAirports as groupAirports,
+} from '../../data/airports'
 import type { FlightOffer, HotelOffer } from '../../types'
 
 export type FlightSearchResult = {
@@ -71,10 +76,13 @@ function wait(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
+export type FlightLeg = 'outbound' | 'transfer' | 'return'
+
 export type FlightQuery = {
   from: string
   to: string
   date: string
+  leg: FlightLeg
 }
 
 export type HotelQuery = {
@@ -89,6 +97,7 @@ export async function searchFlights(query: FlightQuery): Promise<FlightSearchRes
       from: query.from,
       to: query.to,
       date: query.date,
+      leg: query.leg,
     })
     const res = await fetch(`/api/flights/search?${params}`, { cache: 'no-store' })
     const data = (await res.json()) as FlightSearchResult & { error?: string }
@@ -100,7 +109,7 @@ export async function searchFlights(query: FlightQuery): Promise<FlightSearchRes
   } catch (err) {
     return {
       offers: [],
-      notice: err instanceof Error ? err.message : '인천공항 시간표를 불러오지 못했습니다.',
+      notice: err instanceof Error ? err.message : '항공 시간표를 불러오지 못했습니다.',
     }
   }
 }
@@ -133,4 +142,8 @@ export function groupedOrigins() {
 
 export function groupedDestinations() {
   return groupAirports(DEST_AIRPORTS)
+}
+
+export function groupedChinaLocalAirports() {
+  return groupAirports(CHINA_LOCAL_AIRPORTS)
 }
