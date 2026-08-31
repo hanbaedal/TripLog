@@ -1534,6 +1534,39 @@ p {
   display: grid;
 }
 
+.travel-card-open {
+  display: grid;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+}
+
+.travel-card-open:hover img {
+  opacity: 0.92;
+}
+
+.travel-card-meta {
+  padding: 0 16px 8px;
+}
+
+.travel-card-actions {
+  padding: 0 16px 16px;
+}
+
+.travel-city-intro {
+  margin-bottom: 18px;
+}
+
+.travel-city-intro .gallery-preview {
+  width: 100%;
+  max-height: 280px;
+  object-fit: cover;
+  margin-bottom: 12px;
+}
+
 .travel-card img {
   width: 100%;
   aspect-ratio: 16 / 10;

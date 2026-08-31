@@ -106,6 +106,20 @@ export type TravelInfo = {
   at?: string
 }
 
+export type TravelSpot = {
+  id: string
+  cityId: string
+  name: string
+  body: string
+  tip: string
+  src: string
+  sort?: number
+  catalog?: boolean
+  ownerId?: string
+  ownerName?: string
+  at?: string
+}
+
 export type Inquiry = {
   id: string
   name: string

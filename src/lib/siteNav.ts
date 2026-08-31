@@ -7,6 +7,7 @@ export type AppView =
   | 'planner'
   | 'guide'
   | 'info'
+  | 'infoPlace'
   | 'gallery'
   | 'galleryWrite'
   | 'board'
@@ -19,6 +20,7 @@ export type SiteGo = {
   samples: () => void
   trips: () => void
   info: () => void
+  infoPlace: (cityId: string) => void
   gallery: (photoId?: string) => void
   galleryWrite: () => void
   board: () => void
@@ -54,6 +56,7 @@ export function goSite(nav: SiteNav, id: AppView) {
   else if (id === 'samples') nav.go.samples()
   else if (id === 'trips') nav.go.trips()
   else if (id === 'info') nav.go.info()
+  else if (id === 'infoPlace') nav.go.info()
   else if (id === 'gallery') nav.go.gallery()
   else if (id === 'board') nav.go.board()
   else if (id === 'inquiry') nav.go.inquiry()

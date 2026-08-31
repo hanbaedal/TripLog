@@ -1,6 +1,7 @@
 import { GALLERY_PHOTOS, mergeGallery } from '../data/galleryPhotos'
 import { TRAVEL_INFO_CATALOG } from '../data/travelInfoCatalog.js'
-import type { BoardPost, GalleryPhoto, Inquiry, TravelInfo, User } from '../types'
+import { TRAVEL_SPOT_CATALOG } from '../data/travelSpotCatalog.js'
+import type { BoardPost, GalleryPhoto, Inquiry, TravelInfo, TravelSpot, User } from '../types'
 import { isSupervisor } from './auth'
 import { uid } from './id'
 import { api, isRemote } from './remote'
@@ -11,6 +12,8 @@ const INQUIRY_KEY = 'triplog.inquiry.v1'
 const GUEST_INQUIRY_KEY = 'triplog.inquiry.guestIds.v1'
 const TRAVEL_KEY = 'triplog.travel.v1'
 const TRAVEL_DELETED_KEY = 'triplog.travel.deleted.v1'
+const TRAVEL_SPOT_KEY = 'triplog.travel.spots.v1'
+const TRAVEL_SPOT_DELETED_KEY = 'triplog.travel.spots.deleted.v1'
 
 function readJson<T>(key: string, fallback: T): T {
   try {
@@ -365,6 +368,10 @@ export async function removeTravelInfo(id: string): Promise<void> {
   }
   writeJson(TRAVEL_KEY, localTravel().filter((row) => row.id !== id))
   writeJson(TRAVEL_DELETED_KEY, [...new Set([...deletedTravelIds(), id])])
+  writeJson(
+    TRAVEL_SPOT_KEY,
+    localSpots().filter((row) => row.cityId !== id),
+  )
 }
 
 export function canEditTravelInfo(item: TravelInfo, user?: User | null): boolean {
@@ -372,6 +379,91 @@ export function canEditTravelInfo(item: TravelInfo, user?: User | null): boolean
   if (isSupervisor(user)) return true
   if (item.catalog) return false
   return item.ownerId === user.id
+}
+
+function catalogSpots(cityId: string): TravelSpot[] {
+  return (TRAVEL_SPOT_CATALOG as TravelSpot[]).filter((row) => row.cityId === cityId).map((row) => ({ ...row, catalog: true }))
+}
+
+function localSpots(): TravelSpot[] {
+  const rows = readJson<TravelSpot[]>(TRAVEL_SPOT_KEY, [])
+  return Array.isArray(rows) ? rows : []
+}
+
+function deletedSpotIds(): string[] {
+  const rows = readJson<string[]>(TRAVEL_SPOT_DELETED_KEY, [])
+  return Array.isArray(rows) ? rows.filter(Boolean) : []
+}
+
+function mergeSpots(cityId: string, extra: TravelSpot[]): TravelSpot[] {
+  const deleted = new Set(deletedSpotIds())
+  const map = new Map<string, TravelSpot>()
+  for (const row of catalogSpots(cityId)) map.set(row.id, row)
+  for (const row of extra.filter((row) => row.cityId === cityId)) map.set(row.id, row)
+  return [...map.values()]
+    .filter((row) => !deleted.has(row.id))
+    .sort((a, b) => (a.sort || 80) - (b.sort || 80) || a.name.localeCompare(b.name, 'ko'))
+}
+
+export async function listTravelSpots(cityId: string): Promise<TravelSpot[]> {
+  if (isRemote()) {
+    try {
+      const data = await api<{ spots: TravelSpot[] }>(`/travel-info/${encodeURIComponent(cityId)}/spots`)
+      return data.spots?.length ? data.spots : catalogSpots(cityId)
+    } catch {
+      return mergeSpots(cityId, localSpots())
+    }
+  }
+  return mergeSpots(cityId, localSpots())
+}
+
+export async function saveTravelSpot(
+  spot: Omit<TravelSpot, 'id' | 'at'> & { id?: string },
+): Promise<TravelSpot> {
+  if (isRemote()) {
+    const data = await api<{ spot: TravelSpot }>(
+      spot.id ? `/travel-info/spots/${spot.id}` : `/travel-info/${encodeURIComponent(spot.cityId)}/spots`,
+      {
+        method: spot.id ? 'PUT' : 'POST',
+        body: JSON.stringify(spot),
+      },
+    )
+    return data.spot
+  }
+  const rows = localSpots()
+  if (spot.id) {
+    const saved = { ...spot, id: spot.id, at: new Date().toISOString() }
+    const next = rows.some((row) => row.id === spot.id)
+      ? rows.map((row) => (row.id === spot.id ? saved : row))
+      : [...rows, saved]
+    writeJson(TRAVEL_SPOT_KEY, next)
+    writeJson(TRAVEL_SPOT_DELETED_KEY, deletedSpotIds().filter((id) => id !== spot.id))
+    return saved
+  }
+  const saved: TravelSpot = { ...spot, id: uid('spot'), at: new Date().toISOString(), catalog: false }
+  writeJson(TRAVEL_SPOT_KEY, [saved, ...rows])
+  return saved
+}
+
+export async function removeTravelSpot(id: string): Promise<void> {
+  if (isRemote()) {
+    await api(`/travel-info/spots/${id}`, { method: 'DELETE' })
+    return
+  }
+  writeJson(TRAVEL_SPOT_KEY, localSpots().filter((row) => row.id !== id))
+  writeJson(TRAVEL_SPOT_DELETED_KEY, [...new Set([...deletedSpotIds(), id])])
+}
+
+export function canEditTravelSpot(spot: TravelSpot, user?: User | null): boolean {
+  if (!user) return false
+  if (isSupervisor(user)) return true
+  if (spot.catalog) return false
+  return spot.ownerId === user.id
+}
+
+export async function findTravelInfo(id: string): Promise<TravelInfo | undefined> {
+  const rows = await listTravelInfo()
+  return rows.find((row) => row.id === id)
 }
 
 export { GALLERY_PHOTOS }

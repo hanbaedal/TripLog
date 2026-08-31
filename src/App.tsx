@@ -5,6 +5,7 @@ import { GalleryPage } from './components/GalleryPage'
 import { GalleryWritePage } from './components/GalleryWritePage'
 import { Guidebook } from './components/Guidebook'
 import { InfoPage } from './components/InfoPage'
+import { InfoPlacePage } from './components/InfoPlacePage'
 import { ProfilePage } from './components/ProfilePage'
 import { InquiryPage } from './components/InquiryPage'
 import { Landing } from './components/Landing'
@@ -35,6 +36,7 @@ import type { SampleRecord, Trip, User } from './types'
 export default function App() {
   const [view, setView] = useState<AppView>('home')
   const [galleryFocus, setGalleryFocus] = useState<string | null>(null)
+  const [infoPlaceId, setInfoPlaceId] = useState<string | null>(null)
   const [user, setUser] = useState<User | null>(() => currentUser())
   const owner = ownerIdOf(user?.id)
   const [trips, setTrips] = useState<Trip[]>(() => onlyPersonalTrips(loadTrips(owner)))
@@ -259,7 +261,14 @@ export default function App() {
       home: goHome,
       samples: goSamples,
       trips: goTrips,
-      info: () => setView('info'),
+      info: () => {
+        setInfoPlaceId(null)
+        setView('info')
+      },
+      infoPlace: (cityId: string) => {
+        setInfoPlaceId(cityId)
+        setView('infoPlace')
+      },
       gallery: goGallery,
       galleryWrite: () => {
         if (!user) {
@@ -340,6 +349,7 @@ export default function App() {
         />
       ) : null}
       {view === 'info' ? <InfoPage {...nav} /> : null}
+      {view === 'infoPlace' && infoPlaceId ? <InfoPlacePage {...nav} cityId={infoPlaceId} /> : null}
       {view === 'profile' && user ? (
         <ProfilePage {...nav} onSaved={setUser} />
       ) : null}

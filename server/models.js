@@ -135,3 +135,22 @@ export const GalleryPhoto = mongoose.models.GalleryPhoto || mongoose.model('Gall
 export const BoardPost = mongoose.models.BoardPost || mongoose.model('BoardPost', boardSchema)
 export const Inquiry = mongoose.models.Inquiry || mongoose.model('Inquiry', inquirySchema)
 export const TravelInfo = mongoose.models.TravelInfo || mongoose.model('TravelInfo', travelInfoSchema)
+
+const travelSpotSchema = new mongoose.Schema(
+  {
+    spotId: { type: String, required: true, unique: true },
+    cityId: { type: String, required: true, index: true },
+    name: { type: String, required: true, trim: true },
+    body: { type: String, required: true, trim: true },
+    tip: { type: String, default: '', trim: true },
+    src: { type: String, required: true },
+    sort: { type: Number, default: 80 },
+    catalog: { type: Boolean, default: false },
+    ownerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null, index: true },
+    ownerName: { type: String, default: '' },
+    at: { type: Date, default: Date.now },
+  },
+  { timestamps: true },
+)
+
+export const TravelSpot = mongoose.models.TravelSpot || mongoose.model('TravelSpot', travelSpotSchema)

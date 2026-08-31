@@ -164,23 +164,39 @@ export function InfoPage(nav: SiteNav) {
         <div className="travel-cards">
           {cards.map((item) => (
             <article className="travel-card" key={item.id}>
-              <img src={item.src} alt="" />
-              <div className="travel-card-body">
-                <p className="kicker">{item.place}</p>
-                <h3>{item.title}</h3>
-                <p>{item.body}</p>
-                {item.ownerName && !item.catalog ? <p className="muted">{item.ownerName}</p> : null}
-                {canEditTravelInfo(item, nav.user) ? (
-                  <div className="nav-actions">
-                    <button className="btn ghost" type="button" onClick={() => startEdit(item)}>
-                      수정
-                    </button>
-                    <button className="btn ghost" type="button" onClick={() => void remove(item.id)}>
-                      삭제
-                    </button>
-                  </div>
-                ) : null}
-              </div>
+              <button type="button" className="travel-card-open" onClick={() => nav.go.infoPlace(item.id)}>
+                <img src={item.src} alt="" />
+                <div className="travel-card-body">
+                  <p className="kicker">{item.place}</p>
+                  <h3>{item.title}</h3>
+                  <p>{item.body}</p>
+                </div>
+              </button>
+              {item.ownerName && !item.catalog ? <p className="muted travel-card-meta">{item.ownerName}</p> : null}
+              {canEditTravelInfo(item, nav.user) ? (
+                <div className="nav-actions travel-card-actions">
+                  <button
+                    className="btn ghost"
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      startEdit(item)
+                    }}
+                  >
+                    수정
+                  </button>
+                  <button
+                    className="btn ghost"
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      void remove(item.id)
+                    }}
+                  >
+                    삭제
+                  </button>
+                </div>
+              ) : null}
             </article>
           ))}
         </div>
