@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import type { ItemKind, MealSlot, TransportMode, TripItem } from '../types'
 import { KIND_LABEL, MEAL_LABEL, TRANSPORT_LABEL } from '../lib/costs'
+import { composeFlightItem, parseFlightForm } from '../lib/flightFields'
 
 type Props = {
   dayIndex: number
@@ -49,6 +50,13 @@ export function ItemModal({ dayIndex, initial, preset, onClose, onSave, onDelete
   const [subtitle, setSubtitle] = useState(initial?.subtitle ?? '')
   const [note, setNote] = useState(initial?.note ?? '')
   const [cost, setCost] = useState(initial ? String(initial.cost) : '')
+  const parsed = parseFlightForm(initial?.kind === 'flight' ? initial : undefined)
+  const [departTerminal, setDepartTerminal] = useState(parsed.departTerminal)
+  const [destination, setDestination] = useState(parsed.destination)
+  const [arriveTime, setArriveTime] = useState(parsed.arriveTime)
+  const [arriveTerminal, setArriveTerminal] = useState(parsed.arriveTerminal)
+  const [flightNo, setFlightNo] = useState(parsed.flightNo)
+  const [airline, setAirline] = useState(parsed.airline)
 
   function changeKind(next: ItemKind) {
     setKind(next)
@@ -62,6 +70,32 @@ export function ItemModal({ dayIndex, initial, preset, onClose, onSave, onDelete
 
   function submit(e: FormEvent) {
     e.preventDefault()
+    if (kind === 'flight') {
+      const composed = composeFlightItem({
+        departTime: time,
+        departTerminal,
+        destination,
+        arriveTime,
+        arriveTerminal,
+        flightNo,
+        airline,
+      })
+      if (!composed.flight.flightNo && !composed.flight.destination) return
+      onSave({
+        id: initial?.id ?? uid(),
+        dayIndex: initial?.dayIndex ?? dayIndex,
+        time: composed.time,
+        kind: 'flight',
+        title: composed.title,
+        place: composed.place,
+        subtitle: composed.subtitle,
+        note: note.trim() || undefined,
+        cost: Number(cost) || 0,
+        flight: composed.flight,
+        source: initial?.source,
+      })
+      return
+    }
     const trimmed = title.trim()
     if (!trimmed) return
     const item: TripItem = {
@@ -131,47 +165,102 @@ export function ItemModal({ dayIndex, initial, preset, onClose, onSave, onDelete
             ))}
           </div>
         ) : null}
-        <div className="form-grid">
-          <label>
-            시간
-            <input type="time" value={time} onChange={(e) => setTime(e.target.value)} required />
-          </label>
-          <label>
-            제목
-            <input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder={
-                kind === 'flight'
-                  ? '예: KE723 인천 → 간사이'
-                  : kind === 'hotel'
-                    ? '예: 난바 오리엔탈 호텔'
-                    : kind === 'meal'
-                      ? '예: 구로몬 시장 모둠'
-                      : kind === 'transport'
-                        ? '예: 난카이 라피트'
-                        : '예: 오사카성'
-              }
-              required
-            />
-          </label>
-          <label>
-            장소 · 구간
-            <input
-              value={place}
-              onChange={(e) => setPlace(e.target.value)}
-              placeholder="주소, 역, 공항 코드"
-            />
-          </label>
-          <label>
-            보조 정보
-            <input
-              value={subtitle}
-              onChange={(e) => setSubtitle(e.target.value)}
-              placeholder="항공사, 인원, 객실 타입"
-            />
-          </label>
-          <label>
+        <div className={kind === 'flight' ? 'form-grid flight-fields' : 'form-grid'}>
+          {kind === 'flight' ? (
+            <>
+              <label>
+                출발시간
+                <input type="time" value={time} onChange={(e) => setTime(e.target.value)} required />
+              </label>
+              <label>
+                출발 터미널
+                <input
+                  value={departTerminal}
+                  onChange={(e) => setDepartTerminal(e.target.value)}
+                  placeholder="T1, T2"
+                />
+              </label>
+              <label className="span-2">
+                목적지
+                <input
+                  value={destination}
+                  onChange={(e) => setDestination(e.target.value)}
+                  placeholder="베이징 다싱 (PKX)"
+                  required
+                />
+              </label>
+              <label>
+                도착시간
+                <input type="time" value={arriveTime} onChange={(e) => setArriveTime(e.target.value)} />
+              </label>
+              <label>
+                도착 터미널
+                <input
+                  value={arriveTerminal}
+                  onChange={(e) => setArriveTerminal(e.target.value)}
+                  placeholder="있으면 입력"
+                />
+              </label>
+              <label>
+                운항편명
+                <input
+                  value={flightNo}
+                  onChange={(e) => setFlightNo(e.target.value)}
+                  placeholder="CZ316"
+                  required
+                />
+              </label>
+              <label>
+                항공사
+                <input
+                  value={airline}
+                  onChange={(e) => setAirline(e.target.value)}
+                  placeholder="중국남방항공"
+                />
+              </label>
+            </>
+          ) : (
+            <>
+              <label>
+                시간
+                <input type="time" value={time} onChange={(e) => setTime(e.target.value)} required />
+              </label>
+              <label>
+                제목
+                <input
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder={
+                    kind === 'hotel'
+                      ? '예: 난바 오리엔탈 호텔'
+                      : kind === 'meal'
+                        ? '예: 구로몬 시장 모둠'
+                        : kind === 'transport'
+                          ? '예: 난카이 라피트'
+                          : '예: 오사카성'
+                  }
+                  required
+                />
+              </label>
+              <label>
+                장소 · 구간
+                <input
+                  value={place}
+                  onChange={(e) => setPlace(e.target.value)}
+                  placeholder="주소, 역, 공항 코드"
+                />
+              </label>
+              <label>
+                보조 정보
+                <input
+                  value={subtitle}
+                  onChange={(e) => setSubtitle(e.target.value)}
+                  placeholder="인원, 객실 타입"
+                />
+              </label>
+            </>
+          )}
+          <label className={kind === 'flight' ? 'span-2' : undefined}>
             예상 비용 (원, 일행 합계)
             <input
               type="number"
@@ -182,7 +271,7 @@ export function ItemModal({ dayIndex, initial, preset, onClose, onSave, onDelete
               placeholder="0"
             />
           </label>
-          <label>
+          <label className={kind === 'flight' ? 'span-2' : undefined}>
             메모
             <textarea rows={3} value={note} onChange={(e) => setNote(e.target.value)} />
           </label>

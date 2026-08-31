@@ -60,6 +60,7 @@ function toOffer(row, dateIso, i) {
     price: priceFor(row.to, dateIso, flightId),
     seats: 3 + (seed(dateIso + flightId) % 10),
     detail: bits.join(' · '),
+    terminal: row.terminal || '',
   }
 }
 

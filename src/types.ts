@@ -4,6 +4,15 @@ export type MealSlot = 'breakfast' | 'lunch' | 'dinner' | 'latenight'
 
 export type TransportMode = 'train' | 'bus' | 'ferry' | 'car' | 'walk' | 'other'
 
+export type FlightFields = {
+  departTerminal?: string
+  destination?: string
+  arriveTime?: string
+  arriveTerminal?: string
+  flightNo?: string
+  airline?: string
+}
+
 export type TripItem = {
   id: string
   dayIndex: number
@@ -17,6 +26,7 @@ export type TripItem = {
   mealSlot?: MealSlot
   transportMode?: TransportMode
   source?: 'manual' | 'connect'
+  flight?: FlightFields
 }
 
 export type Trip = {
@@ -56,6 +66,7 @@ export type FlightOffer = {
   price: number
   seats: number
   detail?: string
+  terminal?: string
 }
 
 export type HotelOffer = {

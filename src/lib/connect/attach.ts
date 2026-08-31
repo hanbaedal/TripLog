@@ -22,7 +22,6 @@ function paxCost(unit: number, adults: number, children: number): number {
 }
 
 export function attachFlight(trip: Trip, offer: FlightOffer): Trip {
-  const people = Math.max(1, trip.adults + trip.children)
   const placed = ensureDate(trip, offer.date)
   let next = placed.trip
   if (!next.destination) next = { ...next, destination: offer.toCity }
@@ -33,12 +32,25 @@ export function attachFlight(trip: Trip, offer: FlightOffer): Trip {
     dayIndex: placed.dayIndex,
     time: offer.depart,
     kind: 'flight',
-    title: `${offer.airlineCode}${offer.flightNo} ${offer.fromCity} → ${offer.toCity}`,
-    subtitle: `${offer.airline} · ${people}인`,
-    place: `${offer.from} ${offer.depart} → ${offer.to} ${offer.arrive}${offer.plusDay ? ` +${offer.plusDay}` : ''}`,
+    title: `${offer.airlineCode}${offer.flightNo} → ${offer.toCity}`,
+    subtitle: offer.airline,
+    place: [
+      offer.toCity,
+      `${offer.depart} → ${offer.arrive}${offer.plusDay ? ` +${offer.plusDay}` : ''}`,
+      offer.terminal ? `출발 ${offer.terminal}` : '',
+    ]
+      .filter(Boolean)
+      .join(' · '),
     note: `연동 검색 · ${offer.cabin} · 잔여 ${offer.seats}석 · ${offer.duration}`,
     cost: paxCost(offer.price, trip.adults, trip.children),
     source: 'connect',
+    flight: {
+      departTerminal: offer.terminal || undefined,
+      destination: offer.toCity ? `${offer.toCity} (${offer.to})` : offer.to,
+      arriveTime: offer.arrive,
+      flightNo: `${offer.airlineCode}${offer.flightNo}`,
+      airline: offer.airline,
+    },
   }
   return { ...next, items: [...next.items, item] }
 }
