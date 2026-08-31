@@ -1,6 +1,6 @@
 import type { SampleRecord, Trip } from '../types'
 import { SAMPLE_CATALOG } from './sampleCatalog.js'
-import { resolveSightPhoto } from './sightPhotos'
+import { hasItemPhoto, resolveItemPhoto } from './sightPhotos'
 import { addDays, dayCount, todayIso } from '../lib/dates'
 import { uid } from '../lib/id'
 import { api, isRemote, probeRemote } from '../lib/remote'
@@ -45,8 +45,8 @@ export function cloneSampleTrip(sample: SampleRecord): Trip {
       ...entry,
       id: uid('item'),
       photo:
-        entry.kind === 'sight'
-          ? entry.photo || resolveSightPhoto(entry, sample.destination || sample.place)
+        hasItemPhoto(entry.kind)
+          ? entry.photo || resolveItemPhoto(entry, sample.destination || sample.place)
           : entry.photo,
     })),
     updatedAt: new Date().toISOString(),

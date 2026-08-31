@@ -7,7 +7,7 @@ import { ItemModal } from './ItemModal'
 import { attachFlight, attachHotel } from '../lib/connect/attach'
 import { KIND_LABEL, MEAL_LABEL, TRANSPORT_LABEL, krw, summarize } from '../lib/costs'
 import { dateOn, dayCount, formatRange, formatShort } from '../lib/dates'
-import { resolveSightPhoto } from '../data/sightPhotos'
+import { hasItemPhoto, resolveItemPhoto } from '../data/sightPhotos'
 
 type Props = {
   trip: Trip
@@ -290,7 +290,8 @@ export function Planner({
           ) : null}
           {dayItems.length === 0 ? null : (
             dayItems.map((item) => {
-              const photo = item.kind === 'sight' ? resolveSightPhoto(item, trip.destination) : undefined
+              const pictured = hasItemPhoto(item.kind)
+              const photo = pictured ? resolveItemPhoto(item, trip.destination) : undefined
               const copy = (
                 <>
                   <span className={`badge ${item.kind}`}>{badgeText(item)}</span>
@@ -298,14 +299,14 @@ export function Planner({
                   <div className="meta">
                     {[item.place, item.subtitle, item.note].filter(Boolean).join(' · ')}
                   </div>
-                  {item.kind === 'sight' ? (
+                  {pictured ? (
                     <div className="cost-n cost-line">{item.cost ? krw(item.cost) : '—'}</div>
                   ) : null}
                 </>
               )
               const body = locked ? (
-                <div className={item.kind === 'sight' ? 'card-copy' : 'card-main'}>
-                  {item.kind === 'sight' ? (
+                <div className={pictured ? 'card-copy' : 'card-main'}>
+                  {pictured ? (
                     copy
                   ) : (
                     <>
@@ -317,10 +318,10 @@ export function Planner({
               ) : (
                 <button
                   type="button"
-                  className={item.kind === 'sight' ? 'card-copy' : 'card-main'}
+                  className={pictured ? 'card-copy' : 'card-main'}
                   onClick={() => openItem(item)}
                 >
-                  {item.kind === 'sight' ? (
+                  {pictured ? (
                     copy
                   ) : (
                     <>
@@ -336,9 +337,9 @@ export function Planner({
                   <div className="rail">
                     <div className={`dot ${item.kind}`} />
                   </div>
-                  <article className={`card${item.kind === 'sight' ? ' card-sight' : ''}`}>
+                  <article className={`card${pictured ? ' card-photo' : ''}`}>
                     {body}
-                    {item.kind === 'sight' && photo ? (
+                    {pictured && photo ? (
                       <SightThumb
                         src={photo}
                         label={item.title}

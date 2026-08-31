@@ -254,13 +254,79 @@ function cityPhoto(place?: string): string | undefined {
   return (city && CITY_PHOTO[city]) || undefined
 }
 
-export function resolveSightPhoto(
-  item: { title?: string; photo?: string; place?: string },
+const MEAL_KEYS: { keys: string[]; url: string }[] = [
+  { keys: ['샤오롱바오', '난샹'], url: wm('Xiaolongbao.jpg') },
+  { keys: ['카오야'], url: wm('Peking duck.jpg') },
+  { keys: ['딤섬'], url: wm('Dim sum.jpg') },
+  { keys: ['훠궈', '화궈', '마라'], url: wm('Hot pot.jpg') },
+  { keys: ['양육파', '육협모'], url: wm('Roujiamo.jpg') },
+  { keys: ['마파두부'], url: wm('Mapo tofu.jpg') },
+  { keys: ['단단면'], url: wm('Dan dan noodles.jpg') },
+  { keys: ['과교미선'], url: wm('Crossing-the-bridge noodles.jpg') },
+  { keys: ['해산물', '해물', '생선'], url: wm('Chinese seafood.jpg') },
+  { keys: ['만두'], url: wm('Jiaozi.jpg') },
+  { keys: ['냉면'], url: wm('Naengmyeon.jpg') },
+  { keys: ['맥주'], url: wm('Tsingtao beer.jpg') },
+  { keys: ['와인'], url: wm('Red wine.jpg') },
+  { keys: ['브런치', '카페'], url: wm('Brunch.jpg') },
+  { keys: ['산채', '농가채', '소채', '산차이'], url: wm('Chinese vegetarian dish.jpg') },
+  { keys: ['국수', '수타면', '새우면', '해물면', '면'], url: wm('Chinese noodles.jpg') },
+  { keys: ['훠', '요리', '모둠', '코스', '정식', '석식', '안주'], url: wm('Chinese cuisine.jpg') },
+]
+
+const HOTEL_PHOTO = wm('Hotel room.jpg')
+const HOTEL_KEYS: { keys: string[]; url: string }[] = [
+  { keys: ['온천'], url: wm('Hot spring hotel.jpg') },
+  { keys: ['객잔'], url: wm('Chinese courtyard inn.jpg') },
+  { keys: ['산장'], url: wm('Mountain lodge.jpg') },
+  { keys: ['호텔', '마리엇', '샹그릴라', '쉐라톤', '펜인슐라', '하버뷰'], url: HOTEL_PHOTO },
+]
+
+const TRANSPORT_BY_MODE: Record<string, string> = {
+  train: wm('China Railway High-speed.jpg'),
+  bus: wm('Airport bus.jpg'),
+  ferry: wm('Star Ferry.jpg'),
+  car: wm('China highway.jpg'),
+  walk: wm('Pedestrian street China.jpg'),
+  other: wm('Cable car.jpg'),
+}
+
+const TRANSPORT_KEYS: { keys: string[]; url: string }[] = [
+  { keys: ['리무진', '공항'], url: wm('Airport bus.jpg') },
+  { keys: ['기차'], url: wm('China Railway High-speed.jpg') },
+  { keys: ['버스', '이동', '복귀'], url: wm('Coach bus China.jpg') },
+  { keys: ['케이블'], url: wm('Cable car.jpg') },
+  { keys: ['자전거'], url: wm('Bicycle.jpg') },
+  { keys: ['엘리베이터'], url: wm('Bailong Elevator.jpg') },
+]
+
+const KIND_FALLBACK: Record<string, string> = {
+  meal: wm('Chinese cuisine.jpg'),
+  hotel: HOTEL_PHOTO,
+  transport: wm('Airport bus.jpg'),
+}
+
+function matchKeys(text: string, groups: { keys: string[]; url: string }[]): string | undefined {
+  for (const group of groups) {
+    if (group.keys.some((key) => text.includes(key))) return group.url
+  }
+  return undefined
+}
+
+export const PHOTO_KINDS = ['sight', 'meal', 'hotel', 'transport'] as const
+
+export function hasItemPhoto(kind?: string): boolean {
+  return kind === 'sight' || kind === 'meal' || kind === 'hotel' || kind === 'transport'
+}
+
+export function resolveItemPhoto(
+  item: { kind?: string; title?: string; photo?: string; place?: string; transportMode?: string },
   destination?: string,
 ): string | undefined {
   const custom = item.photo?.trim()
   if (custom) return custom
   const title = (item.title || '').trim()
+  const hay = `${title} ${item.place || ''}`
   if (title) {
     const exact = lookupTitle(title)
     if (exact) return exact
@@ -272,5 +338,25 @@ export function resolveSightPhoto(
       if (title.includes(key)) return url
     }
   }
+  if (item.kind === 'meal') {
+    return matchKeys(hay, MEAL_KEYS) || KIND_FALLBACK.meal
+  }
+  if (item.kind === 'hotel') {
+    return matchKeys(hay, HOTEL_KEYS) || KIND_FALLBACK.hotel
+  }
+  if (item.kind === 'transport') {
+    return (
+      matchKeys(hay, TRANSPORT_KEYS) ||
+      (item.transportMode ? TRANSPORT_BY_MODE[item.transportMode] : undefined) ||
+      KIND_FALLBACK.transport
+    )
+  }
   return cityPhoto(destination) || cityPhoto(item.place)
+}
+
+export function resolveSightPhoto(
+  item: { title?: string; photo?: string; place?: string; kind?: string; transportMode?: string },
+  destination?: string,
+): string | undefined {
+  return resolveItemPhoto({ ...item, kind: item.kind ?? 'sight' }, destination)
 }

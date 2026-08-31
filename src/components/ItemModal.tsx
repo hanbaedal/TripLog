@@ -111,7 +111,10 @@ export function ItemModal({ dayIndex, initial, preset, onClose, onSave, onDelete
       cost: Number(cost) || 0,
       mealSlot: kind === 'meal' ? mealSlot : undefined,
       transportMode: kind === 'transport' ? transportMode : undefined,
-      photo: kind === 'sight' ? photo.trim() || undefined : undefined,
+      photo:
+        kind === 'sight' || kind === 'meal' || kind === 'hotel' || kind === 'transport'
+          ? photo.trim() || undefined
+          : undefined,
     }
     onSave(item)
   }
@@ -273,7 +276,7 @@ export function ItemModal({ dayIndex, initial, preset, onClose, onSave, onDelete
               placeholder="0"
             />
           </label>
-          {kind === 'sight' ? (
+          {kind === 'sight' || kind === 'meal' || kind === 'hotel' || kind === 'transport' ? (
             <label className="span-2">
               사진 주소
               <input
