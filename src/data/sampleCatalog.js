@@ -73,12 +73,19 @@ function buildSample({
         }),
       )
     }
-    items.push(
-      row(`${id}-s${d}`, d, d === 0 ? '16:20' : '09:40', 'sight', day.sight, {
-        place: day.sightPlace,
-        cost: day.sightCost || 0,
-      }),
-    )
+    const sights = day.sights || (day.sight ? [day.sight] : [])
+    sights.forEach((sight, i) => {
+      const title = typeof sight === 'string' ? sight : sight.title
+      const sightPlace = typeof sight === 'string' ? day.sightPlace || '' : sight.place || day.sightPlace || ''
+      const hour = 9 + i * 2
+      const minute = 10 + (i % 3) * 15
+      items.push(
+        row(`${id}-s${d}-${i}`, d, `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`, 'sight', title, {
+          place: sightPlace,
+          cost: i === 0 ? day.sightCost || 0 : 0,
+        }),
+      )
+    })
     items.push(
       row(`${id}-l${d}`, d, d === 0 ? '12:30' : '12:10', 'meal', day.lunch, {
         mealSlot: 'lunch',
@@ -96,12 +103,19 @@ function buildSample({
   }
 
   const last = days[nights] || days[days.length - 1]
-  items.push(
-    row(`${id}-sL`, lastDay, '09:10', 'sight', last.sight, {
-      place: last.sightPlace,
-      cost: last.sightCost || 0,
-    }),
-  )
+  const lastSights = last.sights || (last.sight ? [last.sight] : [])
+  lastSights.forEach((sight, i) => {
+    const title = typeof sight === 'string' ? sight : sight.title
+    const sightPlace = typeof sight === 'string' ? last.sightPlace || '' : sight.place || last.sightPlace || ''
+    const hour = 9 + i * 2
+    const minute = 10 + (i % 3) * 15
+    items.push(
+      row(`${id}-sL-${i}`, lastDay, `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`, 'sight', title, {
+        place: sightPlace,
+        cost: i === 0 ? last.sightCost || 0 : 0,
+      }),
+    )
+  })
   items.push(
     row(`${id}-lL`, lastDay, '12:00', 'meal', last.lunch, {
       mealSlot: 'lunch',
@@ -156,84 +170,132 @@ export const SAMPLE_CATALOG = [
     id: 'dalian',
     sort: 1,
     nights: 3,
-    place: '대련',
-    title: '대련 바닷바람 나흘',
+    place: '大连市',
+    title: '大连市 3박4일',
     airport: 'DLC',
-    airportName: '대련 저우수이쯔',
+    airportName: '大连周水子国际机场',
     airline: '대한항공',
     flightOut: 'KE867',
     flightIn: 'KE868',
-    hotel: '대련 푸리화 호텔',
-    hotelPlace: '중산구 인민로',
+    hotel: '大连富丽华酒店',
+    hotelPlace: '中山区人民路',
     nightly: 120000,
     days: [
-      { sight: '싱하이 광장', sightPlace: '사허커우', lunch: '해산물 모둠', lunchPlace: '창싱시장', dinner: '동북식 요리', dinnerPlace: '중산광장' },
-      { sight: '뤼순 군항', sightPlace: '뤼순커우', lunch: '해물 만두', lunchPlace: '뤼순 시내', dinner: '해물 샤브', dinnerPlace: '빈하이루', sightCost: 18000 },
-      { sight: '러시아풍 거리', sightPlace: '시강구', lunch: '동북냉면', lunchPlace: '러시아풍 거리', dinner: '해산물 모둠', dinnerPlace: '싱하이' },
-      { sight: '빈하이루 산책', sightPlace: '빈하이루', lunch: '공항 근처 국수', lunchPlace: '감산' },
+      {
+        sights: ['星海广场', '莲花山', '俄罗斯风情街', '中山广场'],
+        lunch: '海鲜小炒', lunchPlace: '星海广场', dinner: '东北菜', dinnerPlace: '中山广场',
+      },
+      {
+        sights: ['旅顺日俄监狱旧址博物馆', '东港音乐喷泉广场', '东方水城'],
+        lunch: '海鲜饺子', lunchPlace: '东港', dinner: '海鲜火锅', dinnerPlace: '东港', sightCost: 18000,
+      },
+      {
+        sights: ['金石滩', '金石园', '滨海国家地质公园', '西安路'],
+        lunch: '海鲜面', lunchPlace: '金石滩', dinner: '烧烤', dinnerPlace: '西安路', sightCost: 22000,
+      },
+      {
+        sights: ['劳动公园', '大菜市水产品批发大市场'],
+        lunch: '机场简餐', lunchPlace: '周水子',
+      },
     ],
   }),
   buildSample({
     id: 'yantai',
     sort: 2,
     nights: 3,
-    place: '연태',
-    title: '연태 펑라이 나흘',
+    place: '烟台市',
+    title: '烟台市 3박4일',
     airport: 'YNT',
-    airportName: '연태 펑라이',
+    airportName: '烟台蓬莱国际机场',
     airline: '아시아나항공',
     flightOut: 'OZ323',
     flightIn: 'OZ324',
-    hotel: '연태 마리엇',
-    hotelPlace: '라이산구 빈해로',
+    hotel: '烟台万豪酒店',
+    hotelPlace: '莱山区滨海路',
     nightly: 110000,
     days: [
-      { sight: '창위 와인성', sightPlace: '즈푸구', lunch: '와인 안주 세트', lunchPlace: '창위', dinner: '해산물 구이', dinnerPlace: '진산완' },
-      { sight: '펑라이각', sightPlace: '펑라이', lunch: '해물 만두', lunchPlace: '펑라이 고성', dinner: '루차이 코스', dinnerPlace: '시내', sightCost: 22000 },
-      { sight: '진산완 해변', sightPlace: '라이산', lunch: '해물면', lunchPlace: '해변', dinner: '샤오롱바오', dinnerPlace: '즈푸' },
-      { sight: '연태산공원', sightPlace: '즈푸구', lunch: '간단 국수', lunchPlace: '시내' },
+      {
+        sights: ['渔人码头', '月亮湾', '烟台山', '朝阳街', '所城里'],
+        lunch: '海鲜烧烤', lunchPlace: '渔人码头', dinner: '鲁菜', dinnerPlace: '所城里',
+      },
+      {
+        sights: ['养马岛', '烟台自然博物馆'],
+        lunch: '海鲜面', lunchPlace: '养马岛', dinner: '小笼包', dinnerPlace: '市区', sightCost: 20000,
+      },
+      {
+        sights: ['蓬莱阁景区'],
+        lunch: '蓬莱海鲜', lunchPlace: '蓬莱阁', dinner: '海鲜宴', dinnerPlace: '蓬莱', sightCost: 22000,
+      },
+      {
+        sights: ['凤凰山公园'],
+        lunch: '简餐', lunchPlace: '市区',
+      },
     ],
   }),
   buildSample({
     id: 'qingdao',
     sort: 3,
     nights: 3,
-    place: '청도',
-    title: '청도 해변과 맥주 나흘',
+    place: '青岛市',
+    title: '青岛市 3박4일',
     airport: 'TAO',
-    airportName: '칭다오 자오둥',
+    airportName: '青岛胶东国际机场',
     airline: '산둥항공',
     flightOut: 'SC4612',
     flightIn: 'SC4611',
-    hotel: '칭다오 하이팅 호텔',
-    hotelPlace: '스난구 잔차오',
+    hotel: '青岛海天大酒店',
+    hotelPlace: '市南区栈桥',
     nightly: 130000,
     days: [
-      { sight: '잔차오', sightPlace: '스난구', lunch: '칭다오 새우면', lunchPlace: '윈난로', dinner: '해물 모둠', dinnerPlace: '스나오런' },
-      { sight: '라오산', sightPlace: '라오산구', lunch: '도교 소채', lunchPlace: '타이칭궁', dinner: '맥주거리 안주', dinnerPlace: '덩저우로', sightCost: 35000 },
-      { sight: '스나오런 해변', sightPlace: '스난구', lunch: '해물 만두', lunchPlace: '해변', dinner: '칭다오 맥주 플래터', dinnerPlace: '바스구' },
-      { sight: '바스 옛 거리', sightPlace: '스베이구', lunch: '간단 면', lunchPlace: '바스' },
+      {
+        sights: ['即墨路小商品市场', '劈柴院'],
+        lunch: '青岛大虾面', lunchPlace: '劈柴院', dinner: '海鲜大排档', dinnerPlace: '中山路',
+      },
+      {
+        sights: ['崂山风景区'],
+        lunch: '道家素斋', lunchPlace: '太清宫', dinner: '啤酒街小食', dinnerPlace: '登州路', sightCost: 35000,
+      },
+      {
+        sights: ['五四广场', '奥帆海洋文化旅游区', '八大关风景区', '青岛啤酒博物馆'],
+        lunch: '海鲜饺子', lunchPlace: '八大关', dinner: '青岛啤酒套餐', dinnerPlace: '啤酒博物馆', sightCost: 15000,
+      },
+      {
+        sights: ['小鱼山景区', '小青岛景区', '栈桥景区'],
+        lunch: '简餐', lunchPlace: '栈桥',
+      },
     ],
   }),
   buildSample({
     id: 'harbin',
     sort: 4,
     nights: 3,
-    place: '하얼빈',
-    title: '하얼빈 중앙대가 나흘',
+    place: '哈尔滨市',
+    title: '哈尔滨市 3박4일',
     airport: 'HRB',
-    airportName: '하얼빈 타이핑',
+    airportName: '哈尔滨太平国际机场',
     airline: '중국남방항공',
     flightOut: 'CZ316',
     flightIn: 'CZ315',
-    hotel: '하얼빈 샹그릴라',
-    hotelPlace: '다오리카이 홍보가',
+    hotel: '哈尔滨香格里拉',
+    hotelPlace: '道里区中央大街',
     nightly: 125000,
     days: [
-      { sight: '중앙대가', sightPlace: '다오리카이', lunch: '홍창창 소시지', lunchPlace: '중앙대가', dinner: '동북식 냄비', dinnerPlace: '중앙대가' },
-      { sight: '성 소피아 성당', sightPlace: '소피아 광장', lunch: '러시아 서양식', lunchPlace: '중앙대가', dinner: '화궈 마라', dinnerPlace: '홍보가', sightCost: 8000 },
-      { sight: '태양도', sightPlace: '쑹화강', lunch: '강변 만두', lunchPlace: '태양도', dinner: '동북식 요리', dinnerPlace: '다오리카이', sightCost: 15000 },
-      { sight: '하얼빈극 거리', sightPlace: '다오리카이', lunch: '간단 국수', lunchPlace: '시내' },
+      {
+        sights: ['安重根义士纪念馆', '圣索菲亚教堂', '中央大街', '胜利纪念塔'],
+        lunch: '红肠简餐', lunchPlace: '中央大街', dinner: '东北炖菜', dinnerPlace: '中央大街',
+      },
+      {
+        sights: ['太阳岛', '黑龙江省博物馆'],
+        lunch: '江鱼饺子', lunchPlace: '太阳岛', dinner: '俄式西餐', dinnerPlace: '中央大街', sightCost: 15000,
+      },
+      {
+        sights: ['第七三一部队遗址', '龙塔'],
+        lunch: '东北菜', lunchPlace: '南岗', dinner: '火锅', dinnerPlace: '果戈里大街', sightCost: 12000,
+      },
+      {
+        sights: ['东北虎林园'],
+        lunch: '简餐', lunchPlace: '机场方向',
+      },
     ],
   }),
   buildSample({

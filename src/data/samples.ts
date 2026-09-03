@@ -64,7 +64,7 @@ function seedLocal(): SampleRecord[] {
 function fillMissing(rows: SampleRecord[]): SampleRecord[] {
   const byId = new Map(rows.map((row) => [row.id, row]))
   for (const row of seedLocal()) {
-    if (!byId.has(row.id)) byId.set(row.id, row)
+    if (!byId.has(row.id) || isCatalogSample(row)) byId.set(row.id, row)
   }
   return [...byId.values()]
 }
