@@ -515,10 +515,57 @@ p {
   margin: 0 auto;
   display: flex;
   flex-wrap: wrap;
-  gap: 12px 16px;
-  align-items: center;
+  gap: 10px 14px;
+  align-items: flex-end;
   justify-content: space-between;
-  padding: 12px 0;
+  padding: 10px 0;
+}
+
+.trip-compact {
+  display: grid;
+  gap: 6px;
+  flex: 1 1 280px;
+  min-width: 0;
+}
+
+.trip-name input {
+  font-family: var(--serif);
+  font-size: 1.05rem;
+}
+
+.trip-dates {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 6px 8px;
+}
+
+.field-date input {
+  min-width: 0;
+  width: min(100%, 138px);
+}
+
+.trip-date-sep {
+  padding-bottom: 10px;
+  color: var(--ink-soft);
+}
+
+.trip-range {
+  padding-bottom: 10px;
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.planner-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.planner-actions .btn {
+  padding: 8px 14px;
+  font-size: 0.84rem;
 }
 
 .trip-fields {
@@ -586,14 +633,34 @@ p {
 
 .planner-grid {
   width: min(1280px, calc(100% - 24px));
-  margin: 18px auto 48px;
+  margin: 12px auto 48px;
   display: grid;
-  grid-template-columns: 168px 1fr 300px;
+  grid-template-columns: 1fr 300px;
   gap: 16px;
   align-items: start;
 }
 
-.day-rail,
+.day-rail-sticky {
+  position: sticky;
+  top: calc(var(--nav-h) + 92px);
+  z-index: 7;
+  width: min(1280px, calc(100% - 24px));
+  margin: 0 auto;
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 8px 4px;
+  background: rgba(243, 238, 230, 0.94);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+
+.day-rail-sticky::-webkit-scrollbar {
+  display: none;
+}
+
 .timeline,
 .side-col > * {
   background: var(--cream);
@@ -603,18 +670,21 @@ p {
 
 .day-rail {
   padding: 12px;
-  position: sticky;
-  top: 84px;
 }
 
 .day-btn {
-  width: 100%;
-  text-align: left;
+  flex: 0 0 auto;
+  width: auto;
+  text-align: center;
   border: 0;
   background: transparent;
   border-radius: 12px;
-  padding: 10px 10px;
-  margin-bottom: 4px;
+  padding: 8px 12px;
+  margin: 0;
+  white-space: nowrap;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
 }
 
 .day-btn.active {
@@ -643,7 +713,7 @@ p {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  padding: 0 14px 12px;
+  padding: 12px 14px;
 }
 
 .chip {
@@ -742,7 +812,7 @@ p {
   cursor: default;
 }
 
-.planner-shell.is-locked .trip-fields {
+.planner-shell.is-locked .trip-compact {
   opacity: 0.78;
 }
 
@@ -1937,6 +2007,10 @@ p {
 }
 
 @media (min-width: 981px) {
+  .trip-range {
+    display: none;
+  }
+
   .sample-card {
     flex-basis: 280px;
   }
@@ -1961,19 +2035,30 @@ p {
     grid-template-columns: 1fr;
   }
 
-  .day-rail {
-    position: static;
-    display: flex;
-    gap: 6px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+  .day-rail-sticky {
+    top: calc(var(--nav-h) + 118px);
+    width: calc(100% - 16px);
   }
 
-  .day-btn {
-    flex: 0 0 auto;
-    width: auto;
-    margin: 0;
-    white-space: nowrap;
+  .planner-bar-inner {
+    flex-direction: column;
+    align-items: stretch;
+    width: calc(100% - 16px);
+    padding: 8px 0;
+  }
+
+  .planner-actions {
+    justify-content: stretch;
+  }
+
+  .planner-actions .btn {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .trip-range {
+    flex: 1 1 100%;
+    padding-bottom: 0;
   }
 
   .side-col {

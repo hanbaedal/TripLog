@@ -69,6 +69,13 @@ function SightThumb({ src, label, onOpen }: { src: string; label: string; onOpen
   )
 }
 
+function tripDestinationFromTitle(title: string, fallback: string): string {
+  const bit = String(title || '')
+    .trim()
+    .split(/\s+/)[0]
+  return bit || fallback
+}
+
 export function Planner({
   trip,
   user,
@@ -150,70 +157,45 @@ export function Planner({
     <div className={`planner-shell${locked ? ' is-locked' : ''}`}>
       <header className="planner-bar">
         <div className="planner-bar-inner">
-          <div className="trip-fields">
-            <label className="field title">
-              <span>Title</span>
+          <div className="trip-compact">
+            <label className="field trip-name">
+              <span>여행 이름</span>
               <input
                 value={trip.title}
-                onChange={(e) => patch({ title: e.target.value })}
+                onChange={(e) => {
+                  const title = e.target.value
+                  patch({ title, destination: tripDestinationFromTitle(title, trip.destination) })
+                }}
+                placeholder="예: 大连市 3박4일"
                 disabled={locked}
               />
             </label>
-            <label className="field">
-              <span>Destination</span>
-              <input
-                value={trip.destination}
-                onChange={(e) => patch({ destination: e.target.value })}
-                placeholder="도시"
-                disabled={locked}
-              />
-            </label>
-            <label className="field">
-              <span>Start</span>
-              <input
-                type="date"
-                value={trip.startDate}
-                onChange={(e) => patch({ startDate: e.target.value })}
-                disabled={locked}
-              />
-            </label>
-            <label className="field">
-              <span>End</span>
-              <input
-                type="date"
-                value={trip.endDate}
-                onChange={(e) => patch({ endDate: e.target.value })}
-                disabled={locked}
-              />
-            </label>
-            <div className="people">
-              <div className="field">
-                <span>Adults</span>
-                <div className="stepper">
-                  <button type="button" disabled={locked} onClick={() => patch({ adults: Math.max(1, trip.adults - 1) })}>
-                    –
-                  </button>
-                  <b>{trip.adults}</b>
-                  <button type="button" disabled={locked} onClick={() => patch({ adults: trip.adults + 1 })}>
-                    +
-                  </button>
-                </div>
-              </div>
-              <div className="field">
-                <span>Children</span>
-                <div className="stepper">
-                  <button type="button" disabled={locked} onClick={() => patch({ children: Math.max(0, trip.children - 1) })}>
-                    –
-                  </button>
-                  <b>{trip.children}</b>
-                  <button type="button" disabled={locked} onClick={() => patch({ children: trip.children + 1 })}>
-                    +
-                  </button>
-                </div>
-              </div>
+            <div className="trip-dates">
+              <label className="field field-date">
+                <span>시작</span>
+                <input
+                  type="date"
+                  value={trip.startDate}
+                  onChange={(e) => patch({ startDate: e.target.value })}
+                  disabled={locked}
+                />
+              </label>
+              <span className="trip-date-sep" aria-hidden="true">
+                –
+              </span>
+              <label className="field field-date">
+                <span>종료</span>
+                <input
+                  type="date"
+                  value={trip.endDate}
+                  onChange={(e) => patch({ endDate: e.target.value })}
+                  disabled={locked}
+                />
+              </label>
+              <span className="trip-range muted">{formatRange(trip.startDate, trip.endDate)}</span>
             </div>
           </div>
-          <div className="nav-actions">
+          <div className="planner-actions">
             {user && copyingSample && onSaveCopy ? (
               <button className="btn stamp" type="button" onClick={onSaveCopy}>
                 내 여행에 저장
@@ -240,31 +222,22 @@ export function Planner({
         </div>
       </header>
 
-      <div className="planner-grid">
-        <nav className="day-rail" aria-label="날짜">
-          {Array.from({ length: days }, (_, i) => (
-            <button
-              key={i}
-              type="button"
-              className={`day-btn ${i === selected ? 'active' : ''}`}
-              onClick={() => setDay(i)}
-            >
-              {i + 1}일차
-              <small>{formatShort(dateOn(trip.startDate, i))}</small>
-            </button>
-          ))}
-        </nav>
+      <nav className="day-rail day-rail-sticky" aria-label="날짜">
+        {Array.from({ length: days }, (_, i) => (
+          <button
+            key={i}
+            type="button"
+            className={`day-btn ${i === selected ? 'active' : ''}`}
+            onClick={() => setDay(i)}
+          >
+            {i + 1}일차
+            <small>{formatShort(dateOn(trip.startDate, i))}</small>
+          </button>
+        ))}
+      </nav>
 
+      <div className="planner-grid">
         <section className="timeline">
-          <div className="timeline-head">
-            <div>
-              <div className="kicker">{formatRange(trip.startDate, trip.endDate)}</div>
-              <h2>
-                {selected + 1}일차 · {formatShort(dateOn(trip.startDate, selected))}
-              </h2>
-            </div>
-            <div className="muted">{dayItems.length}개 일정</div>
-          </div>
           {!locked ? (
             <div className="chips">
               {ADD_CHIPS.map((chip) => (
@@ -359,9 +332,7 @@ export function Planner({
           <section>
             <div className="kicker">Budget</div>
             <div className="cost-total">{krw(summary.total)}</div>
-            <p className="muted">
-              1인 {krw(summary.perPerson)} · 하루 평균 {krw(summary.perDay)} · {summary.people}명
-            </p>
+            <p className="muted">하루 평균 {krw(summary.perDay)}</p>
             {(['flight', 'hotel', 'meal', 'sight', 'transport'] as const).map((kind) => (
               <div className="bar" key={kind}>
                 <span>{KIND_LABEL[kind]}</span>
