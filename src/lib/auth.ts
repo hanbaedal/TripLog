@@ -29,12 +29,12 @@ function publicUser(user: StoredUser): User {
     email: user.email,
     name: user.name,
     phone: user.phone ? formatPhone(user.phone) : '',
-    role: user.name.trim() === '해수' ? 'supervisor' : user.role || 'user',
+    role: user.role || 'user',
   }
 }
 
 export function isSupervisor(user: User | null): boolean {
-  return user?.role === 'supervisor' || user?.name.trim() === '해수'
+  return user?.role === 'supervisor'
 }
 
 async function digest(value: string): Promise<string> {

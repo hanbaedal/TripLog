@@ -162,3 +162,17 @@ const travelSpotSchema = new mongoose.Schema(
 )
 
 export const TravelSpot = mongoose.models.TravelSpot || mongoose.model('TravelSpot', travelSpotSchema)
+
+const taxonomySchema = new mongoose.Schema(
+  {
+    kind: { type: String, enum: ['city', 'category', 'sightType'], required: true, index: true },
+    slug: { type: String, required: true, trim: true },
+    label: { type: String, required: true, trim: true },
+    sort: { type: Number, default: 99 },
+  },
+  { timestamps: true },
+)
+taxonomySchema.index({ kind: 1, slug: 1 }, { unique: true })
+
+export const TaxonomyOption =
+  mongoose.models.TaxonomyOption || mongoose.model('TaxonomyOption', taxonomySchema)

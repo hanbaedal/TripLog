@@ -1508,6 +1508,22 @@ p {
   gap: 12px;
 }
 
+.gallery-card-cell {
+  display: grid;
+  gap: 6px;
+}
+
+.gallery-card-edit {
+  width: 100%;
+  padding: 6px 10px;
+  font-size: 0.78rem;
+}
+
+.gallery-write-note {
+  margin: 0 0 12px;
+  font-size: 0.88rem;
+}
+
 .gallery-card {
   display: grid;
   gap: 8px;
@@ -2381,6 +2397,59 @@ p {
     flex: 1 1 100%;
     min-width: 0;
   }
+}
+
+.board-readonly-note {
+  margin: 0 0 16px;
+  font-size: 0.88rem;
+}
+
+.admin-section {
+  margin-top: 20px;
+}
+
+.admin-inline-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px;
+  align-items: end;
+}
+
+.admin-table {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.admin-row {
+  display: grid;
+  grid-template-columns: minmax(72px, 0.8fr) 1.2fr auto auto;
+  gap: 8px;
+  align-items: center;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--cream);
+}
+
+.users-table .admin-row {
+  grid-template-columns: minmax(64px, 0.7fr) minmax(120px, 1.4fr) auto auto;
+}
+
+.admin-row-code,
+.admin-row-email {
+  font-family: var(--en);
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.88rem;
 }
 
 @media print {

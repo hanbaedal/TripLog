@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { PageShell } from './PageShell'
-import { listGallery } from '../lib/community'
+import { listGallery, canEditGallery } from '../lib/community'
+import { isSupervisor } from '../lib/auth'
 import { galleryCityLabel, photoCategoryLabel, photoTaxonomyLabel } from '../lib/galleryFilter'
 import { GALLERY_CATEGORIES, GALLERY_CITIES } from '../data/galleryTaxonomy.js'
 import type { GalleryCategory, GalleryPhoto } from '../types'
@@ -25,6 +26,8 @@ export function GalleryPage({ focusId, ...nav }: Props) {
   const [activeId, setActiveId] = useState<string | null>(() => focusId ?? null)
   const [slideCity, setSlideCity] = useState('')
   const [categoryFilter, setCategoryFilter] = useState<GalleryCategory | ''>('')
+
+  const supervisor = isSupervisor(nav.user)
 
   useEffect(() => {
     void listGallery().then(setPhotos)
@@ -131,13 +134,22 @@ export function GalleryPage({ focusId, ...nav }: Props) {
         <section className="wrap section gallery-list-page">
           <div className="section-head">
             <h2>갤러리</h2>
-            <button
-              className="btn ghost"
-              type="button"
-              onClick={() => (nav.user ? nav.go.galleryWrite() : nav.go.auth())}
-            >
-              사진 올리기
-            </button>
+            <div className="nav-actions">
+              {supervisor ? (
+                <button className="btn ghost" type="button" onClick={() => nav.go.galleryWrite()}>
+                  카탈로그 관리
+                </button>
+              ) : null}
+              {nav.user ? (
+              <button
+                className="btn ghost"
+                type="button"
+                onClick={() => nav.go.galleryWrite()}
+              >
+                사진 올리기
+              </button>
+              ) : null}
+            </div>
           </div>
           <div className="gallery-list-filters">
             <label>
@@ -164,16 +176,26 @@ export function GalleryPage({ focusId, ...nav }: Props) {
               </div>
               <div className="gallery-grid">
                 {group.photos.map((photo) => (
-                  <button
-                    type="button"
-                    className="gallery-card"
-                    key={photo.id}
-                    onClick={() => openSlide(photo.id, group.slug)}
-                  >
-                    <img src={photo.src} alt={photo.title} loading="lazy" />
-                    <span>{photo.title}</span>
-                    <small>{photoCategoryLabel(photo)}</small>
-                  </button>
+                  <article className="gallery-card-cell" key={photo.id}>
+                    <button
+                      type="button"
+                      className="gallery-card"
+                      onClick={() => openSlide(photo.id, group.slug)}
+                    >
+                      <img src={photo.src} alt={photo.title} loading="lazy" />
+                      <span>{photo.title}</span>
+                      <small>{photoCategoryLabel(photo)}</small>
+                    </button>
+                    {canEditGallery(photo, nav.user) ? (
+                      <button
+                        className="btn ghost gallery-card-edit"
+                        type="button"
+                        onClick={() => nav.go.galleryWrite(photo.id)}
+                      >
+                        수정
+                      </button>
+                    ) : null}
+                  </article>
                 ))}
               </div>
             </div>

@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { goSite, visibleSiteLinks, type SiteNav } from '../lib/siteNav'
+import { goSite, SUPERVISOR_LINKS, visibleSiteLinks, type SiteNav } from '../lib/siteNav'
+import { isSupervisor } from '../lib/auth'
 
 type Props = SiteNav
 
@@ -35,6 +36,11 @@ export function AppNav({ view, user, go }: Props) {
 
   const nav = { view, user, go }
 
+  const links = [
+    ...visibleSiteLinks(user),
+    ...(isSupervisor(user) ? SUPERVISOR_LINKS : []),
+  ]
+
   function pick(id: Parameters<typeof goSite>[1]) {
     goSite(nav, id)
     setMenuOpen(false)
@@ -69,7 +75,7 @@ export function AppNav({ view, user, go }: Props) {
           className={`nav-actions${menuOpen ? ' is-open' : ''}`}
           aria-label="주요 메뉴"
         >
-          {visibleSiteLinks(user).map((link) => (
+          {links.map((link) => (
             <button
               key={link.id}
               className={`btn ghost${view === link.id ? ' is-on' : ''}`}

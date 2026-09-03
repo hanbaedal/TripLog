@@ -39,6 +39,10 @@ export function BoardPage(nav: SiteNav) {
 
   async function submit(e: FormEvent) {
     e.preventDefault()
+    if (!nav.user) {
+      nav.go.auth()
+      return
+    }
     const nextTitle = title.trim()
     const nextBody = body.trim()
     const nextName = (nav.user?.name || name).trim()
@@ -53,7 +57,7 @@ export function BoardPage(nav: SiteNav) {
         name: nextName,
         title: nextTitle,
         body: nextBody,
-        ownerId: nav.user?.id,
+    ownerId: nav.user.id,
       })
       setPosts((cur) => [saved, ...cur.filter((row) => row.id !== saved.id)])
       setTitle('')
@@ -123,10 +127,8 @@ export function BoardPage(nav: SiteNav) {
         <div className="section-head">
           <h2>자유게시판</h2>
         </div>
+        {nav.user ? (
         <form className="board-form" onSubmit={(e) => void submit(e)}>
-          {nav.user ? null : (
-            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="이름" required />
-          )}
           <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="제목" required />
           <textarea value={body} onChange={(e) => setBody(e.target.value)} rows={4} placeholder="내용" required />
           <div className="nav-actions">
@@ -149,6 +151,9 @@ export function BoardPage(nav: SiteNav) {
           </div>
           {error ? <p className="muted">{error}</p> : null}
         </form>
+        ) : (
+          <p className="muted board-readonly-note">글쓰기와 댓글은 로그인 후 이용할 수 있습니다.</p>
+        )}
         <div className="board-list">
           {sorted.map((post) => (
             <article className="info-card" key={post.id}>

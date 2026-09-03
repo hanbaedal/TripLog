@@ -88,6 +88,7 @@ galleryRouter.post('/', requireUser, async (req, res) => {
   const title = String(req.body?.title || '').trim()
   const src = String(req.body?.src || '').trim()
   const meta = parseGalleryMeta(req.body)
+  const asCatalog = Boolean(req.body?.catalog) && isSupervisor(req.user)
   if (!title || !src) {
     res.status(400).json({ error: '제목과 사진이 필요합니다.' })
     return
@@ -101,14 +102,15 @@ galleryRouter.post('/', requireUser, async (req, res) => {
     return
   }
   const doc = await GalleryPhoto.create({
-    photoId: nid('gal'),
-    ownerId: req.user._id,
-    ownerName: req.user.name,
+    photoId: req.body?.id ? String(req.body.id).trim() : nid('gal'),
+    ownerId: asCatalog ? null : req.user._id,
+    ownerName: asCatalog ? '' : req.user.name,
     title,
     src,
     city: meta.city,
     category: meta.category,
     sightType: meta.sightType,
+    catalog: asCatalog,
     at: new Date(),
   })
   res.json({ photo: toPhoto(doc) })
@@ -136,6 +138,13 @@ galleryRouter.put('/:id', requireUser, async (req, res) => {
   doc.city = meta.city
   doc.category = meta.category
   doc.sightType = meta.sightType
+  if (isSupervisor(req.user) && req.body?.catalog != null) {
+    doc.catalog = Boolean(req.body.catalog)
+    if (doc.catalog) {
+      doc.ownerId = null
+      doc.ownerName = ''
+    }
+  }
   await doc.save()
   res.json({ photo: toPhoto(doc) })
 })
@@ -157,17 +166,17 @@ boardRouter.get('/', async (_req, res) => {
   res.json({ posts: rows.map(toPost) })
 })
 
-boardRouter.post('/', optionalUser, async (req, res) => {
+boardRouter.post('/', requireUser, async (req, res) => {
   const title = String(req.body?.title || '').trim()
   const body = String(req.body?.body || '').trim()
-  const name = String(req.user?.name || req.body?.name || '').trim()
+  const name = String(req.user.name || '').trim()
   if (!title || !body || !name) {
     res.status(400).json({ error: '이름, 제목, 내용이 필요합니다.' })
     return
   }
   const doc = await BoardPost.create({
     postId: nid('post'),
-    ownerId: req.user?._id || null,
+    ownerId: req.user._id,
     name,
     title,
     body,

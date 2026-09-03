@@ -12,6 +12,8 @@ import { Landing } from './components/Landing'
 import { Planner } from './components/Planner'
 import { SampleGallery } from './components/SampleGallery'
 import { SitemapPage } from './components/SitemapPage'
+import { TaxonomyAdminPage } from './components/TaxonomyAdminPage'
+import { UsersAdminPage } from './components/UsersAdminPage'
 import { TripList } from './components/TripList'
 import { emptyTrip } from './data/demo'
 import { cloneSampleTrip, isBlankDraft, removeSample, sampleFromTrip, saveSample } from './data/samples'
@@ -36,6 +38,7 @@ import type { SampleRecord, Trip, User } from './types'
 export default function App() {
   const [view, setView] = useState<AppView>('home')
   const [galleryFocus, setGalleryFocus] = useState<string | null>(null)
+  const [galleryEditId, setGalleryEditId] = useState<string | null>(null)
   const [infoPlaceId, setInfoPlaceId] = useState<string | null>(null)
   const [user, setUser] = useState<User | null>(() => currentUser())
   const owner = ownerIdOf(user?.id)
@@ -270,11 +273,13 @@ export default function App() {
         setView('infoPlace')
       },
       gallery: goGallery,
-      galleryWrite: () => {
+      galleryWrite: (photoId?: string) => {
         if (!user) {
+          setGalleryEditId(photoId || null)
           askAuth('galleryWrite')
           return
         }
+        setGalleryEditId(photoId || null)
         setView('galleryWrite')
       },
       board: () => setView('board'),
@@ -286,6 +291,14 @@ export default function App() {
           return
         }
         setView('profile')
+      },
+      taxonomyAdmin: () => {
+        if (!user || !isSupervisor(user)) return
+        setView('taxonomyAdmin')
+      },
+      usersAdmin: () => {
+        if (!user || !isSupervisor(user)) return
+        setView('usersAdmin')
       },
       auth: () => askAuth(samplePreview && !sampleEditId ? 'claimSample' : null),
       logout: handleLogout,
@@ -354,10 +367,12 @@ export default function App() {
         <ProfilePage {...nav} onSaved={setUser} />
       ) : null}
       {view === 'gallery' ? <GalleryPage {...nav} focusId={galleryFocus} /> : null}
-      {view === 'galleryWrite' ? <GalleryWritePage {...nav} /> : null}
+      {view === 'galleryWrite' ? <GalleryWritePage {...nav} editPhotoId={galleryEditId} /> : null}
       {view === 'board' ? <BoardPage {...nav} /> : null}
       {view === 'inquiry' ? <InquiryPage {...nav} /> : null}
       {view === 'sitemap' ? <SitemapPage {...nav} /> : null}
+      {view === 'taxonomyAdmin' && user && isSupervisor(user) ? <TaxonomyAdminPage {...nav} /> : null}
+      {view === 'usersAdmin' && user && isSupervisor(user) ? <UsersAdminPage {...nav} /> : null}
       {view === 'planner' ? (
         <Planner
           trip={trip}
@@ -366,12 +381,18 @@ export default function App() {
           onChange={handleTripChange}
           onSaveCopy={() => void saveSampleCopy()}
           nav={nav}
-          onGuide={() => setView('guide')}
+          onGuide={() => {
+            if (!user) {
+              askAuth(samplePreview && !sampleEditId ? 'claimSample' : null)
+              return
+            }
+            setView('guide')
+          }}
           onPublish={user && !samplePreview && !sampleEditId ? () => void publishTrip(trip) : undefined}
           onUnpublish={user && !samplePreview && !sampleEditId ? () => void unpublishTrip(trip) : undefined}
         />
       ) : null}
-      {view === 'guide' ? (
+      {view === 'guide' && user ? (
         <Guidebook {...nav} trip={trip} onBack={() => setView('planner')} />
       ) : null}
       {authOpen ? (

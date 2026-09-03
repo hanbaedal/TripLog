@@ -19,7 +19,7 @@ export function SitemapPage(nav: SiteNav) {
           ))}
           {nav.user ? (
             <>
-              <button className="btn ghost" type="button" onClick={nav.go.galleryWrite}>
+              <button className="btn ghost" type="button" onClick={() => nav.go.galleryWrite()}>
                 갤러리 등록
               </button>
               <button className="btn ghost" type="button" onClick={nav.go.profile}>

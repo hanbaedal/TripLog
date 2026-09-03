@@ -1,6 +1,12 @@
-import { goSite, visibleSiteLinks, type SiteNav } from '../lib/siteNav'
+import { goSite, SUPERVISOR_LINKS, visibleSiteLinks, type SiteNav } from '../lib/siteNav'
+import { isSupervisor } from '../lib/auth'
 
 export function SideMenu(nav: SiteNav) {
+  const links = [
+    ...visibleSiteLinks(nav.user),
+    ...(isSupervisor(nav.user) ? SUPERVISOR_LINKS : []),
+  ]
+
   return (
     <aside className="side-menu" aria-label="왼쪽 메뉴">
       <button
@@ -10,7 +16,7 @@ export function SideMenu(nav: SiteNav) {
       >
         홈
       </button>
-      {visibleSiteLinks(nav.user).map((link) => (
+      {links.map((link) => (
         <button
           key={link.id}
           className={`side-menu-item${nav.view === link.id ? ' is-on' : ''}`}

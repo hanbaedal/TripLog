@@ -110,6 +110,7 @@ export async function saveGalleryPhoto(photo: GalleryPhoto): Promise<GalleryPhot
       method: photo.id ? 'PUT' : 'POST',
       body: JSON.stringify(photo),
     })
+    invalidateGalleryCache()
     return data.photo
   }
   const rows = localGallery()
@@ -127,6 +128,7 @@ export async function saveGalleryPhoto(photo: GalleryPhoto): Promise<GalleryPhot
 export async function removeGalleryPhoto(id: string): Promise<void> {
   if (isRemote()) {
     await api(`/gallery/${id}`, { method: 'DELETE' })
+    invalidateGalleryCache()
     return
   }
   writeJson(GALLERY_KEY, localGallery().filter((row) => row.id !== id))
@@ -152,6 +154,7 @@ export async function listBoard(): Promise<BoardPost[]> {
 }
 
 export async function saveBoardPost(post: Omit<BoardPost, 'id' | 'at' | 'comments'> & { id?: string }): Promise<BoardPost> {
+  if (!post.ownerId) throw new Error('로그인이 필요합니다.')
   if (isRemote()) {
     const data = await api<{ post: BoardPost }>(post.id ? `/board/${post.id}` : '/board', {
       method: post.id ? 'PUT' : 'POST',

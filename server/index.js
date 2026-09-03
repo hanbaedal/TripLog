@@ -11,6 +11,9 @@ import { samplesRouter, seedSamples } from './routes/samples.js'
 import { boardRouter, galleryRouter, inquiryRouter } from './routes/community.js'
 import { seedGallery } from './seedGallery.js'
 import { seedTravelInfo, travelInfoRouter } from './routes/travelInfo.js'
+import { taxonomyRouter } from './routes/taxonomy.js'
+import { adminRouter } from './routes/admin.js'
+import { seedTaxonomy } from './seedTaxonomy.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const app = express()
@@ -47,6 +50,8 @@ app.use('/api/gallery', galleryRouter)
 app.use('/api/board', boardRouter)
 app.use('/api/inquiries', inquiryRouter)
 app.use('/api/travel-info', travelInfoRouter)
+app.use('/api/taxonomy', taxonomyRouter)
+app.use('/api/admin', adminRouter)
 
 const dist = path.join(__dirname, '..', 'dist')
 app.use(express.static(dist))
@@ -66,6 +71,7 @@ async function start() {
   await seedSamples()
   await seedGallery()
   await seedTravelInfo()
+  await seedTaxonomy()
   app.listen(port, () => {
     console.log(`TripLog listening on ${port}`)
   })

@@ -14,6 +14,8 @@ export type AppView =
   | 'inquiry'
   | 'sitemap'
   | 'profile'
+  | 'taxonomyAdmin'
+  | 'usersAdmin'
 
 export type SiteGo = {
   home: () => void
@@ -22,11 +24,13 @@ export type SiteGo = {
   info: () => void
   infoPlace: (cityId: string) => void
   gallery: (photoId?: string) => void
-  galleryWrite: () => void
+  galleryWrite: (photoId?: string) => void
   board: () => void
   inquiry: () => void
   sitemap: () => void
   profile: () => void
+  taxonomyAdmin: () => void
+  usersAdmin: () => void
   auth: () => void
   logout: () => void
 }
@@ -47,6 +51,11 @@ export const SITE_LINKS: { id: AppView; label: string }[] = [
   { id: 'sitemap', label: '사이트맵' },
 ]
 
+export const SUPERVISOR_LINKS: { id: AppView; label: string }[] = [
+  { id: 'taxonomyAdmin', label: '분류 관리' },
+  { id: 'usersAdmin', label: '회원 관리' },
+]
+
 export function visibleSiteLinks(user: User | null) {
   return SITE_LINKS.filter((link) => link.id !== 'trips' || Boolean(user))
 }
@@ -62,4 +71,6 @@ export function goSite(nav: SiteNav, id: AppView) {
   else if (id === 'inquiry') nav.go.inquiry()
   else if (id === 'sitemap') nav.go.sitemap()
   else if (id === 'profile') nav.go.profile()
+  else if (id === 'taxonomyAdmin') nav.go.taxonomyAdmin()
+  else if (id === 'usersAdmin') nav.go.usersAdmin()
 }

@@ -10,7 +10,46 @@ import { photoTaxonomyLabel } from '../lib/galleryFilter'
 import type { GalleryCategory, GalleryPhoto, SightType } from '../types'
 import type { SiteNav } from '../lib/siteNav'
 
-export function GalleryWritePage(nav: SiteNav) {
+type Props = SiteNav & {
+  editPhotoId?: string | null
+}
+
+function EditableGalleryList({
+  photos,
+  allowCatalogDelete,
+  onEdit,
+  onRemove,
+}: {
+  photos: GalleryPhoto[]
+  allowCatalogDelete?: boolean
+  onEdit: (photo: GalleryPhoto) => void
+  onRemove: (id: string) => void
+}) {
+  if (!photos.length) return <p className="muted">수정할 사진이 없습니다.</p>
+  return (
+    <div className="gallery-mine">
+      {photos.map((photo) => (
+        <article className="info-card" key={photo.id}>
+          <img className="gallery-preview" src={photo.src} alt={photo.title} />
+          <h3>{photo.title}</h3>
+          <p className="muted">{photoTaxonomyLabel(photo)}</p>
+          <div className="nav-actions">
+            <button className="btn ghost" type="button" onClick={() => onEdit(photo)}>
+              수정
+            </button>
+            {!photo.catalog || allowCatalogDelete ? (
+              <button className="btn ghost" type="button" onClick={() => void onRemove(photo.id)}>
+                삭제
+              </button>
+            ) : null}
+          </div>
+        </article>
+      ))}
+    </div>
+  )
+}
+
+export function GalleryWritePage({ editPhotoId, ...nav }: Props) {
   const [photos, setPhotos] = useState<GalleryPhoto[]>([])
   const [editing, setEditing] = useState<GalleryPhoto | null>(null)
   const [title, setTitle] = useState('')
@@ -18,8 +57,10 @@ export function GalleryWritePage(nav: SiteNav) {
   const [city, setCity] = useState('')
   const [category, setCategory] = useState<GalleryCategory | ''>('')
   const [sightType, setSightType] = useState<SightType | ''>('')
+  const [asCatalog, setAsCatalog] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const supervisor = isSupervisor(nav.user)
 
   useEffect(() => {
     if (!nav.user) {
@@ -38,10 +79,13 @@ export function GalleryWritePage(nav: SiteNav) {
     }
   }, [city, category, sightType])
 
-  const mine = useMemo(
+  const editable = useMemo(
     () => photos.filter((photo) => canEditGallery(photo, nav.user)),
     [photos, nav.user],
   )
+
+  const catalogPhotos = useMemo(() => editable.filter((photo) => photo.catalog), [editable])
+  const memberPhotos = useMemo(() => editable.filter((photo) => !photo.catalog), [editable])
 
   function startEdit(photo: GalleryPhoto) {
     setEditing(photo)
@@ -50,8 +94,15 @@ export function GalleryWritePage(nav: SiteNav) {
     setCity(photo.city || '')
     setCategory(photo.category || '')
     setSightType(photo.sightType || '')
+    setAsCatalog(Boolean(photo.catalog))
     setError('')
   }
+
+  useEffect(() => {
+    if (!editPhotoId || !photos.length || !nav.user) return
+    const photo = photos.find((row) => row.id === editPhotoId)
+    if (photo && canEditGallery(photo, nav.user)) startEdit(photo)
+  }, [editPhotoId, photos, nav.user])
 
   function reset() {
     setEditing(null)
@@ -60,6 +111,7 @@ export function GalleryWritePage(nav: SiteNav) {
     setCity('')
     setCategory('')
     setSightType('')
+    setAsCatalog(false)
     setError('')
   }
 
@@ -82,14 +134,15 @@ export function GalleryWritePage(nav: SiteNav) {
         return
       }
       const saved = await saveGalleryPhoto({
-        id: editing?.id || photoId,
+        id: editing?.id || '',
         title: title.trim(),
         src,
         city,
         category,
         sightType: category === 'sight' ? sightType || 'other' : undefined,
-        ownerId: nav.user.id,
-        ownerName: nav.user.name,
+        ownerId: editing?.ownerId || nav.user.id,
+        ownerName: editing?.ownerName || nav.user.name,
+        catalog: supervisor ? Boolean(editing?.catalog || asCatalog) : undefined,
         at: editing?.at,
       })
       const rows = await listGallery()
@@ -118,6 +171,11 @@ export function GalleryWritePage(nav: SiteNav) {
             갤러리
           </button>
         </div>
+        {supervisor ? (
+          <p className="muted gallery-write-note">
+            슈퍼바이저(해수)는 카탈로그 사진의 제목·분류·이미지를 수정할 수 있습니다.
+          </p>
+        ) : null}
         <form className="board-form gallery-write-form" onSubmit={(e) => void submit(e)}>
           <GalleryTaxonomyFields
             city={city}
@@ -132,13 +190,24 @@ export function GalleryWritePage(nav: SiteNav) {
             disabled={busy}
           />
           <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="사진 제목" required />
+          {supervisor && !editing ? (
+            <label className="check-row">
+              <input
+                type="checkbox"
+                checked={asCatalog}
+                onChange={(e) => setAsCatalog(e.target.checked)}
+                disabled={busy}
+              />
+              카탈로그 사진으로 등록
+            </label>
+          ) : null}
           <ImagePicker
             photoId={photoId}
             onChange={setPhotoId}
             user={nav.user}
             defaultTitle={title}
             disabled={busy}
-            scope="mine"
+            scope={supervisor ? 'all' : 'mine'}
             uploadMeta={uploadMeta}
           />
           <div className="nav-actions">
@@ -154,26 +223,27 @@ export function GalleryWritePage(nav: SiteNav) {
           {error ? <p className="muted">{error}</p> : null}
         </form>
 
-        <div className="section-head">
-          <h2>{isSupervisor(nav.user) ? '회원 사진' : '내가 올린 사진'}</h2>
-        </div>
-        <div className="gallery-mine">
-          {mine.map((photo) => (
-            <article className="info-card" key={photo.id}>
-              <img className="gallery-preview" src={photo.src} alt={photo.title} />
-              <h3>{photo.title}</h3>
-              <p className="muted">{photoTaxonomyLabel(photo)}</p>
-              <div className="nav-actions">
-                <button className="btn ghost" type="button" onClick={() => startEdit(photo)}>
-                  수정
-                </button>
-                <button className="btn ghost" type="button" onClick={() => void remove(photo.id)}>
-                  삭제
-                </button>
-              </div>
-            </article>
-          ))}
-        </div>
+        {supervisor ? (
+          <>
+            <div className="section-head">
+              <h2>카탈로그 사진</h2>
+              <span className="muted">{catalogPhotos.length}장</span>
+            </div>
+            <EditableGalleryList photos={catalogPhotos} allowCatalogDelete onEdit={startEdit} onRemove={remove} />
+            <div className="section-head">
+              <h2>회원 사진</h2>
+              <span className="muted">{memberPhotos.length}장</span>
+            </div>
+            <EditableGalleryList photos={memberPhotos} onEdit={startEdit} onRemove={remove} />
+          </>
+        ) : (
+          <>
+            <div className="section-head">
+              <h2>내가 올린 사진</h2>
+            </div>
+            <EditableGalleryList photos={memberPhotos} onEdit={startEdit} onRemove={remove} />
+          </>
+        )}
       </section>
     </PageShell>
   )

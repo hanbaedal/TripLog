@@ -46,12 +46,13 @@ export async function requireUser(req, res, next) {
 }
 
 export function publicUser(user) {
+  const role = user.role || supervisorRole(user.name, user.email)
   return {
     id: String(user._id),
     email: user.email,
     name: user.name,
     phone: user.phone || '',
-    role: user.role || 'user',
+    role,
   }
 }
 

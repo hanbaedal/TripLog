@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react'
 import type { GalleryCategory, SightType } from '../types'
 import { GALLERY_CATEGORIES, GALLERY_CITIES, SIGHT_TYPES } from '../data/galleryTaxonomy.js'
+import { loadTaxonomy, type TaxonomyBundle } from '../lib/taxonomy'
 
 type Props = {
   city: string
@@ -20,13 +22,23 @@ export function GalleryTaxonomyFields({
   onSightType,
   disabled,
 }: Props) {
+  const [taxonomy, setTaxonomy] = useState<TaxonomyBundle | null>(null)
+
+  useEffect(() => {
+    void loadTaxonomy().then(setTaxonomy)
+  }, [])
+
+  const cities = taxonomy?.cities ?? GALLERY_CITIES
+  const categories = taxonomy?.categories ?? GALLERY_CATEGORIES
+  const sightTypes = taxonomy?.sightTypes ?? SIGHT_TYPES
+
   return (
     <>
       <label>
         도시
         <select value={city} onChange={(e) => onCity(e.target.value)} required disabled={disabled}>
           <option value="">선택</option>
-          {GALLERY_CITIES.map((row) => (
+          {cities.map((row) => (
             <option key={row.slug} value={row.slug}>
               {row.label}
             </option>
@@ -42,7 +54,7 @@ export function GalleryTaxonomyFields({
           disabled={disabled}
         >
           <option value="">선택</option>
-          {GALLERY_CATEGORIES.map((row) => (
+          {categories.map((row) => (
             <option key={row.slug} value={row.slug}>
               {row.label}
             </option>
@@ -58,7 +70,7 @@ export function GalleryTaxonomyFields({
             disabled={disabled}
           >
             <option value="">선택(선택)</option>
-            {SIGHT_TYPES.map((row) => (
+            {sightTypes.map((row) => (
               <option key={row.slug} value={row.slug}>
                 {row.label}
               </option>

@@ -49,6 +49,7 @@ function enrichGalleryPhoto(photo: GalleryPhoto): GalleryPhoto {
     sightType: sightType || undefined,
     src: photo.src || seed?.src || '',
     title: photo.title || seed?.title || photo.id,
+    catalog: Boolean(photo.catalog ?? seed?.catalog),
   }
 }
 

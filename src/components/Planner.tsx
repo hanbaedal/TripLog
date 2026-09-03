@@ -195,18 +195,14 @@ export function Planner({
               </label>
             </div>
           </div>
+          {user ? (
           <div className="planner-actions">
-            {user && copyingSample && onSaveCopy ? (
+            {copyingSample && onSaveCopy ? (
               <button className="btn stamp" type="button" onClick={onSaveCopy}>
                 내 여행에 저장
               </button>
             ) : null}
-            {!user && copyingSample ? (
-              <button className="btn stamp" type="button" onClick={nav.go.auth}>
-                로그인하고 내 일정으로
-              </button>
-            ) : null}
-            {user && !copyingSample && onPublish && onUnpublish ? (
+            {!copyingSample && onPublish && onUnpublish ? (
               <button
                 className="btn ghost"
                 type="button"
@@ -219,6 +215,7 @@ export function Planner({
               안내서 만들기
             </button>
           </div>
+          ) : null}
         </div>
       </header>
 
