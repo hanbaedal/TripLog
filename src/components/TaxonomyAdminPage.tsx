@@ -3,15 +3,29 @@ import type { FormEvent } from 'react'
 import { PageShell } from './PageShell'
 import { isSupervisor } from '../lib/auth'
 import { isRemote } from '../lib/remote'
-import { loadTaxonomy, removeTaxonomyRow, saveTaxonomyRow, type TaxonomyBundle, type TaxonomyRow } from '../lib/taxonomy'
+import {
+  loadTaxonomy,
+  nextTaxonomySort,
+  removeTaxonomyRow,
+  saveTaxonomyRow,
+  type TaxonomyBundle,
+  type TaxonomyKind,
+  type TaxonomyRow,
+} from '../lib/taxonomy'
 import type { SiteNav } from '../lib/siteNav'
 
-type Kind = 'city' | 'category' | 'sightType'
-
-const KIND_LABEL: Record<Kind, string> = {
+const KIND_LABEL: Record<TaxonomyKind, string> = {
   city: '도시',
   category: '분류',
   sightType: '관광 유형',
+  foodType: '음식 종류',
+}
+
+const SLUG_PLACEHOLDER: Record<TaxonomyKind, string> = {
+  city: '핑인 (pinyin)',
+  category: '핑인 (pinyin)',
+  sightType: '핑인 (pinyin)',
+  foodType: '핑인 (pinyin)',
 }
 
 function TaxonomySection({
@@ -19,20 +33,24 @@ function TaxonomySection({
   rows,
   onChange,
 }: {
-  kind: Kind
+  kind: TaxonomyKind
   rows: TaxonomyRow[]
   onChange: (next: TaxonomyBundle) => void
 }) {
   const [slug, setSlug] = useState('')
   const [label, setLabel] = useState('')
-  const [sort, setSort] = useState('99')
+  const [sort, setSort] = useState('1')
   const [editing, setEditing] = useState<TaxonomyRow | null>(null)
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    if (!editing) setSort(String(nextTaxonomySort(rows)))
+  }, [rows, editing])
 
   function reset() {
     setSlug('')
     setLabel('')
-    setSort('99')
+    setSort(String(nextTaxonomySort(rows)))
     setEditing(null)
     setError('')
   }
@@ -45,7 +63,7 @@ function TaxonomySection({
         kind,
         slug: slug.trim().toLowerCase(),
         label: label.trim(),
-        sort: Number(sort) || 99,
+        sort: Number(sort) || nextTaxonomySort(rows),
         prevSlug: editing?.slug,
       })
       onChange(next)
@@ -71,11 +89,26 @@ function TaxonomySection({
     <section className="admin-section">
       <div className="section-head">
         <h3>{KIND_LABEL[kind]}</h3>
+        <span className="muted">{rows.length}개</span>
       </div>
       <form className="board-form admin-inline-form" onSubmit={(e) => void submit(e)}>
-        <input value={slug} onChange={(e) => setSlug(e.target.value)} placeholder="코드(slug)" required />
-        <input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="이름" required />
-        <input value={sort} onChange={(e) => setSort(e.target.value)} placeholder="순서" />
+        <label>
+          코드
+          <input
+            value={slug}
+            onChange={(e) => setSlug(e.target.value)}
+            placeholder={SLUG_PLACEHOLDER[kind]}
+            required
+          />
+        </label>
+        <label>
+          한글
+          <input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="한글 이름" required />
+        </label>
+        <label>
+          순번
+          <input value={sort} onChange={(e) => setSort(e.target.value)} placeholder="순번" inputMode="numeric" />
+        </label>
         <div className="nav-actions">
           <button className="btn" type="submit">
             {editing ? '수정' : '추가'}
@@ -93,7 +126,7 @@ function TaxonomySection({
           <div className="admin-row" key={row.slug}>
             <span className="admin-row-code">{row.slug}</span>
             <span>{row.label}</span>
-            <span className="muted">{row.sort ?? 99}</span>
+            <span className="muted">{row.sort ?? ''}</span>
             <div className="nav-actions">
               <button
                 className="btn ghost"
@@ -102,16 +135,14 @@ function TaxonomySection({
                   setEditing(row)
                   setSlug(row.slug)
                   setLabel(row.label)
-                  setSort(String(row.sort ?? 99))
+                  setSort(String(row.sort ?? nextTaxonomySort(rows)))
                 }}
               >
                 수정
               </button>
-              {row.slug !== 'other' ? (
-                <button className="btn ghost" type="button" onClick={() => void remove(row)}>
-                  삭제
-                </button>
-              ) : null}
+              <button className="btn ghost" type="button" onClick={() => void remove(row)}>
+                삭제
+              </button>
             </div>
           </div>
         ))}
@@ -146,6 +177,7 @@ export function TaxonomyAdminPage(nav: SiteNav) {
             갤러리
           </button>
         </div>
+        <p className="muted taxonomy-admin-note">코드는 중국어 핑인, 이름은 한글로 입력합니다. 순번은 마지막 번호 다음 값이 자동 표시됩니다.</p>
         {!isRemote() ? (
           <p className="muted">분류 관리는 서버(Render) 배포 환경에서 이용할 수 있습니다.</p>
         ) : bundle ? (
@@ -153,6 +185,7 @@ export function TaxonomyAdminPage(nav: SiteNav) {
             <TaxonomySection kind="city" rows={bundle.cities} onChange={setBundle} />
             <TaxonomySection kind="category" rows={bundle.categories} onChange={setBundle} />
             <TaxonomySection kind="sightType" rows={bundle.sightTypes} onChange={setBundle} />
+            <TaxonomySection kind="foodType" rows={bundle.foodTypes} onChange={setBundle} />
           </>
         ) : null}
       </section>

@@ -67,7 +67,7 @@ export async function uploadGalleryImage(
     src,
     city: meta.city,
     category: meta.category,
-    sightType: meta.category === 'sight' ? meta.sightType || 'other' : undefined,
+    sightType: meta.category === 'sight' ? meta.sightType || 'town' : undefined,
     ownerId: user.id,
     ownerName: user.name,
   })

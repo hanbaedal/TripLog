@@ -51,7 +51,7 @@ export function InfoPlacePage({ cityId, ...nav }: Props) {
     return {
       city: cityGalleryId(cityId),
       category: 'sight',
-      sightType: guessSightType(name || city?.place || '') || 'other',
+      sightType: guessSightType(name || city?.place || '') || 'town',
     }
   }, [cityId, name, city?.place])
 

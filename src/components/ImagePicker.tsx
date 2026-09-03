@@ -76,7 +76,7 @@ export function ImagePicker({
     setBusy(true)
     setError('')
     try {
-      const meta = uploadMeta ?? { city: 'other', category: 'other' as const }
+      const meta = uploadMeta ?? { city: 'dalian', category: 'sight' as const }
       const saved = await uploadGalleryImage(file, user, defaultTitle, meta)
       const rows = await loadGalleryPhotos()
       setPhotos(rows)
@@ -143,7 +143,9 @@ export function ImagePicker({
                   className={photo.id === photoId ? 'image-picker-cell on' : 'image-picker-cell'}
                   onClick={() => pick(photo.id)}
                 >
-                  <img src={photo.src} alt={photo.title} />
+                  <div className="image-picker-cell-thumb">
+                    <img src={photo.src} alt={photo.title} />
+                  </div>
                   <span>{photo.title}</span>
                   <small>{photoTaxonomyLabel(photo)}</small>
                 </button>

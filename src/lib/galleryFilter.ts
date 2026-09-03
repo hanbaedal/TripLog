@@ -30,7 +30,7 @@ export {
 
 export type GalleryFilter = {
   city?: string
-  category?: GalleryCategory | ItemKind | 'other'
+  category?: GalleryCategory | ItemKind
   sightType?: SightType
 }
 
@@ -65,7 +65,7 @@ export function filterGalleryPhotos(
 
 function matchPhoto(row: GalleryPhoto, filter: GalleryFilter, strictSight: boolean): boolean {
   if (filter.category && row.category !== filter.category) return false
-  if (filter.city && row.city !== filter.city && row.city !== 'other') return false
+  if (filter.city && row.city !== filter.city) return false
   if (filter.sightType && row.category === 'sight') {
     if (strictSight && row.sightType && row.sightType !== filter.sightType) return false
   }
@@ -96,7 +96,7 @@ export function photoTaxonomyLabel(photo: GalleryPhoto): string {
 }
 
 export function photoCategoryLabel(photo: GalleryPhoto): string {
-  const category = normalizeGalleryCategory(photo.category || 'other')
+  const category = normalizeGalleryCategory(photo.category || 'sight')
   const bits = [galleryCategoryLabel(category)]
   if (category === 'sight') {
     const sight =

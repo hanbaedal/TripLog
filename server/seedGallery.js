@@ -7,7 +7,7 @@ function catalogMeta(row) {
   return {
     city: normalizeCity(row.city || row.id),
     category: normalizeGalleryCategory(row.category || 'sight'),
-    sightType: normalizeSightType(row.sightType || 'other', row.category || 'sight'),
+    sightType: normalizeSightType(row.sightType || 'town', row.category || 'sight'),
   }
 }
 

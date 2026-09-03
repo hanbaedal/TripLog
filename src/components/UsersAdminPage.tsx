@@ -92,33 +92,44 @@ export function UsersAdminPage(nav: SiteNav) {
         ) : (
           <>
             {editing ? (
-              <form className="board-form" onSubmit={(e) => void submit(e)}>
-                <input value={name} onChange={(e) => setName(e.target.value)} placeholder="이름" required />
-                <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="이메일" required />
-                <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="전화번호" />
-                <label>
-                  역할
-                  <select value={role} onChange={(e) => setRole(e.target.value as 'user' | 'supervisor')}>
-                    <option value="user">회원</option>
-                    <option value="supervisor">슈퍼바이저</option>
-                  </select>
-                </label>
-                <input
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="새 비밀번호(선택)"
-                  type="password"
-                />
-                <div className="nav-actions">
-                  <button className="btn" type="submit">
-                    저장
-                  </button>
-                  <button className="btn ghost" type="button" onClick={reset}>
-                    취소
-                  </button>
-                </div>
-                {error ? <p className="muted">{error}</p> : null}
-              </form>
+              <div className="modal-back" onClick={reset} role="presentation">
+                <form
+                  className="modal"
+                  role="dialog"
+                  aria-modal="true"
+                  aria-labelledby="user-edit-title"
+                  onClick={(e) => e.stopPropagation()}
+                  onSubmit={(e) => void submit(e)}
+                >
+                  <h2 id="user-edit-title">회원 수정</h2>
+                  <p className="muted">{editing.name} · {editing.email}</p>
+                  <input value={name} onChange={(e) => setName(e.target.value)} placeholder="이름" required />
+                  <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="이메일" required />
+                  <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="전화번호" />
+                  <label>
+                    역할
+                    <select value={role} onChange={(e) => setRole(e.target.value as 'user' | 'supervisor')}>
+                      <option value="user">회원</option>
+                      <option value="supervisor">슈퍼바이저</option>
+                    </select>
+                  </label>
+                  <input
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="새 비밀번호(선택)"
+                    type="password"
+                  />
+                  {error ? <p className="muted">{error}</p> : null}
+                  <div className="modal-actions">
+                    <button className="btn ghost" type="button" onClick={reset}>
+                      취소
+                    </button>
+                    <button className="btn" type="submit">
+                      저장
+                    </button>
+                  </div>
+                </form>
+              </div>
             ) : null}
             <div className="admin-table users-table">
               {rows.map((user) => (

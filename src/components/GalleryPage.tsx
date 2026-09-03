@@ -51,7 +51,7 @@ export function GalleryPage({ focusId, ...nav }: Props) {
   const cityGroups = useMemo((): CityGroup[] => {
     const buckets = new Map<string, GalleryPhoto[]>()
     for (const photo of filtered) {
-      const slug = photo.city || 'other'
+      const slug = photo.city || 'dalian'
       const list = buckets.get(slug) || []
       list.push(photo)
       buckets.set(slug, list)
@@ -83,7 +83,7 @@ export function GalleryPage({ focusId, ...nav }: Props) {
 
   const slideItems = useMemo(() => {
     if (!slideCity) return filtered
-    return filtered.filter((photo) => (photo.city || 'other') === slideCity)
+    return filtered.filter((photo) => (photo.city || 'dalian') === slideCity)
   }, [filtered, slideCity])
 
   const activeIndex = useMemo(
@@ -182,7 +182,9 @@ export function GalleryPage({ focusId, ...nav }: Props) {
                       className="gallery-card"
                       onClick={() => openSlide(photo.id, group.slug)}
                     >
-                      <img src={photo.src} alt={photo.title} loading="lazy" />
+                      <div className="gallery-card-thumb">
+                        <img src={photo.src} alt={photo.title} loading="lazy" />
+                      </div>
                       <span>{photo.title}</span>
                       <small>{photoCategoryLabel(photo)}</small>
                     </button>

@@ -68,8 +68,8 @@ const gallerySchema = new mongoose.Schema(
     ownerName: { type: String, default: '' },
     title: { type: String, required: true, trim: true },
     src: { type: String, required: true },
-    city: { type: String, default: 'other', trim: true, index: true },
-    category: { type: String, default: 'other', trim: true, index: true },
+    city: { type: String, default: 'dalian', trim: true, index: true },
+    category: { type: String, default: 'sight', trim: true, index: true },
     sightType: { type: String, default: '', trim: true },
     catalog: { type: Boolean, default: false },
     at: { type: Date, default: Date.now },
@@ -165,7 +165,7 @@ export const TravelSpot = mongoose.models.TravelSpot || mongoose.model('TravelSp
 
 const taxonomySchema = new mongoose.Schema(
   {
-    kind: { type: String, enum: ['city', 'category', 'sightType'], required: true, index: true },
+    kind: { type: String, enum: ['city', 'category', 'sightType', 'foodType'], required: true, index: true },
     slug: { type: String, required: true, trim: true },
     label: { type: String, required: true, trim: true },
     sort: { type: Number, default: 99 },

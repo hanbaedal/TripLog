@@ -35,11 +35,11 @@ export function InfoPage(nav: SiteNav) {
   )
 
   const uploadMeta = useMemo((): GalleryUploadMeta | undefined => {
-    const city = citySlugFromPlace(place) || 'other'
+    const city = citySlugFromPlace(place) || 'dalian'
     return {
       city,
       category: 'sight',
-      sightType: guessSightType(title || place) || 'other',
+      sightType: guessSightType(title || place) || 'town',
     }
   }, [place, title])
 

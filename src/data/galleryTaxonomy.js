@@ -14,7 +14,6 @@ export const GALLERY_CITIES = [
   { slug: 'zhangjiajie', label: '장가계' },
   { slug: 'yunnan', label: '운남' },
   { slug: 'guizhou', label: '귀주' },
-  { slug: 'other', label: '기타' },
 ]
 
 export const GALLERY_CATEGORIES = [
@@ -23,7 +22,6 @@ export const GALLERY_CATEGORIES = [
   { slug: 'hotel', label: '호텔' },
   { slug: 'transport', label: '교통' },
   { slug: 'flight', label: '항공' },
-  { slug: 'other', label: '기타' },
 ]
 
 export const SIGHT_TYPES = [
@@ -34,7 +32,20 @@ export const SIGHT_TYPES = [
   { slug: 'temple', label: '사찰·종교' },
   { slug: 'town', label: '거리·마을' },
   { slug: 'park', label: '공원·테마' },
-  { slug: 'other', label: '기타' },
+]
+
+/** 중국 요리 대표 10선 — 코드는 핑인(slug), 표기는 한글 */
+export const FOOD_TYPES = [
+  { slug: 'beijingkaoya', label: '베이징 오리구이' },
+  { slug: 'mapodoufu', label: '마파두부' },
+  { slug: 'gongbaojiding', label: '궁보계정' },
+  { slug: 'tangculiji', label: '탕추리지' },
+  { slug: 'huoguo', label: '훠궈' },
+  { slug: 'jiaozi', label: '교자' },
+  { slug: 'xiaolongbao', label: '샤오롱바오' },
+  { slug: 'chaofan', label: '볶음밥' },
+  { slug: 'chunjuan', label: '춘권' },
+  { slug: 'lamian', label: '라면(手拉面)' },
 ]
 
 const CITY_BY_LABEL = Object.fromEntries(GALLERY_CITIES.map((row) => [row.label, row.slug]))
@@ -72,6 +83,10 @@ export function guessSightType(name) {
   return 'town'
 }
 
+export function foodTypeLabel(slug) {
+  return FOOD_TYPES.find((row) => row.slug === slug)?.label || slug || ''
+}
+
 export function galleryCategoryLabel(slug) {
   return GALLERY_CATEGORIES.find((row) => row.slug === slug)?.label || slug || ''
 }
@@ -86,17 +101,25 @@ export function sightTypeLabel(slug) {
 
 export function normalizeGalleryCategory(value) {
   const slug = String(value || '').trim()
-  return GALLERY_CATEGORIES.some((row) => row.slug === slug) ? slug : 'other'
+  if (GALLERY_CATEGORIES.some((row) => row.slug === slug)) return slug
+  return 'sight'
 }
 
 export function normalizeCity(value) {
   const slug = String(value || '').trim()
   if (GALLERY_CITIES.some((row) => row.slug === slug)) return slug
-  return citySlugFromPlace(slug) || 'other'
+  return citySlugFromPlace(slug) || GALLERY_CITIES[0]?.slug || 'dalian'
 }
 
 export function normalizeSightType(value, category) {
   if (normalizeGalleryCategory(category) !== 'sight') return ''
   const slug = String(value || '').trim()
-  return SIGHT_TYPES.some((row) => row.slug === slug) ? slug : 'other'
+  if (SIGHT_TYPES.some((row) => row.slug === slug)) return slug
+  return 'town'
+}
+
+export function normalizeFoodType(value) {
+  const slug = String(value || '').trim().toLowerCase()
+  if (FOOD_TYPES.some((row) => row.slug === slug)) return slug
+  return FOOD_TYPES[0]?.slug || 'beijingkaoya'
 }

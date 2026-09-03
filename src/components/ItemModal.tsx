@@ -61,9 +61,9 @@ export function ItemModal({ dayIndex, initial, preset, user, tripDestination, on
     const category = itemKindToGalleryCategory(kind)
     if (!category) return undefined
     return {
-      city: citySlugFromPlace(tripDestination) || 'other',
+      city: citySlugFromPlace(tripDestination) || 'dalian',
       category,
-      sightType: category === 'sight' ? guessSightType(title) || 'other' : '',
+      sightType: category === 'sight' ? guessSightType(title) || 'town' : '',
     }
   }, [kind, tripDestination, title])
   const parsed = parseFlightForm(initial?.kind === 'flight' ? initial : undefined)

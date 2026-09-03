@@ -29,16 +29,27 @@ function EditableGalleryList({
   return (
     <div className="gallery-mine">
       {photos.map((photo) => (
-        <article className="info-card" key={photo.id}>
-          <img className="gallery-preview" src={photo.src} alt={photo.title} />
-          <h3>{photo.title}</h3>
-          <p className="muted">{photoTaxonomyLabel(photo)}</p>
+        <article className="info-card gallery-manage-card" key={photo.id}>
+          <button type="button" className="gallery-manage-open" onClick={() => onEdit(photo)}>
+            <div className="gallery-card-thumb">
+              <img src={photo.src} alt={photo.title} loading="lazy" />
+            </div>
+            <h3>{photo.title}</h3>
+            <p className="muted">{photoTaxonomyLabel(photo)}</p>
+          </button>
           <div className="nav-actions">
             <button className="btn ghost" type="button" onClick={() => onEdit(photo)}>
               수정
             </button>
             {!photo.catalog || allowCatalogDelete ? (
-              <button className="btn ghost" type="button" onClick={() => void onRemove(photo.id)}>
+              <button
+                className="btn ghost"
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  void onRemove(photo.id)
+                }}
+              >
                 삭제
               </button>
             ) : null}
@@ -49,17 +60,119 @@ function EditableGalleryList({
   )
 }
 
+type PhotoFormValues = {
+  title: string
+  photoId: string
+  city: string
+  category: GalleryCategory | ''
+  sightType: SightType | ''
+  asCatalog: boolean
+}
+
+function GalleryPhotoForm({
+  values,
+  onChange,
+  user,
+  supervisor,
+  editing,
+  busy,
+  error,
+  onSubmit,
+  onCancel,
+  submitLabel,
+}: {
+  values: PhotoFormValues
+  onChange: (patch: Partial<PhotoFormValues>) => void
+  user: SiteNav['user']
+  supervisor: boolean
+  editing?: GalleryPhoto | null
+  busy: boolean
+  error: string
+  onSubmit: (e: FormEvent) => void
+  onCancel?: () => void
+  submitLabel: string
+}) {
+  const uploadMeta = useMemo(() => {
+    if (!values.city || !values.category) return undefined
+    return {
+      city: values.city,
+      category: values.category,
+      sightType: (values.category === 'sight' ? values.sightType || 'town' : '') as SightType | '',
+    }
+  }, [values.city, values.category, values.sightType])
+
+  return (
+    <form className="board-form gallery-write-form" onSubmit={(e) => void onSubmit(e)}>
+      <GalleryTaxonomyFields
+        city={values.city}
+        category={values.category}
+        sightType={values.sightType}
+        onCity={(city) => onChange({ city })}
+        onCategory={(category) => {
+          onChange({ category, sightType: category === 'sight' ? values.sightType : '' })
+        }}
+        onSightType={(sightType) => onChange({ sightType })}
+        disabled={busy}
+      />
+      <input
+        value={values.title}
+        onChange={(e) => onChange({ title: e.target.value })}
+        placeholder="사진 제목"
+        required
+      />
+      {supervisor && !editing ? (
+        <label className="check-row">
+          <input
+            type="checkbox"
+            checked={values.asCatalog}
+            onChange={(e) => onChange({ asCatalog: e.target.checked })}
+            disabled={busy}
+          />
+          카탈로그 사진으로 등록
+        </label>
+      ) : null}
+      <ImagePicker
+        photoId={values.photoId}
+        onChange={(photoId) => onChange({ photoId })}
+        user={user}
+        defaultTitle={values.title}
+        disabled={busy}
+        scope={supervisor ? 'all' : 'mine'}
+        uploadMeta={uploadMeta}
+      />
+      {error ? <p className="muted">{error}</p> : null}
+      <div className={onCancel ? 'modal-actions' : 'nav-actions'}>
+        {onCancel ? (
+          <button className="btn ghost" type="button" onClick={onCancel} disabled={busy}>
+            취소
+          </button>
+        ) : null}
+        <button className="btn" type="submit" disabled={busy}>
+          {submitLabel}
+        </button>
+      </div>
+    </form>
+  )
+}
+
+const EMPTY_FORM: PhotoFormValues = {
+  title: '',
+  photoId: '',
+  city: '',
+  category: '',
+  sightType: '',
+  asCatalog: false,
+}
+
 export function GalleryWritePage({ editPhotoId, ...nav }: Props) {
   const [photos, setPhotos] = useState<GalleryPhoto[]>([])
+  const [register, setRegister] = useState<PhotoFormValues>(EMPTY_FORM)
+  const [registerBusy, setRegisterBusy] = useState(false)
+  const [registerError, setRegisterError] = useState('')
   const [editing, setEditing] = useState<GalleryPhoto | null>(null)
-  const [title, setTitle] = useState('')
-  const [photoId, setPhotoId] = useState('')
-  const [city, setCity] = useState('')
-  const [category, setCategory] = useState<GalleryCategory | ''>('')
-  const [sightType, setSightType] = useState<SightType | ''>('')
-  const [asCatalog, setAsCatalog] = useState(false)
-  const [busy, setBusy] = useState(false)
-  const [error, setError] = useState('')
+  const [editForm, setEditForm] = useState<PhotoFormValues>(EMPTY_FORM)
+  const [editBusy, setEditBusy] = useState(false)
+  const [editError, setEditError] = useState('')
   const supervisor = isSupervisor(nav.user)
 
   useEffect(() => {
@@ -70,15 +183,6 @@ export function GalleryWritePage({ editPhotoId, ...nav }: Props) {
     void loadGalleryPhotos().then(setPhotos)
   }, [nav.user])
 
-  const uploadMeta = useMemo(() => {
-    if (!city || !category) return undefined
-    return {
-      city,
-      category,
-      sightType: (category === 'sight' ? sightType || 'other' : '') as SightType | '',
-    }
-  }, [city, category, sightType])
-
   const editable = useMemo(
     () => photos.filter((photo) => canEditGallery(photo, nav.user)),
     [photos, nav.user],
@@ -87,15 +191,21 @@ export function GalleryWritePage({ editPhotoId, ...nav }: Props) {
   const catalogPhotos = useMemo(() => editable.filter((photo) => photo.catalog), [editable])
   const memberPhotos = useMemo(() => editable.filter((photo) => !photo.catalog), [editable])
 
+  function photoToForm(photo: GalleryPhoto): PhotoFormValues {
+    return {
+      title: photo.title,
+      photoId: photo.id,
+      city: photo.city || '',
+      category: photo.category || '',
+      sightType: photo.sightType || '',
+      asCatalog: Boolean(photo.catalog),
+    }
+  }
+
   function startEdit(photo: GalleryPhoto) {
     setEditing(photo)
-    setTitle(photo.title)
-    setPhotoId(photo.id)
-    setCity(photo.city || '')
-    setCategory(photo.category || '')
-    setSightType(photo.sightType || '')
-    setAsCatalog(Boolean(photo.catalog))
-    setError('')
+    setEditForm(photoToForm(photo))
+    setEditError('')
   }
 
   useEffect(() => {
@@ -104,50 +214,50 @@ export function GalleryWritePage({ editPhotoId, ...nav }: Props) {
     if (photo && canEditGallery(photo, nav.user)) startEdit(photo)
   }, [editPhotoId, photos, nav.user])
 
-  function reset() {
+  function closeEdit() {
     setEditing(null)
-    setTitle('')
-    setPhotoId('')
-    setCity('')
-    setCategory('')
-    setSightType('')
-    setAsCatalog(false)
-    setError('')
+    setEditForm(EMPTY_FORM)
+    setEditError('')
   }
 
-  async function submit(e: FormEvent) {
-    e.preventDefault()
+  async function persistPhoto(
+    values: PhotoFormValues,
+    target: GalleryPhoto | null,
+    setBusy: (busy: boolean) => void,
+    setError: (message: string) => void,
+    onDone: () => void,
+  ) {
     if (!nav.user) {
       nav.go.auth()
       return
     }
-    if (!title.trim() || !photoId || !city || !category) {
+    if (!values.title.trim() || !values.photoId || !values.city || !values.category) {
       setError('제목, 도시, 분류, 사진이 필요합니다.')
       return
     }
     setBusy(true)
     setError('')
     try {
-      const src = resolvePhotoSrc(photoId, photos)
+      const src = resolvePhotoSrc(values.photoId, photos)
       if (!src) {
         setError('갤러리에서 사진을 선택해 주세요.')
         return
       }
       const saved = await saveGalleryPhoto({
-        id: editing?.id || '',
-        title: title.trim(),
+        id: target?.id || '',
+        title: values.title.trim(),
         src,
-        city,
-        category,
-        sightType: category === 'sight' ? sightType || 'other' : undefined,
-        ownerId: editing?.ownerId || nav.user.id,
-        ownerName: editing?.ownerName || nav.user.name,
-        catalog: supervisor ? Boolean(editing?.catalog || asCatalog) : undefined,
-        at: editing?.at,
+        city: values.city,
+        category: values.category,
+        sightType: values.category === 'sight' ? values.sightType || 'town' : undefined,
+        ownerId: target?.ownerId || nav.user.id,
+        ownerName: target?.ownerName || nav.user.name,
+        catalog: supervisor ? Boolean(target?.catalog || values.asCatalog) : undefined,
+        at: target?.at,
       })
       const rows = await listGallery()
       setPhotos(rows.some((row) => row.id === saved.id) ? rows : [...rows, saved])
-      reset()
+      onDone()
     } catch (err) {
       setError(err instanceof Error ? err.message : '저장하지 못했습니다.')
     } finally {
@@ -155,73 +265,50 @@ export function GalleryWritePage({ editPhotoId, ...nav }: Props) {
     }
   }
 
+  async function submitRegister(e: FormEvent) {
+    e.preventDefault()
+    await persistPhoto(register, null, setRegisterBusy, setRegisterError, () => {
+      setRegister(EMPTY_FORM)
+    })
+  }
+
+  async function submitEdit(e: FormEvent) {
+    e.preventDefault()
+    if (!editing) return
+    await persistPhoto(editForm, editing, setEditBusy, setEditError, closeEdit)
+  }
+
   async function remove(id: string) {
     if (!window.confirm('이 사진을 삭제할까요?')) return
     await removeGalleryPhoto(id)
     setPhotos(await listGallery())
-    if (editing?.id === id) reset()
+    if (editing?.id === id) closeEdit()
   }
 
   return (
     <PageShell {...nav}>
       <section className="wrap section">
         <div className="section-head">
-          <h2>{editing ? '사진 수정' : '갤러리 등록'}</h2>
+          <h2>{supervisor ? '카탈로그 관리' : '갤러리 등록'}</h2>
           <button className="btn ghost" type="button" onClick={() => nav.go.gallery()}>
             갤러리
           </button>
         </div>
         {supervisor ? (
           <p className="muted gallery-write-note">
-            슈퍼바이저(해수)는 카탈로그 사진의 제목·분류·이미지를 수정할 수 있습니다.
+            아래 목록에서 사진을 클릭하면 수정 모달이 열립니다. 새 카탈로그 사진은 아래 폼으로 등록할 수 있습니다.
           </p>
         ) : null}
-        <form className="board-form gallery-write-form" onSubmit={(e) => void submit(e)}>
-          <GalleryTaxonomyFields
-            city={city}
-            category={category}
-            sightType={sightType}
-            onCity={setCity}
-            onCategory={(value) => {
-              setCategory(value)
-              if (value !== 'sight') setSightType('')
-            }}
-            onSightType={setSightType}
-            disabled={busy}
-          />
-          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="사진 제목" required />
-          {supervisor && !editing ? (
-            <label className="check-row">
-              <input
-                type="checkbox"
-                checked={asCatalog}
-                onChange={(e) => setAsCatalog(e.target.checked)}
-                disabled={busy}
-              />
-              카탈로그 사진으로 등록
-            </label>
-          ) : null}
-          <ImagePicker
-            photoId={photoId}
-            onChange={setPhotoId}
-            user={nav.user}
-            defaultTitle={title}
-            disabled={busy}
-            scope={supervisor ? 'all' : 'mine'}
-            uploadMeta={uploadMeta}
-          />
-          <div className="nav-actions">
-            <button className="btn" type="submit" disabled={busy}>
-              {editing ? '수정' : '등록'}
-            </button>
-            {editing ? (
-              <button className="btn ghost" type="button" onClick={reset}>
-                취소
-              </button>
-            ) : null}
-          </div>
-          {error ? <p className="muted">{error}</p> : null}
-        </form>
+        <GalleryPhotoForm
+          values={register}
+          onChange={(patch) => setRegister((prev) => ({ ...prev, ...patch }))}
+          user={nav.user}
+          supervisor={supervisor}
+          busy={registerBusy}
+          error={registerError}
+          onSubmit={submitRegister}
+          submitLabel="등록"
+        />
 
         {supervisor ? (
           <>
@@ -245,6 +332,33 @@ export function GalleryWritePage({ editPhotoId, ...nav }: Props) {
           </>
         )}
       </section>
+
+      {editing ? (
+        <div className="modal-back" onClick={closeEdit} role="presentation">
+          <div
+            className="modal gallery-edit-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="gallery-edit-title"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 id="gallery-edit-title">사진 수정</h2>
+            <p className="muted">{editing.title}</p>
+            <GalleryPhotoForm
+              values={editForm}
+              onChange={(patch) => setEditForm((prev) => ({ ...prev, ...patch }))}
+              user={nav.user}
+              supervisor={supervisor}
+              editing={editing}
+              busy={editBusy}
+              error={editError}
+              onSubmit={submitEdit}
+              onCancel={closeEdit}
+              submitLabel="저장"
+            />
+          </div>
+        </div>
+      ) : null}
     </PageShell>
   )
 }

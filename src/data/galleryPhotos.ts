@@ -33,8 +33,8 @@ const CATALOG_BY_ID = new Map<string, GalleryPhoto>([
 
 function enrichGalleryPhoto(photo: GalleryPhoto): GalleryPhoto {
   const seed = CATALOG_BY_ID.get(photo.id)
-  const category = normalizeGalleryCategory(photo.category || seed?.category || 'other') as GalleryCategory
-  const city = photo.city || seed?.city || 'other'
+  const category = normalizeGalleryCategory(photo.category || seed?.category || 'sight') as GalleryCategory
+  const city = photo.city || seed?.city || 'dalian'
   const guessedSight =
     photo.sightType ||
     seed?.sightType ||

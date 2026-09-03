@@ -1506,11 +1506,13 @@ p {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 12px;
+  align-items: start;
 }
 
 .gallery-card-cell {
   display: grid;
   gap: 6px;
+  min-width: 0;
 }
 
 .gallery-card-edit {
@@ -1527,6 +1529,7 @@ p {
 .gallery-card {
   display: grid;
   gap: 8px;
+  min-width: 0;
   padding: 0;
   border: 0;
   background: transparent;
@@ -1534,13 +1537,21 @@ p {
   text-align: left;
 }
 
-.gallery-card img {
+.gallery-card-thumb {
+  position: relative;
   width: 100%;
   aspect-ratio: 4 / 3;
-  object-fit: cover;
+  overflow: hidden;
   border-radius: 12px;
   background: #111;
   border: 1px solid var(--line);
+}
+
+.gallery-card-thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .gallery-card span {
@@ -1719,11 +1730,13 @@ p {
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   gap: 10px;
   margin: 12px 0;
+  align-items: start;
 }
 
 .image-picker-cell {
   display: grid;
   gap: 6px;
+  min-width: 0;
   padding: 6px;
   border: 2px solid transparent;
   border-radius: 10px;
@@ -1736,12 +1749,20 @@ p {
   border-color: var(--forest);
 }
 
-.image-picker-cell img {
+.image-picker-cell-thumb {
+  position: relative;
   width: 100%;
   aspect-ratio: 4 / 3;
-  object-fit: cover;
+  overflow: hidden;
   border-radius: 8px;
   background: #111;
+}
+
+.image-picker-cell-thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .image-picker-cell span {
@@ -1754,6 +1775,39 @@ p {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 12px;
+  align-items: start;
+}
+
+.gallery-manage-card {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.gallery-manage-open {
+  display: grid;
+  gap: 8px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  min-width: 0;
+}
+
+.gallery-manage-open h3 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.gallery-manage-open p {
+  margin: 0;
+}
+
+.gallery-edit-modal {
+  width: min(560px, 96vw);
+  max-height: 90vh;
+  overflow: auto;
 }
 
 .inquiry-reply {
@@ -2408,11 +2462,27 @@ p {
   margin-top: 20px;
 }
 
+.taxonomy-admin-note {
+  margin: 0 0 14px;
+  font-size: 0.86rem;
+}
+
+.admin-inline-form label {
+  display: grid;
+  gap: 2px;
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+}
+
 .admin-inline-form {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: 8px;
   align-items: end;
+}
+
+.admin-inline-form .nav-actions {
+  align-self: end;
 }
 
 .admin-table {

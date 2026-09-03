@@ -66,9 +66,22 @@ export type User = {
   role?: 'user' | 'supervisor'
 }
 
-export type GalleryCategory = 'sight' | 'meal' | 'hotel' | 'transport' | 'flight' | 'other'
+export type GalleryCategory = 'sight' | 'meal' | 'hotel' | 'transport' | 'flight'
 
-export type SightType = 'mountain' | 'lake' | 'beach' | 'palace' | 'temple' | 'town' | 'park' | 'other'
+export type SightType = 'mountain' | 'lake' | 'beach' | 'palace' | 'temple' | 'town' | 'park'
+
+export type FoodType =
+  | 'beijingkaoya'
+  | 'mapodoufu'
+  | 'gongbaojiding'
+  | 'tangculiji'
+  | 'huoguo'
+  | 'jiaozi'
+  | 'xiaolongbao'
+  | 'chaofan'
+  | 'chunjuan'
+  | 'lamian'
+  | string
 
 export type GalleryPhoto = {
   id: string
