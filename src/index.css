@@ -515,15 +515,15 @@ p {
   margin: 0 auto;
   display: flex;
   flex-wrap: wrap;
-  gap: 10px 14px;
+  gap: 8px 12px;
   align-items: flex-end;
   justify-content: space-between;
-  padding: 10px 0;
+  padding: 8px 0;
 }
 
 .trip-compact {
   display: grid;
-  gap: 6px;
+  gap: 4px;
   flex: 1 1 280px;
   min-width: 0;
 }
@@ -535,9 +535,9 @@ p {
 
 .trip-dates {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: end;
-  gap: 6px 8px;
+  gap: 4px 6px;
 }
 
 .field-date input {
@@ -546,14 +546,8 @@ p {
 }
 
 .trip-date-sep {
-  padding-bottom: 10px;
+  padding-bottom: 8px;
   color: var(--ink-soft);
-}
-
-.trip-range {
-  padding-bottom: 10px;
-  font-size: 0.82rem;
-  white-space: nowrap;
 }
 
 .planner-actions {
@@ -589,7 +583,7 @@ p {
 
 .field {
   display: grid;
-  gap: 2px;
+  gap: 1px;
 }
 
 .field span {
@@ -604,7 +598,7 @@ p {
   background: var(--cream);
   border: 1px solid var(--line);
   border-radius: 10px;
-  padding: 8px 10px;
+  padding: 6px 8px;
   min-width: 0;
 }
 
@@ -633,32 +627,26 @@ p {
 
 .planner-grid {
   width: min(1280px, calc(100% - 24px));
-  margin: 12px auto 48px;
+  margin: 8px auto 40px;
   display: grid;
   grid-template-columns: 1fr 300px;
-  gap: 16px;
+  gap: 14px;
   align-items: start;
 }
 
 .day-rail-sticky {
   position: sticky;
-  top: calc(var(--nav-h) + 92px);
+  top: calc(var(--nav-h) + 88px);
   z-index: 7;
   width: min(1280px, calc(100% - 24px));
   margin: 0 auto;
   display: flex;
-  gap: 6px;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  padding: 8px 4px;
+  gap: 4px;
+  overflow: visible;
+  padding: 4px 0;
   background: rgba(243, 238, 230, 0.94);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--line);
-}
-
-.day-rail-sticky::-webkit-scrollbar {
-  display: none;
 }
 
 .timeline,
@@ -669,22 +657,23 @@ p {
 }
 
 .day-rail {
-  padding: 12px;
+  padding: 8px;
 }
 
 .day-btn {
-  flex: 0 0 auto;
-  width: auto;
+  flex: 1 1 0;
+  min-width: 0;
   text-align: center;
   border: 0;
   background: transparent;
-  border-radius: 12px;
-  padding: 8px 12px;
+  border-radius: 10px;
+  padding: 5px 6px;
   margin: 0;
-  white-space: nowrap;
+  line-height: 1.15;
   cursor: pointer;
   color: inherit;
   font: inherit;
+  font-size: 13px;
 }
 
 .day-btn.active {
@@ -695,11 +684,13 @@ p {
 .day-btn small {
   display: block;
   opacity: 0.7;
-  font-size: 11px;
+  font-size: 10px;
+  line-height: 1.1;
+  margin-top: 1px;
 }
 
 .timeline {
-  padding: 8px 8px 20px;
+  padding: 6px 6px 16px;
 }
 
 .timeline-head {
@@ -712,8 +703,8 @@ p {
 .chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  padding: 12px 14px;
+  gap: 5px;
+  padding: 8px 10px;
 }
 
 .chip {
@@ -730,9 +721,9 @@ p {
 
 .item-row {
   display: grid;
-  grid-template-columns: 64px 16px 1fr;
-  gap: 8px;
-  padding: 0 12px;
+  grid-template-columns: 52px 14px 1fr;
+  gap: 6px;
+  padding: 0 8px;
 }
 
 .card-main {
@@ -750,7 +741,7 @@ p {
 
 .card-copy {
   display: grid;
-  gap: 2px;
+  gap: 1px;
   min-width: 0;
   text-align: left;
   background: none;
@@ -760,7 +751,8 @@ p {
 }
 
 .card-copy h3 {
-  font-size: 15px;
+  font-size: 14px;
+  line-height: 1.25;
 }
 
 .card-photo .meta {
@@ -820,8 +812,8 @@ p {
   text-align: right;
   font-variant-numeric: tabular-nums;
   font-family: var(--en);
-  font-size: 13px;
-  padding-top: 16px;
+  font-size: 12px;
+  padding-top: 10px;
   color: var(--ink-soft);
 }
 
@@ -839,13 +831,13 @@ p {
 }
 
 .dot {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
-  margin-top: 18px;
+  margin-top: 12px;
   position: relative;
   z-index: 1;
-  border: 3px solid var(--cream);
+  border: 2px solid var(--cream);
 }
 
 .dot.flight { background: var(--sky); }
@@ -855,13 +847,13 @@ p {
 .dot.transport { background: var(--ink); }
 
 .card {
-  margin: 8px 0;
+  margin: 4px 0;
   border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 12px 14px;
+  border-radius: 12px;
+  padding: 8px 10px;
   display: grid;
   grid-template-columns: 1fr;
-  gap: 8px;
+  gap: 4px;
 }
 
 .card.card-photo {
@@ -879,10 +871,10 @@ p {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  font-size: 11px;
-  padding: 2px 8px;
+  font-size: 10px;
+  padding: 1px 6px;
   border-radius: 999px;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .badge.flight { background: var(--sky-soft); color: var(--sky); }
@@ -897,7 +889,8 @@ p {
 
 .card .meta {
   color: var(--ink-soft);
-  font-size: 13px;
+  font-size: 12px;
+  line-height: 1.3;
 }
 
 .cost-n {
@@ -2036,7 +2029,7 @@ p {
   }
 
   .day-rail-sticky {
-    top: calc(var(--nav-h) + 118px);
+    top: calc(var(--nav-h) + 100px);
     width: calc(100% - 16px);
   }
 
@@ -2044,7 +2037,8 @@ p {
     flex-direction: column;
     align-items: stretch;
     width: calc(100% - 16px);
-    padding: 8px 0;
+    padding: 6px 0;
+    gap: 6px;
   }
 
   .planner-actions {
@@ -2054,11 +2048,6 @@ p {
   .planner-actions .btn {
     flex: 1 1 auto;
     min-width: 0;
-  }
-
-  .trip-range {
-    flex: 1 1 100%;
-    padding-bottom: 0;
   }
 
   .side-col {
@@ -2207,6 +2196,57 @@ p {
   .planner-bar-inner,
   .planner-grid {
     width: calc(100% - 16px);
+  }
+
+  .planner-grid {
+    margin-top: 8px;
+    gap: 12px;
+  }
+
+  .trip-name input {
+    font-size: 0.95rem;
+  }
+
+  .field-date input {
+    width: 100%;
+  }
+
+  .trip-dates {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: end;
+  }
+
+  .trip-date-sep {
+    padding-bottom: 8px;
+  }
+
+  .planner-actions .btn {
+    padding: 7px 10px;
+    font-size: 0.82rem;
+  }
+
+  .day-btn {
+    padding: 4px 2px;
+    font-size: 12px;
+  }
+
+  .day-btn small {
+    font-size: 9px;
+  }
+
+  .card-photo {
+    grid-template-columns: minmax(0, 1fr) 72px;
+    column-gap: 8px;
+  }
+
+  .item-photo {
+    width: 72px;
+    min-height: 72px;
+  }
+
+  .cost-line {
+    margin-top: 4px;
   }
 
   .slot-grid {

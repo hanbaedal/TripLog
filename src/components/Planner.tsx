@@ -6,7 +6,7 @@ import { HotelSearch } from './HotelSearch'
 import { ItemModal } from './ItemModal'
 import { attachFlight, attachHotel } from '../lib/connect/attach'
 import { KIND_LABEL, MEAL_LABEL, TRANSPORT_LABEL, krw, summarize } from '../lib/costs'
-import { dateOn, dayCount, formatRange, formatShort } from '../lib/dates'
+import { dateOn, dayCount, formatShort } from '../lib/dates'
 import { hasItemPhoto, resolveItemPhoto } from '../data/sightPhotos'
 import { loadGalleryPhotos } from '../lib/galleryResolve'
 import type { SiteNav } from '../lib/siteNav'
@@ -192,7 +192,6 @@ export function Planner({
                   disabled={locked}
                 />
               </label>
-              <span className="trip-range muted">{formatRange(trip.startDate, trip.endDate)}</span>
             </div>
           </div>
           <div className="planner-actions">
