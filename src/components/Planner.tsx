@@ -155,6 +155,7 @@ export function Planner({
     <div>
       <AppNav {...nav} />
     <div className={`planner-shell${locked ? ' is-locked' : ''}`}>
+      <div className="planner-head-sticky">
       <header className="planner-bar">
         <div className="planner-bar-inner">
           <div className="trip-compact">
@@ -221,7 +222,7 @@ export function Planner({
         </div>
       </header>
 
-      <nav className="day-rail day-rail-sticky" aria-label="날짜">
+      <nav className="day-rail" aria-label="날짜">
         {Array.from({ length: days }, (_, i) => (
           <button
             key={i}
@@ -234,6 +235,7 @@ export function Planner({
           </button>
         ))}
       </nav>
+      </div>
 
       <div className="planner-grid">
         <section className="timeline">
