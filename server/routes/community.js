@@ -128,6 +128,10 @@ galleryRouter.put('/:id', requireUser, async (req, res) => {
     res.status(400).json({ error: '도시와 분류를 선택해 주세요.' })
     return
   }
+  if (src.length > 4_500_000) {
+    res.status(400).json({ error: '사진이 너무 큽니다.' })
+    return
+  }
   const doc = await GalleryPhoto.findOne({ photoId: req.params.id })
   if (!doc || !canManageGallery(req.user, doc)) {
     res.status(404).json({ error: '사진을 찾지 못했습니다.' })

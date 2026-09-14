@@ -1413,7 +1413,7 @@ p {
 .home-body,
 .page-body {
   display: grid;
-  grid-template-columns: 196px minmax(0, 1fr);
+  grid-template-columns: 172px minmax(0, 1fr);
   gap: 20px;
   width: min(1280px, calc(100% - 32px));
   margin: 0 auto;
@@ -1430,29 +1430,30 @@ p {
   position: sticky;
   top: calc(var(--nav-h) + 12px);
   display: grid;
-  gap: 4px;
-  padding: 12px 10px;
+  gap: 2px;
+  padding: 8px 6px;
   background: var(--cream);
   border: 1px solid var(--line);
-  border-radius: 18px;
+  border-radius: 14px;
 }
 
 .side-menu-group {
   display: grid;
-  gap: 4px;
+  gap: 1px;
 }
 
 .side-menu-group + .side-menu-group {
-  margin-top: 8px;
-  padding-top: 8px;
+  margin-top: 4px;
+  padding-top: 4px;
   border-top: 1px solid var(--line);
 }
 
 .side-menu-group-title {
   margin: 0;
-  padding: 4px 12px 2px;
-  font-size: 0.72rem;
+  padding: 2px 8px 1px;
+  font-size: 0.65rem;
   font-weight: 600;
+  line-height: 1.2;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--muted);
@@ -1467,8 +1468,10 @@ p {
   text-align: left;
   border: 0;
   background: transparent;
-  border-radius: 10px;
-  padding: 10px 12px;
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 0.88rem;
+  line-height: 1.2;
   color: var(--ink);
 }
 
@@ -2069,6 +2072,10 @@ p {
   touch-action: pan-x;
 }
 
+.sample-slider-track.is-infinite {
+  scroll-snap-type: none;
+}
+
 .sample-slider-track::-webkit-scrollbar {
   display: none;
 }
@@ -2091,6 +2098,21 @@ p {
   border: 0;
   padding: 0;
   text-align: left;
+}
+
+.sample-card-duration {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--cream);
+  background: rgba(23, 32, 51, 0.72);
+  pointer-events: none;
 }
 
 .sample-card-photo {
@@ -2317,7 +2339,8 @@ p {
     position: static;
     top: auto;
     width: min(1280px, calc(100% - 24px));
-    margin: 12px auto 0;
+    margin: 8px auto 0;
+    padding: 6px;
     max-height: none;
     overflow: visible;
     box-shadow: none;
@@ -2325,6 +2348,22 @@ p {
 
   .side-menu.is-open {
     display: grid;
+    gap: 1px;
+  }
+
+  .side-menu-group {
+    grid-template-columns: 1fr 1fr;
+    column-gap: 6px;
+  }
+
+  .side-menu-group-title {
+    grid-column: 1 / -1;
+    padding: 1px 6px 0;
+  }
+
+  .side-menu-item {
+    padding: 4px 8px;
+    font-size: 0.84rem;
   }
 
   .page-main,

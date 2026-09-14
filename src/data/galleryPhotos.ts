@@ -41,8 +41,5 @@ export function galleryPhotoById(id?: string | null): GalleryPhoto | undefined {
 }
 
 export function mergeGallery(userPhotos: GalleryPhoto[]): GalleryPhoto[] {
-  const map = new Map<string, GalleryPhoto>()
-  for (const row of CATALOG_BY_ID.values()) map.set(row.id, enrichGalleryPhoto(row))
-  for (const row of userPhotos) map.set(row.id, enrichGalleryPhoto(row))
-  return [...map.values()]
+  return userPhotos.map(enrichGalleryPhoto)
 }

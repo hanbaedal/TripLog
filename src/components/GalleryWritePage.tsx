@@ -63,6 +63,7 @@ function EditableGalleryList({
 type PhotoFormValues = {
   title: string
   photoId: string
+  pendingSrc?: string
   city: string
   category: GalleryCategory | ''
   sightType: SightType | ''
@@ -133,7 +134,13 @@ function GalleryPhotoForm({
       ) : null}
       <ImagePicker
         photoId={values.photoId}
-        onChange={(photoId) => onChange({ photoId })}
+        pendingSrc={values.pendingSrc}
+        deferUpload
+        onChange={(photoId, pending) => {
+          if (pending === null) onChange({ photoId, pendingSrc: undefined })
+          else if (pending?.src) onChange({ photoId, pendingSrc: pending.src })
+          else onChange({ photoId })
+        }}
         user={user}
         defaultTitle={values.title}
         disabled={busy}
@@ -195,6 +202,7 @@ export function GalleryWritePage({ editPhotoId, ...nav }: Props) {
     return {
       title: photo.title,
       photoId: photo.id,
+      pendingSrc: undefined,
       city: photo.city || '',
       category: photo.category || '',
       sightType: photo.sightType || '',
@@ -231,20 +239,25 @@ export function GalleryWritePage({ editPhotoId, ...nav }: Props) {
       nav.go.auth()
       return
     }
-    if (!values.title.trim() || !values.photoId || !values.city || !values.category) {
+    if (!values.title.trim() || (!values.photoId && !values.pendingSrc) || !values.city || !values.category) {
       setError('제목, 도시, 분류, 사진이 필요합니다.')
       return
     }
     setBusy(true)
     setError('')
     try {
-      const src = resolvePhotoSrc(values.photoId, photos)
+      const src = values.pendingSrc?.trim() || resolvePhotoSrc(values.photoId, photos)
       if (!src) {
         setError('갤러리에서 사진을 선택해 주세요.')
         return
       }
+      const existing =
+        target ??
+        (values.photoId
+          ? photos.find((row) => row.id === values.photoId && canEditGallery(row, nav.user))
+          : undefined)
       const saved = await saveGalleryPhoto({
-        id: target?.id || '',
+        id: existing?.id || '',
         title: values.title.trim(),
         src,
         city: values.city,

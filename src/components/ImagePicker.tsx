@@ -9,6 +9,7 @@ import {
   type GalleryFilter,
   type GalleryUploadMeta,
 } from '../lib/galleryResolve'
+import { compressImage } from '../lib/imageFile'
 import { photoTaxonomyLabel } from '../lib/galleryFilter'
 import {
   galleryCategoryLabel,
@@ -19,11 +20,13 @@ import type { GalleryPhoto, User } from '../types'
 
 type Props = {
   photoId: string
-  onChange: (photoId: string) => void
+  pendingSrc?: string
+  onChange: (photoId: string, pending?: { src: string } | null) => void
   user: User | null
   label?: string
   defaultTitle?: string
   disabled?: boolean
+  deferUpload?: boolean
   scope?: 'default' | 'mine' | 'all'
   uploadMeta?: GalleryUploadMeta
   filter?: GalleryFilter
@@ -34,11 +37,13 @@ type Props = {
 
 export function ImagePicker({
   photoId,
+  pendingSrc,
   onChange,
   user,
   label = '사진',
   defaultTitle,
   disabled,
+  deferUpload,
   scope = 'default',
   uploadMeta,
   filter: filterProp,
@@ -65,7 +70,7 @@ export function ImagePicker({
     () => filteredPickablePhotos(photos, user, scope, filter),
     [photos, user, scope, filter],
   )
-  const preview = resolvePhotoSrc(photoId, photos)
+  const preview = pendingSrc || resolvePhotoSrc(photoId, photos)
 
   async function onPc(file: File | undefined) {
     if (!file || disabled) return
@@ -76,11 +81,16 @@ export function ImagePicker({
     setBusy(true)
     setError('')
     try {
-      const meta = uploadMeta ?? { city: 'dalian', category: 'sight' as const }
-      const saved = await uploadGalleryImage(file, user, defaultTitle, meta)
-      const rows = await loadGalleryPhotos()
-      setPhotos(rows)
-      onChange(saved.id)
+      if (deferUpload) {
+        const src = await compressImage(file)
+        onChange('', { src })
+      } else {
+        const meta = uploadMeta ?? { city: 'dalian', category: 'sight' as const }
+        const saved = await uploadGalleryImage(file, user, defaultTitle, meta)
+        const rows = await loadGalleryPhotos()
+        setPhotos(rows)
+        onChange(saved.id)
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : '사진을 올리지 못했습니다.')
     } finally {
@@ -90,12 +100,13 @@ export function ImagePicker({
   }
 
   function pick(id: string) {
-    onChange(id)
+    onChange(id, null)
     setOpen(false)
     setError('')
   }
 
-  const pcDisabled = disabled || busy || !user || (scope === 'mine' && (!uploadMeta?.city || !uploadMeta?.category))
+  const pcDisabled =
+    disabled || busy || !user || (scope === 'mine' && (!uploadMeta?.city || !uploadMeta?.category))
 
   return (
     <div className="image-picker">

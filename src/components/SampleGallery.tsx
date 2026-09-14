@@ -66,6 +66,7 @@ export function SampleGallery({ onPick, onEdit, onCreate, onUnpublish, ...nav }:
               {group.items.map((sample) => (
                 <article className="sample-card" key={sample.id}>
                   <button type="button" className="sample-card-main" onClick={() => onPick(sample)}>
+                    <span className="sample-card-duration">{nightsLabel(sample.nights)}</span>
                     <img className="sample-card-photo" src={sampleCover(sample, photos)} alt="" />
                     <span className="sample-card-label">
                       <h3>{sample.place}</h3>
