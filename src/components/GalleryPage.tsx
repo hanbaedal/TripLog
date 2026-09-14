@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { PageShell } from './PageShell'
 import { listGallery, canEditGallery } from '../lib/community'
+import { galleryMediaSrc } from '../lib/galleryResolve'
 import { isSupervisor } from '../lib/auth'
 import { galleryCityLabel, photoCategoryLabel, photoTaxonomyLabel } from '../lib/galleryFilter'
 import { GALLERY_CATEGORIES, GALLERY_CITIES } from '../data/galleryTaxonomy.js'
@@ -183,7 +184,7 @@ export function GalleryPage({ focusId, ...nav }: Props) {
                       onClick={() => openSlide(photo.id, group.slug)}
                     >
                       <div className="gallery-card-thumb">
-                        <img src={photo.src} alt={photo.title} loading="lazy" />
+                        <img src={galleryMediaSrc(photo.src)} alt={photo.title} loading="lazy" />
                       </div>
                       <span>{photo.title}</span>
                       <small>{photoCategoryLabel(photo)}</small>
@@ -218,7 +219,7 @@ export function GalleryPage({ focusId, ...nav }: Props) {
             {slideItems.map((photo) => (
               <figure className="gallery-frame" id={`gallery-${photo.id}`} key={photo.id}>
                 <img
-                  src={photo.src}
+                  src={galleryMediaSrc(photo.src)}
                   alt={photo.title}
                   loading={photo.id === activeId ? 'eager' : 'lazy'}
                 />

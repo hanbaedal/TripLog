@@ -27,7 +27,7 @@ export async function deleteTrip(tripId: string): Promise<Trip[]> {
 }
 
 export async function purgeSampleCopies(trips: Trip[]): Promise<Trip[]> {
-  const junk = trips.filter((trip) => !isPersonalTrip(trip))
+  const junk = trips.filter((trip) => trip.savedByUser === false)
   if (!junk.length) return onlyPersonalTrips(trips)
   let list = trips
   for (const row of junk) {

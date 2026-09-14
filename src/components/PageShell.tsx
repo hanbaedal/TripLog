@@ -25,6 +25,15 @@ export function PageShell({ children, wide, shellClass, ...nav }: Props) {
     return () => window.removeEventListener('keydown', onKey)
   }, [drawerOpen])
 
+  const menu = (
+    <SideMenu
+      {...nav}
+      overlay={wide}
+      drawerOpen={drawerOpen}
+      onDrawerClose={() => setDrawerOpen(false)}
+    />
+  )
+
   return (
     <div className={shellClass}>
       <AppNav
@@ -33,10 +42,13 @@ export function PageShell({ children, wide, shellClass, ...nav }: Props) {
         onOpenMenu={() => setDrawerOpen((open) => !open)}
       />
       {wide ? (
-        children
+        <>
+          {menu}
+          {children}
+        </>
       ) : (
         <div className="page-body">
-          <SideMenu {...nav} drawerOpen={drawerOpen} onDrawerClose={() => setDrawerOpen(false)} />
+          {menu}
           <div className="page-main">{children}</div>
         </div>
       )}

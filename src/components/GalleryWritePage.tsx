@@ -5,7 +5,7 @@ import { ImagePicker } from './ImagePicker'
 import { GalleryTaxonomyFields } from './GalleryTaxonomyFields'
 import { isSupervisor } from '../lib/auth'
 import { canEditGallery, listGallery, removeGalleryPhoto, saveGalleryPhoto } from '../lib/community'
-import { loadGalleryPhotos, resolvePhotoSrc } from '../lib/galleryResolve'
+import { galleryMediaSrc, loadGalleryPhotos, resolvePhotoSrc } from '../lib/galleryResolve'
 import { photoTaxonomyLabel } from '../lib/galleryFilter'
 import type { GalleryCategory, GalleryPhoto, SightType } from '../types'
 import type { SiteNav } from '../lib/siteNav'
@@ -32,7 +32,7 @@ function EditableGalleryList({
         <article className="info-card gallery-manage-card" key={photo.id}>
           <button type="button" className="gallery-manage-open" onClick={() => onEdit(photo)}>
             <div className="gallery-card-thumb">
-              <img src={photo.src} alt={photo.title} loading="lazy" />
+              <img src={galleryMediaSrc(photo.src)} alt={photo.title} loading="lazy" />
             </div>
             <h3>{photo.title}</h3>
             <p className="muted">{photoTaxonomyLabel(photo)}</p>

@@ -1430,8 +1430,8 @@ p {
   position: sticky;
   top: calc(var(--nav-h) + 12px);
   display: grid;
-  gap: 2px;
-  padding: 8px 6px;
+  gap: 6px;
+  padding: 10px 8px;
   background: var(--cream);
   border: 1px solid var(--line);
   border-radius: 14px;
@@ -1443,8 +1443,8 @@ p {
 }
 
 .side-menu-group + .side-menu-group {
-  margin-top: 4px;
-  padding-top: 4px;
+  margin-top: 14px;
+  padding-top: 14px;
   border-top: 1px solid var(--line);
 }
 
@@ -1461,7 +1461,13 @@ p {
 
 .side-menu-group-utility,
 .side-menu-group-auth {
+  margin-top: 14px;
+  padding-top: 14px;
   border-top: 1px solid var(--line);
+}
+
+.side-menu > .side-menu-item:first-child {
+  margin-bottom: 4px;
 }
 
 .side-menu-item {
@@ -1479,6 +1485,31 @@ p {
 .side-menu-item.is-on {
   background: var(--ink);
   color: var(--cream);
+}
+
+.side-menu.is-overlay {
+  display: none;
+  position: fixed;
+  top: calc(var(--nav-h) + 8px);
+  left: 12px;
+  right: 12px;
+  z-index: 40;
+  max-height: calc(100dvh - var(--nav-h) - 20px);
+  overflow: auto;
+  box-shadow: 0 16px 40px rgba(23, 32, 51, 0.18);
+}
+
+.side-menu.is-overlay.is-open {
+  display: grid;
+}
+
+.side-menu-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 35;
+  border: 0;
+  background: rgba(23, 32, 51, 0.35);
+  cursor: pointer;
 }
 
 .gallery-hero {
@@ -1885,8 +1916,7 @@ p {
 }
 
 .info-list,
-.board-list,
-.sitemap-list {
+.board-list {
   display: grid;
   gap: 12px;
 }
@@ -2049,8 +2079,66 @@ p {
   justify-self: start;
 }
 
-.sitemap-list {
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+.sitemap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.sitemap-card {
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 18px 16px;
+}
+
+.sitemap-card h3 {
+  margin: 0 0 12px;
+  font-family: var(--serif);
+  font-size: 1.15rem;
+}
+
+.sitemap-card-links {
+  display: grid;
+  gap: 6px;
+}
+
+.sitemap-link {
+  text-align: left;
+  border: 0;
+  background: rgba(255, 255, 255, 0.48);
+  border-radius: 10px;
+  padding: 9px 12px;
+  font: inherit;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.sitemap-link:hover {
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.sitemap-card-home {
+  background: #faf3e8;
+}
+
+.sitemap-card-travel {
+  background: #e8f0fc;
+}
+
+.sitemap-card-info {
+  background: #e3f5ea;
+}
+
+.sitemap-card-community {
+  background: #fceee8;
+}
+
+.sitemap-card-admin {
+  background: #efe8fa;
+}
+
+.sitemap-card-account {
+  background: #e8f4fa;
 }
 
 .sample-slider {

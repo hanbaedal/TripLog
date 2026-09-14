@@ -46,13 +46,12 @@ export async function requireUser(req, res, next) {
 }
 
 export function publicUser(user) {
-  const role = user.role || supervisorRole(user.name, user.email)
   return {
     id: String(user._id),
     email: user.email,
     name: user.name,
     phone: user.phone || '',
-    role,
+    role: user.role === 'supervisor' ? 'supervisor' : 'user',
   }
 }
 
@@ -82,13 +81,12 @@ export async function applySupervisorRole(user) {
 
 export function isSupervisorUser(user) {
   if (!user) return false
-  return user.role === 'supervisor' || supervisorRole(user.name, user.email) === 'supervisor'
+  return user.role === 'supervisor'
 }
 
 export function requireSupervisor(req, res, next) {
   requireUser(req, res, () => {
-    const role = req.user.role || supervisorRole(req.user.name, req.user.email)
-    if (role !== 'supervisor') {
+    if (req.user.role !== 'supervisor') {
       res.status(403).json({ error: '권한이 없습니다.' })
       return
     }

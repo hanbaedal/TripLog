@@ -1,10 +1,18 @@
 import type { GalleryCategory, GalleryPhoto, SightType, User } from '../types'
 import { GALLERY_PHOTOS } from '../data/galleryCatalog.js'
 import { compressImage } from './imageFile'
+import { apiUrl } from './remote'
 import type { GalleryFilter } from './galleryFilter'
 import { buildGalleryFilter, filterGalleryPhotos, photoTaxonomyLabel } from './galleryFilter'
 
 let cache: GalleryPhoto[] | null = null
+
+export function galleryMediaSrc(src: string | undefined | null): string {
+  const value = (src || '').trim()
+  if (!value) return ''
+  if (/^(data:|https?:)/i.test(value)) return value
+  return apiUrl(value)
+}
 
 export function invalidateGalleryCache() {
   cache = null
@@ -26,11 +34,11 @@ export function resolvePhotoSrc(
   const id = (photoId || '').trim()
   if (id) {
     const found = photos.find((row) => row.id === id)
-    if (found?.src) return found.src
+    if (found?.src) return galleryMediaSrc(found.src)
     const catalog = (GALLERY_PHOTOS as GalleryPhoto[]).find((row) => row.id === id)
-    if (catalog?.src) return catalog.src
+    if (catalog?.src) return galleryMediaSrc(catalog.src)
   }
-  return legacySrc?.trim() || ''
+  return galleryMediaSrc(legacySrc?.trim() || '')
 }
 
 export function pickableGalleryPhotos(

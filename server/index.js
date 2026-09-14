@@ -14,6 +14,7 @@ import { seedTravelInfo, travelInfoRouter } from './routes/travelInfo.js'
 import { taxonomyRouter } from './routes/taxonomy.js'
 import { adminRouter } from './routes/admin.js'
 import { seedTaxonomy } from './seedTaxonomy.js'
+import { ensureGalleryUploadDir, migrateGalleryDataUrls, uploadRoot } from './galleryStorage.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const app = express()
@@ -33,6 +34,8 @@ app.use(
     origin: origin ? corsOrigins : true,
   }),
 )
+
+app.use('/uploads', express.static(uploadRoot()))
 
 app.get('/api/health', (_req, res) => {
   res.json({
@@ -62,12 +65,24 @@ app.use((req, res, next) => {
   })
 })
 
+function assertJwtSecret() {
+  const secret = process.env.JWT_SECRET
+  const isProd = process.env.NODE_ENV === 'production'
+  if (isProd && (!secret || secret === 'triplog-dev-secret' || secret === 'change-me')) {
+    console.error('JWT_SECRET must be set to a strong value in production')
+    process.exit(1)
+  }
+}
+
 async function start() {
+  assertJwtSecret()
   if (!mongoUri) {
     console.error('MONGODB_URI is missing')
     process.exit(1)
   }
   await mongoose.connect(mongoUri, { dbName: process.env.MONGODB_DB || 'triplog' })
+  await ensureGalleryUploadDir()
+  await migrateGalleryDataUrls()
   await seedSamples()
   await seedGallery()
   await seedTravelInfo()

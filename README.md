@@ -31,6 +31,9 @@ MongoDB까지:
    - `MONGODB_URI` — Atlas Project **triplog** 클러스터 연결 문자열
    - `MONGODB_DB=triplog`
    - `JWT_SECRET` — 임의 긴 문자열
+   - `UPLOAD_DIR` — (선택) 갤러리 업로드 저장 경로. Render Persistent Disk 사용 시 `/opt/render/project/src/uploads`
 4. Atlas Network Access에 `0.0.0.0/0`을 허용해야 Render에서 접속됩니다.
+
+갤러리 회원 업로드 사진은 MongoDB가 아니라 서버 `uploads/gallery/` 파일로 저장됩니다. Render에서는 `render.yaml`의 Persistent Disk를 붙여야 재배포 후에도 파일이 유지됩니다.
 
 항공·호텔 검색은 시범 연동이며 결제·발권은 하지 않습니다.

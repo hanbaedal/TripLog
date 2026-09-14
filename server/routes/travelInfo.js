@@ -107,10 +107,6 @@ export async function seedTravelInfo() {
       },
       { upsert: true },
     )
-    await TravelSpot.updateOne(
-      { spotId: row.id },
-      { $set: { photoId: cityPhotoId, src: '' } },
-    )
   }
 }
 

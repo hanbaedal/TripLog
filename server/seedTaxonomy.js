@@ -19,7 +19,14 @@ export async function seedTaxonomy() {
   for (const row of SEED) {
     await TaxonomyOption.updateOne(
       { kind: row.kind, slug: row.slug },
-      { $set: { label: row.label, sort: row.sort }, $setOnInsert: { kind: row.kind, slug: row.slug } },
+      {
+        $setOnInsert: {
+          kind: row.kind,
+          slug: row.slug,
+          label: row.label,
+          sort: row.sort,
+        },
+      },
       { upsert: true },
     )
   }

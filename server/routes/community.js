@@ -1,8 +1,9 @@
 import { Router } from 'express'
 import crypto from 'node:crypto'
 import { BoardPost, GalleryPhoto, Inquiry } from '../models.js'
-import { optionalUser, requireSupervisor, requireUser, supervisorRole } from '../auth.js'
+import { optionalUser, requireSupervisor, requireUser } from '../auth.js'
 import { parseGalleryMeta } from '../galleryMeta.js'
+import { deleteGalleryFile, isDataUrl, resolveGallerySrc } from '../galleryStorage.js'
 
 function nid(prefix) {
   return `${prefix}-${crypto.randomUUID()}`
@@ -74,7 +75,7 @@ function toInquiry(doc) {
 
 function isSupervisor(user) {
   if (!user) return false
-  return user.role === 'supervisor' || supervisorRole(user.name, user.email) === 'supervisor'
+  return user.role === 'supervisor'
 }
 
 export const galleryRouter = Router()
@@ -97,16 +98,24 @@ galleryRouter.post('/', requireUser, async (req, res) => {
     res.status(400).json({ error: '도시와 분류를 선택해 주세요.' })
     return
   }
-  if (src.length > 4_500_000) {
+  if (isDataUrl(src) && src.length > 4_500_000) {
     res.status(400).json({ error: '사진이 너무 큽니다.' })
     return
   }
+  const photoId = req.body?.id ? String(req.body.id).trim() : nid('gal')
+  let storedSrc
+  try {
+    storedSrc = await resolveGallerySrc(photoId, src)
+  } catch (err) {
+    res.status(400).json({ error: err instanceof Error ? err.message : '사진을 저장하지 못했습니다.' })
+    return
+  }
   const doc = await GalleryPhoto.create({
-    photoId: req.body?.id ? String(req.body.id).trim() : nid('gal'),
+    photoId,
     ownerId: asCatalog ? null : req.user._id,
     ownerName: asCatalog ? '' : req.user.name,
     title,
-    src,
+    src: storedSrc,
     city: meta.city,
     category: meta.category,
     sightType: meta.sightType,
@@ -128,7 +137,7 @@ galleryRouter.put('/:id', requireUser, async (req, res) => {
     res.status(400).json({ error: '도시와 분류를 선택해 주세요.' })
     return
   }
-  if (src.length > 4_500_000) {
+  if (isDataUrl(src) && src.length > 4_500_000) {
     res.status(400).json({ error: '사진이 너무 큽니다.' })
     return
   }
@@ -137,8 +146,15 @@ galleryRouter.put('/:id', requireUser, async (req, res) => {
     res.status(404).json({ error: '사진을 찾지 못했습니다.' })
     return
   }
+  let storedSrc
+  try {
+    storedSrc = await resolveGallerySrc(doc.photoId, src, doc.src)
+  } catch (err) {
+    res.status(400).json({ error: err instanceof Error ? err.message : '사진을 저장하지 못했습니다.' })
+    return
+  }
   doc.title = title
-  doc.src = src
+  doc.src = storedSrc
   doc.city = meta.city
   doc.category = meta.category
   doc.sightType = meta.sightType
@@ -159,6 +175,7 @@ galleryRouter.delete('/:id', requireUser, async (req, res) => {
     res.status(404).json({ error: '사진을 찾지 못했습니다.' })
     return
   }
+  await deleteGalleryFile(doc.photoId, doc.src)
   await doc.deleteOne()
   res.json({ ok: true })
 })

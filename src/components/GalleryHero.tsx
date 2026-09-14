@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { listGallery } from '../lib/community'
+import { galleryMediaSrc } from '../lib/galleryResolve'
 import type { GalleryPhoto } from '../types'
 
 type Props = {
@@ -30,7 +31,7 @@ export function GalleryHero({ onOpen }: Props) {
       {photos.map((row, i) => (
         <img
           key={row.id}
-          src={row.src}
+          src={galleryMediaSrc(row.src)}
           alt={row.title}
           className={i === index ? 'is-on' : ''}
           loading={i === 0 ? 'eager' : 'lazy'}

@@ -1,3 +1,4 @@
+import { isSupervisor } from '../lib/auth'
 import {
   goSite,
   SUPERVISOR_LINKS,
@@ -8,6 +9,7 @@ import {
 
 type Props = SiteNav & {
   drawerOpen?: boolean
+  overlay?: boolean
   onDrawerClose?: () => void
 }
 
@@ -21,9 +23,10 @@ const MENU_GROUPS: MenuGroup[] = [
 
 const ADMIN_GROUP: MenuGroup = { title: '관리', ids: ['taxonomyAdmin', 'usersAdmin'] }
 
-export function SideMenu({ drawerOpen, onDrawerClose, ...nav }: Props) {
+export function SideMenu({ drawerOpen, overlay, onDrawerClose, ...nav }: Props) {
+  const adminLinks = isSupervisor(nav.user) ? SUPERVISOR_LINKS : []
   const linkMap = new Map(
-    [...visibleSiteLinks(nav.user), ...SUPERVISOR_LINKS].map((link) => [link.id, link.label]),
+    [...visibleSiteLinks(nav.user), ...adminLinks].map((link) => [link.id, link.label]),
   )
 
   function pick(id: AppView) {
@@ -52,7 +55,19 @@ export function SideMenu({ drawerOpen, onDrawerClose, ...nav }: Props) {
   }
 
   return (
-    <aside className={`side-menu${drawerOpen ? ' is-open' : ''}`} aria-label="탐색 메뉴">
+    <>
+      {overlay && drawerOpen ? (
+        <button
+          type="button"
+          className="side-menu-backdrop"
+          aria-label="메뉴 닫기"
+          onClick={onDrawerClose}
+        />
+      ) : null}
+      <aside
+        className={`side-menu${drawerOpen ? ' is-open' : ''}${overlay ? ' is-overlay' : ''}`}
+        aria-label="탐색 메뉴"
+      >
       <button
         className={`side-menu-item${nav.view === 'home' ? ' is-on' : ''}`}
         type="button"
@@ -102,5 +117,6 @@ export function SideMenu({ drawerOpen, onDrawerClose, ...nav }: Props) {
         )}
       </div>
     </aside>
+    </>
   )
 }

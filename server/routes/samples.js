@@ -35,16 +35,14 @@ export async function seedSamples() {
     await Sample.updateOne(
       { sampleId: row.id },
       {
-        $set: {
+        $setOnInsert: {
+          sampleId: row.id,
           sort: row.sort,
           nights: row.nights,
           place: row.place,
           title: row.title,
           destination: row.destination,
           trip: row.trip,
-        },
-        $setOnInsert: {
-          sampleId: row.id,
         },
       },
       { upsert: true },

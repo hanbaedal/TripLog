@@ -22,9 +22,9 @@ export function isBlankDraft(trip: Trip): boolean {
 
 export function isPersonalTrip(trip: Trip): boolean {
   if (isBlankDraft(trip)) return false
-  if (trip.savedByUser === true) return true
   if (trip.savedByUser === false) return false
-  return !isKnownSampleTitle(trip.title)
+  if (trip.savedByUser === true) return true
+  return true
 }
 
 export function nightsLabel(nights: number): string {

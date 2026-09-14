@@ -1,4 +1,5 @@
 import type { GalleryPhoto } from '../types'
+import { galleryMediaSrc } from '../lib/galleryResolve'
 import { GALLERY_PHOTOS } from './galleryCatalog.js'
 
 const BY_PLACE: Record<string, string> = {
@@ -34,8 +35,8 @@ export function sampleCover(sample: { id?: string; place?: string }, photos?: Ga
   const photoId = sampleCoverPhotoId(sample)
   if (photos?.length) {
     const found = photos.find((row) => row.id === photoId)
-    if (found?.src) return found.src
+    if (found?.src) return galleryMediaSrc(found.src)
   }
   const catalog = CATALOG.find((row) => row.id === photoId)
-  return catalog?.src || CATALOG.find((row) => row.id === 'shanghai')?.src || ''
+  return galleryMediaSrc(catalog?.src || CATALOG.find((row) => row.id === 'shanghai')?.src || '')
 }
