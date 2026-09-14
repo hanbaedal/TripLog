@@ -2,9 +2,16 @@ import { useEffect, useMemo, useState } from 'react'
 import { PageShell } from './PageShell'
 import { loadGalleryPhotos } from '../lib/galleryResolve'
 import type { GalleryPhoto, SampleRecord } from '../types'
-import { SAMPLE_GROUPS, SAMPLE_CATALOG } from '../data/sampleCatalog.js'
+import { sampleGroupsForMarket, SAMPLE_CATALOG } from '../data/sampleCatalog.js'
 import { sampleCover } from '../data/sampleCovers'
-import { canManageSample, compareSamples, listSamples, nightsLabel, removeSample } from '../data/samples'
+import {
+  canManageSample,
+  compareSamples,
+  filterSamplesByMarket,
+  listSamples,
+  nightsLabel,
+  removeSample,
+} from '../data/samples'
 import { isSupervisor } from '../lib/auth'
 import type { SiteNav } from '../lib/siteNav'
 
@@ -23,23 +30,29 @@ export function SampleGallery({ onPick, onEdit, onCreate, onUnpublish, ...nav }:
   useEffect(() => {
     void listSamples().then(setRows)
     void loadGalleryPhotos().then(setPhotos)
-  }, [])
+  }, [nav.market])
+
+  const marketRows = useMemo(
+    () => filterSamplesByMarket(rows, nav.market),
+    [rows, nav.market],
+  )
 
   const groups = useMemo(() => {
-    const known = SAMPLE_GROUPS.map((group: { nights: number; label: string }) => ({
+    const groupDefs = sampleGroupsForMarket(nav.market)
+    const known = groupDefs.map((group: { nights: number; label: string }) => ({
       ...group,
-      items: rows.filter((row) => row.nights === group.nights).sort(compareSamples),
+      items: marketRows.filter((row) => row.nights === group.nights).sort(compareSamples),
     }))
-    const extraNights = [...new Set(rows.map((row) => row.nights))]
-      .filter((n) => !SAMPLE_GROUPS.some((g: { nights: number }) => g.nights === n))
+    const extraNights = [...new Set(marketRows.map((row) => row.nights))]
+      .filter((n) => !groupDefs.some((g: { nights: number }) => g.nights === n))
       .sort((a, b) => a - b)
     const extra = extraNights.map((nights) => ({
       nights,
       label: nightsLabel(nights),
-      items: rows.filter((row) => row.nights === nights).sort(compareSamples),
+      items: marketRows.filter((row) => row.nights === nights).sort(compareSamples),
     }))
     return [...known, ...extra].filter((group) => group.items.length > 0 || supervisor)
-  }, [rows, supervisor])
+  }, [marketRows, nav.market, supervisor])
 
   async function handleDelete(id: string) {
     if (!window.confirm('이 샘플을 삭제할까요?')) return

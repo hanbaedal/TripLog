@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import type { Airport } from '../data/airports'
-import { DEST_AIRPORTS, CHINA_LOCAL_AIRPORTS } from '../data/airports'
+import { DEST_AIRPORTS, CHINA_LOCAL_AIRPORTS, DOMESTIC_AIRPORTS } from '../data/airports'
 import type { FlightOffer, Trip } from '../types'
 import {
   groupedChinaLocalAirports,
@@ -20,10 +20,15 @@ type Props = {
   onPick: (offer: FlightOffer) => void
 }
 
-const LEGS: { id: FlightLeg; label: string }[] = [
+const LEGS_CN: { id: FlightLeg; label: string }[] = [
   { id: 'outbound', label: '출국' },
   { id: 'transfer', label: '환승' },
   { id: 'return', label: '귀국' },
+]
+
+const LEGS_KR: { id: FlightLeg; label: string; domesticReturn?: boolean }[] = [
+  { id: 'domestic', label: '가는 편' },
+  { id: 'domestic', label: '오는 편', domesticReturn: true },
 ]
 
 const COPY: Record<
@@ -48,6 +53,26 @@ const COPY: Record<
     fromLabel: '출발',
     toLabel: '도착',
   },
+  domestic: {
+    dateLabel: '가는 날',
+    results: '국내선 시간표',
+    fromLabel: '출발',
+    toLabel: '도착',
+  },
+}
+
+function krAirportGroups(returnLeg: boolean, side: 'from' | 'to') {
+  const mainland = DOMESTIC_AIRPORTS.filter((a) => a.code !== 'CJU')
+  const jeju = DOMESTIC_AIRPORTS.filter((a) => a.code === 'CJU')
+  const list =
+    side === 'from'
+      ? returnLeg
+        ? jeju
+        : mainland
+      : returnLeg
+        ? mainland
+        : jeju
+  return [['한국', list]] as ReturnType<typeof groupedOrigins>
 }
 
 function selectOptions(groups: ReturnType<typeof groupedOrigins>) {
@@ -120,21 +145,56 @@ function defaultsFor(
 }
 
 export function FlightSearch({ trip, focusDate, onClose, onManual, onPick }: Props) {
-  const [leg, setLeg] = useState<FlightLeg>('outbound')
-  const [from, setFrom] = useState('ICN')
-  const [to, setTo] = useState(matchAirport(trip.destination, DEST_AIRPORTS)?.code || 'PVG')
+  const isKr = trip.market === 'kr'
+  const [leg, setLeg] = useState<FlightLeg>(isKr ? 'domestic' : 'outbound')
+  const [domesticReturn, setDomesticReturn] = useState(false)
+  const [from, setFrom] = useState(isKr ? 'GMP' : 'ICN')
+  const [to, setTo] = useState(
+    isKr ? 'CJU' : matchAirport(trip.destination, DEST_AIRPORTS)?.code || 'PVG',
+  )
   const [date, setDate] = useState(trip.startDate)
   const [out, setOut] = useState<FlightOffer[] | null>(null)
   const [busy, setBusy] = useState(false)
+  const [notice, setNotice] = useState('')
 
   const origins = groupedOrigins()
   const dests = groupedDestinations()
   const chinaLocal = groupedChinaLocalAirports()
-  const copy = COPY[leg]
-  const fromGroups = leg === 'outbound' ? origins : chinaLocal
-  const toGroups = leg === 'outbound' ? dests : leg === 'transfer' ? chinaLocal : origins
+  const copy = isKr
+    ? {
+        ...COPY.domestic,
+        dateLabel: domesticReturn ? '오는 날' : '가는 날',
+      }
+    : COPY[leg]
+  const fromGroups = isKr
+    ? krAirportGroups(domesticReturn, 'from')
+    : leg === 'outbound'
+      ? origins
+      : chinaLocal
+  const toGroups = isKr
+    ? krAirportGroups(domesticReturn, 'to')
+    : leg === 'outbound'
+      ? dests
+      : leg === 'transfer'
+        ? chinaLocal
+        : origins
 
-  function switchLeg(next: FlightLeg) {
+  function switchLeg(next: FlightLeg, returnLeg = false) {
+    if (isKr) {
+      setDomesticReturn(returnLeg)
+      if (returnLeg) {
+        setFrom('CJU')
+        setTo('GMP')
+        setDate(trip.endDate)
+      } else {
+        setFrom('GMP')
+        setTo('CJU')
+        setDate(trip.startDate)
+      }
+      setLeg('domestic')
+      setOut(null)
+      return
+    }
     if (next === leg) return
     const nextVals = defaultsFor(next, trip, focusDate, from, to)
     setLeg(next)
@@ -149,8 +209,9 @@ export function FlightSearch({ trip, focusDate, onClose, onManual, onPick }: Pro
     if (from === to) return
     setBusy(true)
     try {
-      const result = await searchFlights({ from, to, date, leg })
+      const result = await searchFlights({ from, to, date, leg: isKr ? 'domestic' : leg })
       setOut(result.offers)
+      setNotice(result.notice || '')
     } finally {
       setBusy(false)
     }
@@ -167,18 +228,34 @@ export function FlightSearch({ trip, focusDate, onClose, onManual, onPick }: Pro
       >
         <h2 id="flight-search-title">항공 검색</h2>
         <div className="leg-tabs" role="group" aria-label="항공 구간">
-          {LEGS.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              className={leg === item.id ? 'btn' : 'btn ghost'}
-              aria-pressed={leg === item.id}
-              onClick={() => switchLeg(item.id)}
-            >
-              {item.label}
-            </button>
-          ))}
+          {(isKr ? LEGS_KR : LEGS_CN).map((item, index) => {
+            const returnLeg = 'domesticReturn' in item ? Boolean(item.domesticReturn) : false
+            return (
+              <button
+                key={`${item.id}-${index}`}
+                type="button"
+                className={
+                  isKr
+                    ? domesticReturn === returnLeg
+                      ? 'btn'
+                      : 'btn ghost'
+                    : leg === item.id
+                      ? 'btn'
+                      : 'btn ghost'
+                }
+                aria-pressed={isKr ? domesticReturn === returnLeg : leg === item.id}
+                onClick={() => switchLeg(item.id, returnLeg)}
+              >
+                {item.label}
+              </button>
+            )
+          })}
         </div>
+        {isKr ? (
+          <p className="muted flight-kr-tip">
+            국내선은 김포·인천 ↔ 제주 시범 시간표입니다. 제주 외 권역은 KTX·렌터카·고속버스로 일정에 넣어 주세요.
+          </p>
+        ) : null}
         <form className="search-form flight-search-form" onSubmit={submit}>
           <label>
             {copy.fromLabel}
@@ -202,6 +279,8 @@ export function FlightSearch({ trip, focusDate, onClose, onManual, onPick }: Pro
             </button>
           </div>
         </form>
+
+        {notice ? <p className="muted flight-notice">{notice}</p> : null}
 
         {out ? <ResultList title={copy.results} offers={out} onPick={onPick} /> : null}
 

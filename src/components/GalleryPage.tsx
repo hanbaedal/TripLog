@@ -5,6 +5,8 @@ import { galleryMediaSrc } from '../lib/galleryResolve'
 import { isSupervisor } from '../lib/auth'
 import { galleryCityLabel, photoCategoryLabel, photoTaxonomyLabel } from '../lib/galleryFilter'
 import { GALLERY_CATEGORIES, GALLERY_CITIES } from '../data/galleryTaxonomy.js'
+import { KR_GALLERY_CITIES } from '../data/krGalleryCatalog.js'
+import { galleryPhotoMarket } from '../lib/market'
 import { loadTaxonomy, type TaxonomyRow } from '../lib/taxonomy'
 import type { GalleryCategory, GalleryPhoto } from '../types'
 import type { SiteNav } from '../lib/siteNav'
@@ -28,18 +30,35 @@ export function GalleryPage({ focusId, ...nav }: Props) {
   const [activeId, setActiveId] = useState<string | null>(() => focusId ?? null)
   const [slideCity, setSlideCity] = useState('')
   const [categoryFilter, setCategoryFilter] = useState<GalleryCategory | ''>('')
+  const citySource = nav.market === 'kr' ? KR_GALLERY_CITIES : GALLERY_CITIES
   const [cities, setCities] = useState<TaxonomyRow[]>(
-    GALLERY_CITIES.map((row, index) => ({ slug: row.slug, label: row.label, labelZh: row.labelZh, sort: index + 1 })),
+    citySource.map((row, index) => ({
+      slug: row.slug,
+      label: row.label,
+      labelZh: 'labelZh' in row && typeof row.labelZh === 'string' ? row.labelZh : '',
+      sort: index + 1,
+    })),
   )
 
   const supervisor = isSupervisor(nav.user)
 
   useEffect(() => {
-    void listGallery().then(setPhotos)
-    void loadTaxonomy().then((bundle) => {
-      if (bundle.cities.length) setCities(bundle.cities)
-    })
-  }, [])
+    void listGallery(nav.market).then(setPhotos)
+    if (nav.market === 'cn') {
+      void loadTaxonomy().then((bundle) => {
+        if (bundle.cities.length) setCities(bundle.cities)
+      })
+    } else {
+      setCities(
+        KR_GALLERY_CITIES.map((row, index) => ({
+          slug: row.slug,
+          label: row.label,
+          labelZh: '',
+          sort: index + 1,
+        })),
+      )
+    }
+  }, [nav.market])
 
   useEffect(() => {
     if (!focusId) return
@@ -51,10 +70,11 @@ export function GalleryPage({ focusId, ...nav }: Props) {
 
   const filtered = useMemo(() => {
     return photos.filter((photo) => {
+      if (galleryPhotoMarket(photo) !== nav.market) return false
       if (categoryFilter && photo.category !== categoryFilter) return false
       return true
     })
-  }, [photos, categoryFilter])
+  }, [photos, categoryFilter, nav.market])
 
   const cityGroups = useMemo((): CityGroup[] => {
     const buckets = new Map<string, GalleryPhoto[]>()

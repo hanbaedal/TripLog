@@ -1,19 +1,21 @@
 import { useEffect, useState } from 'react'
 import { listGallery } from '../lib/community'
 import { galleryMediaSrc } from '../lib/galleryResolve'
-import type { GalleryPhoto } from '../types'
+import type { GalleryPhoto, Market } from '../types'
 
 type Props = {
+  market?: Market
   onOpen: (photoId: string) => void
 }
 
-export function GalleryHero({ onOpen }: Props) {
+export function GalleryHero({ market = 'cn', onOpen }: Props) {
   const [photos, setPhotos] = useState<GalleryPhoto[]>([])
   const [index, setIndex] = useState(0)
 
   useEffect(() => {
-    void listGallery().then(setPhotos)
-  }, [])
+    void listGallery(market).then(setPhotos)
+    setIndex(0)
+  }, [market])
 
   useEffect(() => {
     if (photos.length < 2) return

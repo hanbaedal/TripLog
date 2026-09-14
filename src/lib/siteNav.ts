@@ -1,4 +1,4 @@
-import type { User } from '../types'
+import type { Market, User } from '../types'
 
 export type AppView =
   | 'home'
@@ -46,6 +46,8 @@ export type SiteGo = {
 export type SiteNav = {
   view: AppView
   user: User | null
+  market: Market
+  setMarket: (market: Market) => void
   go: SiteGo
 }
 

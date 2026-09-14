@@ -1,3 +1,5 @@
+export type Market = 'kr' | 'cn'
+
 export type ItemKind = 'flight' | 'hotel' | 'meal' | 'sight' | 'transport'
 
 export type MealSlot = 'breakfast' | 'lunch' | 'dinner' | 'latenight' | 'snack'
@@ -55,6 +57,7 @@ export type Trip = {
   adults: number
   children: number
   items: TripItem[]
+  market?: Market
   updatedAt?: string
   savedByUser?: boolean
   publishedSampleId?: string
@@ -67,6 +70,8 @@ export type SampleRecord = {
   place: string
   title: string
   destination: string
+  market?: Market
+  region?: string
   trip: Trip
   ownerId?: string
   ownerName?: string
@@ -103,6 +108,7 @@ export type GalleryPhoto = {
   city?: string
   category?: GalleryCategory
   sightType?: SightType
+  market?: Market
   ownerId?: string
   ownerName?: string
   at?: string
@@ -135,6 +141,8 @@ export type TravelInfo = {
   photoId?: string
   src?: string
   sort?: number
+  market?: Market
+  spotCount?: number
   catalog?: boolean
   ownerId?: string
   ownerName?: string
@@ -152,6 +160,7 @@ export type TravelSpot = {
   photoId?: string
   src?: string
   sort?: number
+  market?: Market
   catalog?: boolean
   ownerId?: string
   ownerName?: string

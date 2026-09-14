@@ -4,6 +4,7 @@ import { FlightSnap } from '../models.js'
 import { fetchIcnDay } from '../lib/icnDepartures.js'
 import { fetchIcnArrivals } from '../lib/icnArrivals.js'
 import { gmpArrivals, gmpFlights } from '../lib/gmpCatalog.js'
+import { DOMESTIC_KR_CODES, domesticKrArrivals, domesticKrFlights } from '../lib/domesticKrFlights.js'
 import { transferFlights } from '../lib/transferCatalog.js'
 import {
   CITY,
@@ -166,14 +167,34 @@ flightsRouter.get('/search', async (req, res) => {
     return
   }
 
+  const domesticOk =
+    leg === 'domestic' &&
+    DOMESTIC_KR_CODES.has(from) &&
+    DOMESTIC_KR_CODES.has(to) &&
+    from !== to &&
+    ((from === 'GMP' || from === 'ICN') && to === 'CJU' || from === 'CJU' && (to === 'GMP' || to === 'ICN'))
   const outboundOk = leg === 'outbound' && KR_CODES.has(from) && DEST_CODES.has(to)
   const returnOk = leg === 'return' && TRANSFER_CODES.has(from) && KR_CODES.has(to)
   const transferOk = leg === 'transfer' && TRANSFER_CODES.has(from) && TRANSFER_CODES.has(to)
 
-  if (!outboundOk && !returnOk && !transferOk) {
+  if (!domesticOk && !outboundOk && !returnOk && !transferOk) {
     res.status(400).json({
       error:
-        '출국은 인천/김포→중국권, 환승은 중국 현지공항끼리, 귀국은 중국 현지공항→인천/김포만 검색할 수 있습니다.',
+        '국내선은 김포·인천↔제주, 출국은 인천/김포→중국권, 환승은 중국 현지공항끼리, 귀국은 중국→인천/김포만 검색할 수 있습니다.',
+    })
+    return
+  }
+
+  if (domesticOk) {
+    const rows = from === 'CJU' ? domesticKrArrivals(to) : domesticKrFlights(from, to)
+    const offers = rows
+      .map((row, i) => toOffer(row, dateIso, i, true))
+      .sort((a, b) => a.depart.localeCompare(b.depart) || a.airline.localeCompare(b.airline, 'ko'))
+    res.json({
+      offers,
+      notice: '국내선(김포·인천↔제주) 시범 시간표입니다. 실시간 발권·좌석은 제공하지 않습니다.',
+      live: false,
+      sourceDate: dateIso,
     })
     return
   }

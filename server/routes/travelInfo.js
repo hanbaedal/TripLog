@@ -4,6 +4,8 @@ import { GalleryPhoto, TravelInfo, TravelSpot } from '../models.js'
 import { requireUser, isSupervisorUser } from '../auth.js'
 import { TRAVEL_INFO_CATALOG } from '../../src/data/travelInfoCatalog.js'
 import { TRAVEL_SPOT_CATALOG } from '../../src/data/travelSpotCatalog.js'
+import { KR_TRAVEL_INFO_CATALOG } from '../../src/data/krTravelInfoCatalog.js'
+import { KR_TRAVEL_SPOT_CATALOG } from '../../src/data/krTravelSpotCatalog.js'
 import { cityGalleryId } from '../../src/data/galleryCatalog.js'
 
 export const travelInfoRouter = Router()
@@ -12,7 +14,12 @@ function nid(prefix) {
   return `${prefix}-${crypto.randomUUID()}`
 }
 
+function infoMarket(infoId) {
+  return String(infoId || '').startsWith('info-kr-') ? 'kr' : 'cn'
+}
+
 function toInfo(doc) {
+  const market = infoMarket(doc.infoId)
   return {
     id: doc.infoId,
     place: doc.place,
@@ -22,6 +29,8 @@ function toInfo(doc) {
     src: doc.src || '',
     sort: doc.sort,
     catalog: Boolean(doc.catalog),
+    market,
+    spotCount: doc.spotCount,
     ownerId: doc.ownerId ? String(doc.ownerId) : undefined,
     ownerName: doc.ownerName || '',
     at: doc.at?.toISOString?.() ?? new Date().toISOString(),
@@ -41,6 +50,7 @@ function toSpot(doc) {
     src: doc.src || '',
     sort: doc.sort,
     catalog: Boolean(doc.catalog),
+    market: infoMarket(doc.cityId),
     ownerId: doc.ownerId ? String(doc.ownerId) : undefined,
     ownerName: doc.ownerName || '',
     at: doc.at?.toISOString?.() ?? new Date().toISOString(),
@@ -62,50 +72,66 @@ async function resolvePhotoRef(photoId, fallbackPhotoId) {
   return { photoId: id, src: photo.src }
 }
 
+async function upsertInfoRow(row) {
+  const photoId = row.photoId || cityGalleryId(row.id)
+  await TravelInfo.updateOne(
+    { infoId: row.id },
+    {
+      $set: { place: row.place, title: row.title, spotCount: row.spotCount },
+      $setOnInsert: {
+        infoId: row.id,
+        body: row.body,
+        photoId,
+        src: row.src || '',
+        sort: row.sort,
+        catalog: true,
+        ownerName: '',
+        at: new Date(),
+      },
+    },
+    { upsert: true },
+  )
+}
+
+async function upsertSpotRow(row) {
+  const cityPhotoId = row.photoId || cityGalleryId(row.cityId)
+  await TravelSpot.updateOne(
+    { spotId: row.id },
+    {
+      $set: {
+        name: row.name,
+        body: row.body,
+        tip: row.tip || '',
+        sort: row.sort,
+      },
+      $setOnInsert: {
+        spotId: row.id,
+        cityId: row.cityId,
+        nameZh: row.nameZh || '',
+        addressZh: row.addressZh || '',
+        photoId: cityPhotoId,
+        src: row.src || '',
+        catalog: true,
+        ownerName: '',
+        at: new Date(),
+      },
+    },
+    { upsert: true },
+  )
+}
+
 export async function seedTravelInfo() {
   for (const row of TRAVEL_INFO_CATALOG) {
-    const photoId = row.photoId || cityGalleryId(row.id)
-    await TravelInfo.updateOne(
-      { infoId: row.id },
-      {
-        $set: { place: row.place, title: row.title },
-        $setOnInsert: {
-          infoId: row.id,
-          body: row.body,
-          photoId,
-          src: row.src || '',
-          sort: row.sort,
-          catalog: true,
-          ownerName: '',
-          at: new Date(),
-        },
-      },
-      { upsert: true },
-    )
+    await upsertInfoRow(row)
+  }
+  for (const row of KR_TRAVEL_INFO_CATALOG) {
+    await upsertInfoRow(row)
   }
   for (const row of TRAVEL_SPOT_CATALOG) {
-    const cityPhotoId = cityGalleryId(row.cityId)
-    await TravelSpot.updateOne(
-      { spotId: row.id },
-      {
-        $setOnInsert: {
-          spotId: row.id,
-          cityId: row.cityId,
-          name: row.name,
-          nameZh: row.nameZh || '',
-          addressZh: row.addressZh || '',
-          body: row.body,
-          tip: row.tip,
-          photoId: cityPhotoId,
-          src: '',
-          sort: row.sort,
-          catalog: true,
-          ownerName: '',
-          at: new Date(),
-        },
-      },
-      { upsert: true },
-    )
+    await upsertSpotRow(row)
+  }
+  for (const row of KR_TRAVEL_SPOT_CATALOG) {
+    await upsertSpotRow(row)
   }
 }
 

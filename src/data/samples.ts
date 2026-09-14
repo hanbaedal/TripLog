@@ -1,5 +1,6 @@
-import type { SampleRecord, Trip, User } from '../types'
+import type { Market, SampleRecord, Trip, User } from '../types'
 import { isSupervisor } from '../lib/auth'
+import { sampleMarket } from '../lib/market'
 import { SAMPLE_CATALOG } from './sampleCatalog.js'
 import { hasItemPhoto } from './sightPhotos'
 import { sampleCoverPhotoId } from './sampleCovers'
@@ -28,11 +29,16 @@ export function isPersonalTrip(trip: Trip): boolean {
 }
 
 export function nightsLabel(nights: number): string {
+  if (nights === 0) return '당일'
   return `${nights}박 ${nights + 1}일`
 }
 
 export function compareSamples(a: SampleRecord, b: SampleRecord): number {
   return a.nights - b.nights || a.sort - b.sort || a.place.localeCompare(b.place, 'ko')
+}
+
+export function filterSamplesByMarket(samples: SampleRecord[], market: Market): SampleRecord[] {
+  return samples.filter((row) => sampleMarket(row) === market)
 }
 
 export function cloneSampleTrip(sample: SampleRecord): Trip {
@@ -54,6 +60,7 @@ export function cloneSampleTrip(sample: SampleRecord): Trip {
           : entry.photoId,
       photo: undefined,
     })),
+    market: sampleMarket(sample),
     updatedAt: new Date().toISOString(),
     savedByUser: false,
   }
@@ -94,7 +101,9 @@ export function sampleFromTrip(trip: Trip, previous?: SampleRecord): SampleRecor
     place,
     title: trip.title || place,
     destination: trip.destination || place,
-    trip,
+    market: trip.market || previous?.market || 'cn',
+    region: previous?.region,
+    trip: { ...trip, market: trip.market || previous?.market || 'cn' },
     ownerId: previous?.ownerId,
     ownerName: previous?.ownerName,
     sourceTripId: previous?.sourceTripId || trip.id,

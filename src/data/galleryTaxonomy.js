@@ -1,3 +1,5 @@
+import { KR_GALLERY_CITIES } from './krGalleryCatalog.js'
+
 export const GALLERY_CITIES = [
   { slug: 'dalian', label: '대련', labelZh: '大连' },
   { slug: 'yantai', label: '연태', labelZh: '烟台' },
@@ -113,7 +115,12 @@ export function galleryCategoryLabel(slug) {
 }
 
 export function galleryCityLabel(slug) {
-  return GALLERY_CITIES.find((row) => row.slug === slug)?.label || slug || ''
+  return (
+    GALLERY_CITIES.find((row) => row.slug === slug)?.label ||
+    KR_GALLERY_CITIES.find((row) => row.slug === slug)?.label ||
+    slug ||
+    ''
+  )
 }
 
 export function galleryCityLabelZh(slug) {
@@ -133,6 +140,8 @@ export function normalizeGalleryCategory(value) {
 export function normalizeCity(value) {
   const slug = String(value || '').trim()
   if (GALLERY_CITIES.some((row) => row.slug === slug)) return slug
+  if (KR_GALLERY_CITIES.some((row) => row.slug === slug)) return slug
+  if (slug.startsWith('kr-')) return slug
   return citySlugFromPlace(slug) || GALLERY_CITIES[0]?.slug || 'dalian'
 }
 

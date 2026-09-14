@@ -22,6 +22,7 @@ type Props = {
   }
   user?: User | null
   tripDestination?: string
+  tripMarket?: 'kr' | 'cn'
   onClose: () => void
   onSave: (item: TripItem) => void
   onDelete?: () => void
@@ -69,7 +70,17 @@ function buildItemPayload(
   )
 }
 
-export function ItemModal({ dayIndex, initial, preset, user, tripDestination, onClose, onSave, onDelete }: Props) {
+export function ItemModal({
+  dayIndex,
+  initial,
+  preset,
+  user,
+  tripDestination,
+  tripMarket,
+  onClose,
+  onSave,
+  onDelete,
+}: Props) {
   const startKind = initial?.kind ?? preset?.kind ?? 'sight'
   const [kind, setKind] = useState<ItemKind>(startKind)
   const [menuLevel, setMenuLevel] = useState<'kind' | 'sub'>(() =>
@@ -293,18 +304,25 @@ export function ItemModal({ dayIndex, initial, preset, user, tripDestination, on
         ) : null}
 
         {menuLevel === 'sub' && kind === 'transport' ? (
-          <div className="slot-grid slot-grid-wide">
-            {MODES.map((mode) => (
-              <button
-                key={mode}
-                type="button"
-                className={transportMode === mode ? 'on' : ''}
-                onClick={() => setTransportMode(mode)}
-              >
-                {TRANSPORT_LABEL[mode]}
-              </button>
-            ))}
-          </div>
+          <>
+            <div className="slot-grid slot-grid-wide">
+              {MODES.map((mode) => (
+                <button
+                  key={mode}
+                  type="button"
+                  className={transportMode === mode ? 'on' : ''}
+                  onClick={() => setTransportMode(mode)}
+                >
+                  {TRANSPORT_LABEL[mode]}
+                </button>
+              ))}
+            </div>
+            {tripMarket === 'kr' ? (
+              <p className="muted item-kr-transport-tip">
+                제주: 항공+렌터카 · 권역 이동: KTX·ITX·고속버스 · 수도권: 지하철·카셰어링 · 외곽: 자차·렌터카
+              </p>
+            ) : null}
+          </>
         ) : null}
 
         <div className={kind === 'flight' ? 'form-grid flight-fields' : 'form-grid'}>
@@ -378,7 +396,9 @@ export function ItemModal({ dayIndex, initial, preset, user, tripDestination, on
                       : kind === 'meal'
                         ? '예: 구로몬 시장 모둠'
                         : kind === 'transport'
-                          ? '예: 난카이 라피트'
+                          ? tripMarket === 'kr'
+                            ? '예: KTX 경주 · 제주 렌터카'
+                            : '예: 난카이 라피트'
                           : '예: 오사카성'
                   }
                   required

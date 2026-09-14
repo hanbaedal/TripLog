@@ -10,6 +10,13 @@ export const ORIGIN_AIRPORTS: Airport[] = [
   { code: 'GMP', city: '서울', name: '김포', country: '한국' },
 ]
 
+/** 국내선 — 김포·인천 ↔ 제주 */
+export const DOMESTIC_AIRPORTS: Airport[] = [
+  { code: 'GMP', city: '서울', name: '김포', country: '한국' },
+  { code: 'ICN', city: '인천', name: '인천', country: '한국' },
+  { code: 'CJU', city: '제주', name: '제주', country: '한국' },
+]
+
 export const DEST_AIRPORTS: Airport[] = [
   { code: 'CAN', city: '광저우', name: '바이윈', country: '중국' },
   { code: 'NKG', city: '난징', name: '루커우', country: '중국' },

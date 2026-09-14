@@ -1,6 +1,11 @@
-import type { Trip } from '../types'
+import type { Market, Trip } from '../types'
 import { isPersonalTrip } from '../data/samples'
+import { tripMarket } from './market'
 import { api } from './remote'
+
+export function filterTripsByMarket(trips: Trip[], market: Market): Trip[] {
+  return trips.filter((row) => tripMarket(row) === market)
+}
 
 export function onlyPersonalTrips(trips: Trip[]): Trip[] {
   return trips.filter(isPersonalTrip)

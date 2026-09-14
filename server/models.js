@@ -24,6 +24,7 @@ const tripSchema = new mongoose.Schema(
     items: { type: Array, default: [] },
     savedByUser: { type: Boolean },
     publishedSampleId: { type: String, default: '' },
+    market: { type: String, enum: ['kr', 'cn'], default: 'cn', index: true },
     updatedAt: { type: Date, default: Date.now },
   },
   { timestamps: { createdAt: true, updatedAt: false } },
@@ -57,6 +58,8 @@ const sampleSchema = new mongoose.Schema(
     ownerId: { type: String, default: '', index: true },
     ownerName: { type: String, default: '' },
     sourceTripId: { type: String, default: '' },
+    market: { type: String, enum: ['kr', 'cn'], default: 'cn', index: true },
+    region: { type: String, default: '' },
   },
   { timestamps: true },
 )

@@ -1,5 +1,6 @@
 import type { GalleryCategory, GalleryPhoto, SightType } from '../types'
 import { FOOD_PHOTOS, GALLERY_PHOTOS, cityGalleryId } from './galleryCatalog.js'
+import { KR_GALLERY_PHOTOS } from './krGalleryCatalog.js'
 import { guessSightType, normalizeGalleryCategory, normalizeSightType } from './galleryTaxonomy.js'
 
 export type { GalleryPhoto }
@@ -7,8 +8,9 @@ export type { GalleryPhoto }
 export { GALLERY_PHOTOS, FOOD_PHOTOS, cityGalleryId }
 
 const CATALOG_PHOTOS: GalleryPhoto[] = [
-  ...(GALLERY_PHOTOS as GalleryPhoto[]),
-  ...(FOOD_PHOTOS as GalleryPhoto[]),
+  ...(GALLERY_PHOTOS as GalleryPhoto[]).map((row) => ({ ...row, market: 'cn' as const })),
+  ...(FOOD_PHOTOS as GalleryPhoto[]).map((row) => ({ ...row, market: 'cn' as const })),
+  ...(KR_GALLERY_PHOTOS as GalleryPhoto[]),
 ]
 
 const CATALOG_BY_ID = new Map<string, GalleryPhoto>(CATALOG_PHOTOS.map((row) => [row.id, row]))

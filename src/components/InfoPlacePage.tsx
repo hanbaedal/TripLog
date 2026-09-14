@@ -196,24 +196,38 @@ export function InfoPlacePage({ cityId, ...nav }: Props) {
 
         <div className="travel-cards">
           {cards.map((spot) => {
-            const maps = mapSearchLinks({
-              cityKo: place,
-              spotKo: spot.name,
-              cityZh: CITY_REGION_ZH[cityId as keyof typeof CITY_REGION_ZH],
-              nameZh: spot.nameZh,
-              addressZh: spot.addressZh,
-            })
+            const maps = mapSearchLinks(
+              {
+                cityKo: place,
+                spotKo: spot.name,
+                cityZh: CITY_REGION_ZH[cityId as keyof typeof CITY_REGION_ZH],
+                nameZh: spot.nameZh,
+                addressZh: spot.addressZh,
+              },
+              nav.market,
+            )
             return (
               <article className="travel-card travel-card-text" key={spot.id}>
                 <div className="travel-card-body">
-                  <h3>{formatSpotLabel(spot)}</h3>
-                  {spot.addressZh ? <p className="travel-address">{spot.addressZh}</p> : null}
+                  <h3>{formatSpotLabel(spot, nav.market)}</h3>
+                  {nav.market === 'cn' && spot.addressZh ? <p className="travel-address">{spot.addressZh}</p> : null}
                   <p>{spot.body}</p>
                   {spot.tip ? <p className="muted">{spot.tip}</p> : null}
                   <div className="travel-map-links">
-                    <a className="travel-map-link" href={maps.baidu} target="_blank" rel="noreferrer">
-                      百度地图
-                    </a>
+                    {nav.market === 'kr' ? (
+                      <>
+                        <a className="travel-map-link" href={maps.naver} target="_blank" rel="noreferrer">
+                          네이버 지도
+                        </a>
+                        <a className="travel-map-link" href={maps.kakao} target="_blank" rel="noreferrer">
+                          카카오맵
+                        </a>
+                      </>
+                    ) : (
+                      <a className="travel-map-link" href={maps.baidu} target="_blank" rel="noreferrer">
+                        百度地图
+                      </a>
+                    )}
                     <a className="travel-map-link" href={maps.google} target="_blank" rel="noreferrer">
                       Google Maps
                     </a>

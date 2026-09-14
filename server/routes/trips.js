@@ -17,6 +17,7 @@ function toTrip(doc) {
     items: doc.items || [],
     savedByUser: typeof doc.savedByUser === 'boolean' ? doc.savedByUser : undefined,
     publishedSampleId: doc.publishedSampleId || undefined,
+    market: doc.market === 'kr' ? 'kr' : 'cn',
     updatedAt: doc.updatedAt?.toISOString?.() ?? new Date().toISOString(),
   }
 }
@@ -47,6 +48,7 @@ tripsRouter.put('/:id', async (req, res) => {
       items: Array.isArray(body.items) ? body.items : [],
       savedByUser: body.savedByUser === true,
       publishedSampleId: String(body.publishedSampleId || ''),
+      market: body.market === 'kr' ? 'kr' : 'cn',
       updatedAt: new Date(),
     },
     { upsert: true, new: true, setDefaultsOnInsert: true },

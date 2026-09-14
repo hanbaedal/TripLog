@@ -2,18 +2,54 @@ import { mergeGallery } from '../data/galleryPhotos'
 import { invalidateGalleryCache } from './galleryResolve'
 import { TRAVEL_INFO_CATALOG } from '../data/travelInfoCatalog.js'
 import { TRAVEL_SPOT_CATALOG } from '../data/travelSpotCatalog.js'
-import type { BoardPost, GalleryPhoto, Inquiry, TravelInfo, TravelSpot, User } from '../types'
+import { KR_TRAVEL_INFO_CATALOG } from '../data/krTravelInfoCatalog.js'
+import { KR_TRAVEL_SPOT_CATALOG } from '../data/krTravelSpotCatalog.js'
+import type { BoardPost, GalleryPhoto, Inquiry, Market, TravelInfo, TravelSpot, User } from '../types'
 import { isSupervisor } from './auth'
+import { galleryPhotoMarket, travelInfoMarket } from './market'
 import { api } from './remote'
 
 const GUEST_INQUIRY_KEY = 'triplog.inquiry.guestIds'
 
 function catalogTravel(): TravelInfo[] {
-  return (TRAVEL_INFO_CATALOG as TravelInfo[]).map((row) => ({ ...row, catalog: true }))
+  return [
+    ...(TRAVEL_INFO_CATALOG as TravelInfo[]).map((row) => ({ ...row, market: 'cn' as const, catalog: true })),
+    ...(KR_TRAVEL_INFO_CATALOG as TravelInfo[]).map((row) => ({ ...row, catalog: true })),
+  ]
 }
 
 function catalogSpots(cityId: string): TravelSpot[] {
-  return (TRAVEL_SPOT_CATALOG as TravelSpot[]).filter((row) => row.cityId === cityId).map((row) => ({ ...row, catalog: true }))
+  const cn = (TRAVEL_SPOT_CATALOG as TravelSpot[])
+    .filter((row) => row.cityId === cityId)
+    .map((row) => ({ ...row, market: 'cn' as const, catalog: true }))
+  const kr = (KR_TRAVEL_SPOT_CATALOG as TravelSpot[])
+    .filter((row) => row.cityId === cityId)
+    .map((row) => ({ ...row, catalog: true }))
+  return [...cn, ...kr]
+}
+
+function filterTravelInfo(rows: TravelInfo[], market: Market): TravelInfo[] {
+  return rows.filter((row) => travelInfoMarket(row) === market)
+}
+
+function mergeTravelInfo(remote: TravelInfo[]): TravelInfo[] {
+  const byId = new Map<string, TravelInfo>()
+  for (const row of catalogTravel()) byId.set(row.id, row)
+  for (const row of remote) {
+    const seed = byId.get(row.id)
+    byId.set(row.id, seed ? { ...seed, ...row } : row)
+  }
+  return [...byId.values()].sort((a, b) => (a.sort ?? 99) - (b.sort ?? 99))
+}
+
+function mergeTravelSpots(cityId: string, remote: TravelSpot[]): TravelSpot[] {
+  const byId = new Map<string, TravelSpot>()
+  for (const row of catalogSpots(cityId)) byId.set(row.id, row)
+  for (const row of remote) {
+    const seed = byId.get(row.id)
+    byId.set(row.id, seed ? { ...seed, ...row } : row)
+  }
+  return [...byId.values()].sort((a, b) => (a.sort ?? 99) - (b.sort ?? 99))
 }
 
 export function guestInquiryIds(): string[] {
@@ -31,9 +67,11 @@ function rememberGuestInquiry(id: string) {
   sessionStorage.setItem(GUEST_INQUIRY_KEY, JSON.stringify(next))
 }
 
-export async function listGallery(): Promise<GalleryPhoto[]> {
+export async function listGallery(market?: Market): Promise<GalleryPhoto[]> {
   const data = await api<{ photos: GalleryPhoto[] }>('/gallery')
-  return mergeGallery(data.photos || [])
+  const rows = mergeGallery(data.photos || [])
+  if (!market) return rows
+  return rows.filter((row) => galleryPhotoMarket(row) === market)
 }
 
 export async function saveGalleryPhoto(photo: GalleryPhoto): Promise<GalleryPhoto> {
@@ -135,9 +173,10 @@ export async function replyInquiry(id: string, reply: string): Promise<Inquiry> 
   return data.inquiry
 }
 
-export async function listTravelInfo(): Promise<TravelInfo[]> {
+export async function listTravelInfo(market?: Market): Promise<TravelInfo[]> {
   const data = await api<{ items: TravelInfo[] }>('/travel-info')
-  return data.items?.length ? data.items : catalogTravel()
+  const rows = mergeTravelInfo(data.items || [])
+  return market ? filterTravelInfo(rows, market) : rows
 }
 
 export async function saveTravelInfo(item: Omit<TravelInfo, 'id' | 'at'> & { id?: string }): Promise<TravelInfo> {
@@ -161,7 +200,7 @@ export function canEditTravelInfo(item: TravelInfo, user?: User | null): boolean
 
 export async function listTravelSpots(cityId: string): Promise<TravelSpot[]> {
   const data = await api<{ spots: TravelSpot[] }>(`/travel-info/${encodeURIComponent(cityId)}/spots`)
-  return data.spots?.length ? data.spots : catalogSpots(cityId)
+  return mergeTravelSpots(cityId, data.spots || [])
 }
 
 export async function saveTravelSpot(

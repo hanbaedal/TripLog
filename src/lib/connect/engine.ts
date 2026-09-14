@@ -1,6 +1,7 @@
 import {
   CHINA_LOCAL_AIRPORTS,
   DEST_AIRPORTS,
+  DOMESTIC_AIRPORTS,
   ORIGIN_AIRPORTS,
   groupedAirports as groupAirports,
 } from '../../data/airports'
@@ -77,7 +78,7 @@ function wait(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-export type FlightLeg = 'outbound' | 'transfer' | 'return'
+export type FlightLeg = 'outbound' | 'transfer' | 'return' | 'domestic'
 
 export type FlightQuery = {
   from: string
@@ -147,4 +148,8 @@ export function groupedDestinations() {
 
 export function groupedChinaLocalAirports() {
   return groupAirports(CHINA_LOCAL_AIRPORTS)
+}
+
+export function groupedDomesticAirports() {
+  return groupAirports(DOMESTIC_AIRPORTS)
 }

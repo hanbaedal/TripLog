@@ -19,12 +19,14 @@ import { emptyTrip } from './data/demo'
 import { cloneSampleTrip, isBlankDraft, removeSample, sampleFromTrip, saveSample } from './data/samples'
 import { isSupervisor, remoteMe, signOut } from './lib/auth'
 import { probeRemote } from './lib/remote'
-import { deleteTrip, listTrips, onlyPersonalTrips, purgeSampleCopies, upsertTrip } from './lib/trips'
+import { deleteTrip, filterTripsByMarket, listTrips, onlyPersonalTrips, purgeSampleCopies, upsertTrip } from './lib/trips'
+import { readMarket, writeMarket } from './lib/market'
 import type { AppView, SiteNav } from './lib/siteNav'
 import { isTaxonomyAdminView, taxonomyViewToKind } from './lib/siteNav'
-import type { SampleRecord, Trip, User } from './types'
+import type { Market, SampleRecord, Trip, User } from './types'
 
 export default function App() {
+  const [market, setMarketState] = useState<Market>(() => readMarket())
   const [view, setView] = useState<AppView>('home')
   const [galleryFocus, setGalleryFocus] = useState<string | null>(null)
   const [galleryEditId, setGalleryEditId] = useState<string | null>(null)
@@ -204,7 +206,8 @@ export default function App() {
     setTripDirty(false)
     setGuideHint('')
     setSaveStatus('idle')
-    setTrip(mode === 'preview' ? { ...next, savedByUser: false } : { ...next, savedByUser: true })
+    const withMarket = { ...next, market: next.market || market }
+    setTrip(mode === 'preview' ? { ...withMarket, savedByUser: false } : { ...withMarket, savedByUser: true })
     setView('planner')
   }
 
@@ -212,14 +215,15 @@ export default function App() {
     if (!user) return
     setSaveStatus((cur) => (cur === 'error' ? 'idle' : cur))
     setGuideHint('')
+    const withMarket = { ...next, market: next.market || market }
     if (samplePreview) {
       setSamplePreview(false)
       setTripDirty(true)
-      setTrip({ ...next, savedByUser: true })
+      setTrip({ ...withMarket, savedByUser: true })
       return
     }
     setTripDirty(true)
-    setTrip(next)
+    setTrip(withMarket)
   }
 
   function askAuth(intent: null | 'newTrip' | 'claimSample' | 'trips' | 'galleryWrite' = null) {
@@ -227,12 +231,25 @@ export default function App() {
     setAuthOpen(true)
   }
 
+  function setMarket(next: Market) {
+    setMarketState(next)
+    writeMarket(next)
+    setSamplePreview(false)
+    setSampleEditId(null)
+    setEditingSample(null)
+    setView('home')
+  }
+
+  function emptyForMarket(): Trip {
+    return { ...emptyTrip(), market }
+  }
+
   function startNewTrip() {
     if (!user) {
       askAuth('newTrip')
       return
     }
-    openPlanner(emptyTrip())
+    openPlanner(emptyForMarket())
   }
 
   async function saveSampleCopy(actor: User | null = user) {
@@ -306,9 +323,13 @@ export default function App() {
     setView('gallery')
   }
 
+  const marketTrips = filterTripsByMarket(trips, market)
+
   const nav: SiteNav = {
     view,
     user,
+    market,
+    setMarket,
     go: {
       home: goHome,
       samples: goSamples,
@@ -379,7 +400,7 @@ export default function App() {
       {view === 'trips' && user ? (
         <TripList
           {...nav}
-          trips={trips}
+          trips={marketTrips}
           onOpen={(next) => {
             openPlanner(next)
           }}
@@ -392,7 +413,7 @@ export default function App() {
               if (target?.publishedSampleId) await removeSample(target.publishedSampleId)
               const next = await deleteTrip(id)
               setTrips(onlyPersonalTrips(next))
-              if (trip.id === id) setTrip(next[0] ?? emptyTrip())
+              if (trip.id === id) setTrip(next[0] ?? emptyForMarket())
             })()
           }}
         />
@@ -418,7 +439,7 @@ export default function App() {
             setTripDirty(true)
             setGuideHint('')
             setSaveStatus('idle')
-            setTrip(emptyTrip())
+            setTrip(emptyForMarket())
             setView('planner')
           }}
           onUnpublish={(sample) => {

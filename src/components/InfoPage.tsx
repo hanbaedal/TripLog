@@ -3,6 +3,8 @@ import type { FormEvent } from 'react'
 import { PageShell } from './PageShell'
 import { ImagePicker } from './ImagePicker'
 import { TRAVEL_INFO_CATALOG } from '../data/travelInfoCatalog.js'
+import { KR_TRAVEL_INFO_CATALOG } from '../data/krTravelInfoCatalog.js'
+import { travelInfoMarket } from '../lib/market'
 import { cityGalleryId } from '../data/galleryCatalog.js'
 import { citySlugFromPlace, guessSightType } from '../data/galleryTaxonomy.js'
 import { canEditTravelInfo, listTravelInfo, removeTravelInfo, saveTravelInfo } from '../lib/community'
@@ -11,9 +13,10 @@ import type { GalleryPhoto, TravelInfo } from '../types'
 import type { SiteNav } from '../lib/siteNav'
 
 export function InfoPage(nav: SiteNav) {
-  const [items, setItems] = useState<TravelInfo[]>(() =>
-    (TRAVEL_INFO_CATALOG as TravelInfo[]).map((row) => ({ ...row, catalog: true })),
-  )
+  const [items, setItems] = useState<TravelInfo[]>(() => [
+    ...(TRAVEL_INFO_CATALOG as TravelInfo[]).map((row) => ({ ...row, market: 'cn' as const, catalog: true })),
+    ...(KR_TRAVEL_INFO_CATALOG as TravelInfo[]).map((row) => ({ ...row, catalog: true })),
+  ])
   const [photos, setPhotos] = useState<GalleryPhoto[]>([])
   const [editing, setEditing] = useState<TravelInfo | null>(null)
   const [writing, setWriting] = useState(false)
@@ -25,13 +28,16 @@ export function InfoPage(nav: SiteNav) {
   const [busy, setBusy] = useState(false)
 
   useEffect(() => {
-    void listTravelInfo().then(setItems)
+    void listTravelInfo(nav.market).then(setItems)
     void loadGalleryPhotos().then(setPhotos)
-  }, [])
+  }, [nav.market])
 
   const cards = useMemo(
-    () => [...items].sort((a, b) => (a.sort || 80) - (b.sort || 80) || a.place.localeCompare(b.place, 'ko')),
-    [items],
+    () =>
+      [...items]
+        .filter((row) => travelInfoMarket(row) === nav.market)
+        .sort((a, b) => (a.sort || 80) - (b.sort || 80) || a.place.localeCompare(b.place, 'ko')),
+    [items, nav.market],
   )
 
   const uploadMeta = useMemo((): GalleryUploadMeta | undefined => {
@@ -177,6 +183,7 @@ export function InfoPage(nav: SiteNav) {
                   <p className="kicker">{item.place}</p>
                   <h3>{item.title}</h3>
                   <p>{item.body}</p>
+                  {item.spotCount ? <p className="muted">한국관광100선 {item.spotCount}곳</p> : null}
                 </div>
               </button>
               {item.ownerName && !item.catalog ? <p className="muted travel-card-meta">{item.ownerName}</p> : null}

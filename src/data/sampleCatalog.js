@@ -1,3 +1,5 @@
+import { KR_SAMPLE_CATALOG, KR_SAMPLE_GROUPS } from './krSampleCatalog.js'
+
 function addDays(iso, n) {
   const d = new Date(`${iso}T00:00:00`)
   d.setDate(d.getDate() + n)
@@ -152,6 +154,7 @@ function buildSample({
     place,
     title,
     destination: place,
+    market: 'cn',
     trip: {
       id: `sample-${id}`,
       title,
@@ -160,12 +163,13 @@ function buildSample({
       endDate: addDays(start, nights),
       adults: 2,
       children: 0,
+      market: 'cn',
       items,
     },
   }
 }
 
-export const SAMPLE_CATALOG = [
+const CN_SAMPLE_CATALOG_INTERNAL = [
   buildSample({
     id: 'dalian',
     sort: 1,
@@ -669,9 +673,21 @@ export const SAMPLE_CATALOG = [
   }),
 ]
 
-export const SAMPLE_GROUPS = [
+export { KR_SAMPLE_CATALOG, KR_SAMPLE_GROUPS }
+
+export const CN_SAMPLE_CATALOG = CN_SAMPLE_CATALOG_INTERNAL
+export const SAMPLE_CATALOG = [...CN_SAMPLE_CATALOG_INTERNAL, ...KR_SAMPLE_CATALOG]
+
+export const CN_SAMPLE_GROUPS = [
   { nights: 3, label: '3박 4일' },
   { nights: 4, label: '4박 5일' },
   { nights: 5, label: '5박 6일' },
   { nights: 6, label: '6박 7일' },
 ]
+
+/** @deprecated use sampleGroupsForMarket */
+export const SAMPLE_GROUPS = CN_SAMPLE_GROUPS
+
+export function sampleGroupsForMarket(market) {
+  return market === 'kr' ? KR_SAMPLE_GROUPS : CN_SAMPLE_GROUPS
+}

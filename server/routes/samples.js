@@ -17,6 +17,8 @@ function toSample(doc) {
     ownerId: doc.ownerId || undefined,
     ownerName: doc.ownerName || undefined,
     sourceTripId: doc.sourceTripId || undefined,
+    market: doc.market === 'kr' ? 'kr' : 'cn',
+    region: doc.region || undefined,
   }
 }
 
@@ -42,6 +44,8 @@ export async function seedSamples() {
           title: row.title,
           destination: row.destination,
           trip: row.trip,
+          market: row.market === 'kr' ? 'kr' : 'cn',
+          region: row.region || '',
         },
         $setOnInsert: {
           sampleId: row.id,
@@ -67,6 +71,8 @@ function payload(body, fallbackId, user) {
     ownerId,
     ownerName: String(body.ownerName || user?.name || '').trim(),
     sourceTripId: String(body.sourceTripId || trip.id || '').trim(),
+    market: body.market === 'kr' || trip.market === 'kr' ? 'kr' : 'cn',
+    region: String(body.region || '').trim(),
   }
 }
 
