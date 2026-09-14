@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { ItemKind, MealSlot, Trip, TripItem, User, GalleryPhoto } from '../types'
-import { AppNav } from './AppNav'
+import { PageShell } from './PageShell'
 import { FlightSearch } from './FlightSearch'
 import { HotelSearch } from './HotelSearch'
 import { ItemModal } from './ItemModal'
@@ -152,8 +152,7 @@ export function Planner({
   }
 
   return (
-    <div>
-      <AppNav {...nav} />
+    <PageShell {...nav}>
     <div className={`planner-shell${locked ? ' is-locked' : ''}`}>
       <div className="planner-head-sticky">
       <header className="planner-bar">
@@ -448,6 +447,6 @@ export function Planner({
         </div>
       ) : null}
     </div>
-    </div>
+    </PageShell>
   )
 }

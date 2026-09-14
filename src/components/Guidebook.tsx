@@ -1,4 +1,4 @@
-import { AppNav } from './AppNav'
+import { PageShell } from './PageShell'
 import type { Trip } from '../types'
 import { buildGuidebook } from '../lib/guide'
 import type { SiteNav } from '../lib/siteNav'
@@ -12,8 +12,7 @@ export function Guidebook({ trip, onBack, ...nav }: Props) {
   const book = buildGuidebook(trip)
 
   return (
-    <div className="guide-page">
-      <AppNav {...nav} />
+    <PageShell {...nav} shellClass="guide-page">
       <div className="guide-toolbar no-print">
         <div className="wrap" style={{ display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
           <div className="nav-actions">
@@ -68,6 +67,6 @@ export function Guidebook({ trip, onBack, ...nav }: Props) {
           ) : null}
         </section>
       ))}
-    </div>
+    </PageShell>
   )
 }

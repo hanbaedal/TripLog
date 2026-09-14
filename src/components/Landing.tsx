@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
-import { AppNav } from './AppNav'
 import { GalleryHero } from './GalleryHero'
+import { PageShell } from './PageShell'
 import { SampleSlider } from './SampleSlider'
-import { SideMenu } from './SideMenu'
 import type { SampleRecord } from '../types'
 import { SAMPLE_CATALOG } from '../data/sampleCatalog.js'
 import { compareSamples, listSamples } from '../data/samples'
@@ -22,17 +21,11 @@ export function Landing({ onPickSample, ...nav }: Props) {
   const samples = useMemo(() => [...rows].sort(compareSamples), [rows])
 
   return (
-    <div className="home-shell">
-      <AppNav {...nav} />
-      <div className="home-body">
-        <SideMenu {...nav} />
-        <div className="home-main">
-          <GalleryHero onOpen={(id) => nav.go.gallery(id)} />
-          <section className="samples-home">
-            <SampleSlider items={samples} auto onPick={onPickSample} />
-          </section>
-        </div>
-      </div>
-    </div>
+    <PageShell {...nav} shellClass="home-shell">
+      <GalleryHero onOpen={(id) => nav.go.gallery(id)} />
+      <section className="samples-home">
+        <SampleSlider items={samples} auto onPick={onPickSample} />
+      </section>
+    </PageShell>
   )
 }
