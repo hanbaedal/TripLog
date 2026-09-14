@@ -313,6 +313,11 @@ export default function App() {
         setView('infoPlace')
       },
       gallery: goGallery,
+      catalog: (photoId?: string) => {
+        if (!user || !isSupervisor(user)) return
+        setGalleryEditId(photoId || null)
+        setView('catalog')
+      },
       galleryWrite: (photoId?: string) => {
         if (!user) {
           setGalleryEditId(photoId || null)
@@ -423,7 +428,12 @@ export default function App() {
         <ProfilePage {...nav} onSaved={setUser} />
       ) : null}
       {view === 'gallery' ? <GalleryPage {...nav} focusId={galleryFocus} /> : null}
-      {view === 'galleryWrite' ? <GalleryWritePage {...nav} editPhotoId={galleryEditId} /> : null}
+      {view === 'catalog' && user && isSupervisor(user) ? (
+        <GalleryWritePage pageMode="catalog" {...nav} editPhotoId={galleryEditId} />
+      ) : null}
+      {view === 'galleryWrite' ? (
+        <GalleryWritePage pageMode="upload" {...nav} editPhotoId={galleryEditId} />
+      ) : null}
       {view === 'board' ? <BoardPage {...nav} /> : null}
       {view === 'inquiry' ? <InquiryPage {...nav} /> : null}
       {view === 'sitemap' ? <SitemapPage {...nav} /> : null}

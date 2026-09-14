@@ -143,19 +143,10 @@ export function GalleryPage({ focusId, ...nav }: Props) {
           <div className="section-head">
             <h2>갤러리</h2>
             <div className="nav-actions">
-              {supervisor ? (
-                <button className="btn ghost" type="button" onClick={() => nav.go.galleryWrite()}>
-                  카탈로그 관리
-                </button>
-              ) : null}
               {nav.user ? (
-              <button
-                className="btn ghost"
-                type="button"
-                onClick={() => nav.go.galleryWrite()}
-              >
-                사진 올리기
-              </button>
+                <button className="btn ghost" type="button" onClick={() => nav.go.galleryWrite()}>
+                  사진 올리기
+                </button>
               ) : null}
             </div>
           </div>
@@ -200,7 +191,10 @@ export function GalleryPage({ focusId, ...nav }: Props) {
                       <button
                         className="btn ghost gallery-card-edit"
                         type="button"
-                        onClick={() => nav.go.galleryWrite(photo.id)}
+                        onClick={() => {
+                          if (supervisor && photo.catalog) nav.go.catalog(photo.id)
+                          else nav.go.galleryWrite(photo.id)
+                        }}
                       >
                         수정
                       </button>

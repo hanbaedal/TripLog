@@ -15,7 +15,7 @@ const GROUPS: SitemapGroup[] = [
   {
     title: '관리',
     tone: 'admin',
-    ids: ['taxonomyCity', 'taxonomyCategory', 'taxonomySightType', 'taxonomyFoodType', 'usersAdmin'],
+    ids: ['catalog', 'taxonomyCity', 'taxonomyCategory', 'taxonomySightType', 'taxonomyFoodType', 'usersAdmin'],
   },
 ]
 
@@ -69,6 +69,11 @@ export function SitemapPage(nav: SiteNav) {
             <article className="sitemap-card sitemap-card-account">
               <h3>내 계정</h3>
               <div className="sitemap-card-links">
+                {isSupervisor(nav.user) ? (
+                  <button className="sitemap-link" type="button" onClick={() => nav.go.catalog()}>
+                    카탈로그
+                  </button>
+                ) : null}
                 <button className="sitemap-link" type="button" onClick={() => nav.go.galleryWrite()}>
                   갤러리 등록
                 </button>

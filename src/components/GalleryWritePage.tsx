@@ -12,6 +12,7 @@ import type { SiteNav } from '../lib/siteNav'
 
 type Props = SiteNav & {
   editPhotoId?: string | null
+  pageMode?: 'catalog' | 'upload'
 }
 
 function EditableGalleryList({
@@ -81,6 +82,7 @@ function GalleryPhotoForm({
   onSubmit,
   onCancel,
   submitLabel,
+  catalogMode = false,
 }: {
   values: PhotoFormValues
   onChange: (patch: Partial<PhotoFormValues>) => void
@@ -92,6 +94,7 @@ function GalleryPhotoForm({
   onSubmit: (e: FormEvent) => void
   onCancel?: () => void
   submitLabel: string
+  catalogMode?: boolean
 }) {
   const uploadMeta = useMemo(() => {
     if (!values.city || !values.category) return undefined
@@ -104,7 +107,7 @@ function GalleryPhotoForm({
 
   return (
     <form className="board-form gallery-write-form gallery-write-compact" onSubmit={(e) => void onSubmit(e)}>
-      <div className="gallery-write-grid">
+      <div className="gallery-write-stack">
         <ImagePicker
           photoId={values.photoId}
           pendingSrc={values.pendingSrc}
@@ -143,7 +146,7 @@ function GalleryPhotoForm({
               required
             />
           </label>
-          {supervisor && !editing ? (
+          {supervisor && !editing && !catalogMode ? (
             <label className="check-row gallery-write-catalog">
               <input
                 type="checkbox"
@@ -180,9 +183,15 @@ const EMPTY_FORM: PhotoFormValues = {
   asCatalog: false,
 }
 
-export function GalleryWritePage({ editPhotoId, ...nav }: Props) {
+const CATALOG_REGISTER: PhotoFormValues = {
+  ...EMPTY_FORM,
+  asCatalog: true,
+}
+
+export function GalleryWritePage({ editPhotoId, pageMode = 'upload', ...nav }: Props) {
+  const catalogMode = pageMode === 'catalog'
   const [photos, setPhotos] = useState<GalleryPhoto[]>([])
-  const [register, setRegister] = useState<PhotoFormValues>(EMPTY_FORM)
+  const [register, setRegister] = useState<PhotoFormValues>(catalogMode ? CATALOG_REGISTER : EMPTY_FORM)
   const [registerBusy, setRegisterBusy] = useState(false)
   const [registerError, setRegisterError] = useState('')
   const [editing, setEditing] = useState<GalleryPhoto | null>(null)
@@ -196,8 +205,12 @@ export function GalleryWritePage({ editPhotoId, ...nav }: Props) {
       nav.go.auth()
       return
     }
+    if (catalogMode && !isSupervisor(nav.user)) {
+      nav.go.home()
+      return
+    }
     void loadGalleryPhotos().then(setPhotos)
-  }, [nav.user])
+  }, [nav.user, catalogMode])
 
   const editable = useMemo(
     () => photos.filter((photo) => canEditGallery(photo, nav.user)),
@@ -274,7 +287,11 @@ export function GalleryWritePage({ editPhotoId, ...nav }: Props) {
         sightType: values.category === 'sight' ? values.sightType || 'town' : undefined,
         ownerId: target?.ownerId || nav.user.id,
         ownerName: target?.ownerName || nav.user.name,
-        catalog: supervisor ? Boolean(target?.catalog || values.asCatalog) : undefined,
+        catalog: catalogMode
+          ? true
+          : supervisor
+            ? Boolean(target?.catalog || values.asCatalog)
+            : undefined,
         at: target?.at,
       })
       const rows = await listGallery()
@@ -290,7 +307,7 @@ export function GalleryWritePage({ editPhotoId, ...nav }: Props) {
   async function submitRegister(e: FormEvent) {
     e.preventDefault()
     await persistPhoto(register, null, setRegisterBusy, setRegisterError, () => {
-      setRegister(EMPTY_FORM)
+      setRegister(catalogMode ? CATALOG_REGISTER : EMPTY_FORM)
     })
   }
 
@@ -311,14 +328,14 @@ export function GalleryWritePage({ editPhotoId, ...nav }: Props) {
     <PageShell {...nav}>
       <section className="wrap section">
         <div className="section-head">
-          <h2>{supervisor ? '카탈로그 관리' : '갤러리 등록'}</h2>
+          <h2>{catalogMode ? '카탈로그' : '갤러리 등록'}</h2>
           <button className="btn ghost" type="button" onClick={() => nav.go.gallery()}>
-            갤러리
+            {catalogMode ? '갤러리 보기' : '갤러리'}
           </button>
         </div>
-        {supervisor ? (
+        {catalogMode ? (
           <p className="muted gallery-write-note">
-            목록에서 사진을 누르면 수정합니다. 새 사진은 아래 폼에서 등록합니다.
+            사이트 기본 사진(카탈로그)을 등록·수정합니다. 회원 사진은 아래에서 함께 관리할 수 있습니다.
           </p>
         ) : (
           <p className="muted gallery-write-note">도시·분류·제목·사진을 입력한 뒤 등록합니다.</p>
@@ -328,13 +345,14 @@ export function GalleryWritePage({ editPhotoId, ...nav }: Props) {
           onChange={(patch) => setRegister((prev) => ({ ...prev, ...patch }))}
           user={nav.user}
           supervisor={supervisor}
+          catalogMode={catalogMode}
           busy={registerBusy}
           error={registerError}
           onSubmit={submitRegister}
           submitLabel="등록"
         />
 
-        {supervisor ? (
+        {catalogMode ? (
           <>
             <div className="section-head">
               <h2>카탈로그 사진</h2>
@@ -373,6 +391,7 @@ export function GalleryWritePage({ editPhotoId, ...nav }: Props) {
               onChange={(patch) => setEditForm((prev) => ({ ...prev, ...patch }))}
               user={nav.user}
               supervisor={supervisor}
+              catalogMode={catalogMode}
               editing={editing}
               busy={editBusy}
               error={editError}

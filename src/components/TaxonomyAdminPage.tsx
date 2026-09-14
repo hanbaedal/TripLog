@@ -215,8 +215,8 @@ export function TaxonomyAdminPage({ kind, ...nav }: SiteNav & { kind: TaxonomyKi
       <section className="wrap section">
         <div className="section-head">
           <h2>{KIND_LABEL[kind]}</h2>
-          <button className="btn ghost" type="button" onClick={() => nav.go.galleryWrite()}>
-            갤러리
+          <button className="btn ghost" type="button" onClick={() => nav.go.catalog()}>
+            카탈로그
           </button>
         </div>
         <p className="muted taxonomy-admin-note">

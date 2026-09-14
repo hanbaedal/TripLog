@@ -1621,11 +1621,9 @@ p {
   background: var(--cream);
 }
 
-.gallery-write-grid {
+.gallery-write-stack {
   display: grid;
-  grid-template-columns: minmax(108px, 132px) minmax(0, 1fr);
   gap: 12px;
-  align-items: start;
 }
 
 .gallery-write-meta {
@@ -1676,19 +1674,29 @@ p {
 }
 
 .gallery-write-compact-modal {
-  max-width: min(560px, 94vw);
+  max-width: min(480px, 94vw);
+}
+
+.gallery-edit-modal .gallery-write-compact {
+  padding: 12px;
+  margin-bottom: 0;
+}
+
+.gallery-edit-modal .gallery-write-stack {
+  gap: 10px;
 }
 
 .image-picker-compact .image-picker-body {
-  display: grid;
-  grid-template-columns: 96px minmax(0, 1fr);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   gap: 10px;
-  align-items: start;
 }
 
 .image-picker-thumb {
-  width: 96px;
+  width: 88px;
   aspect-ratio: 4 / 3;
+  flex-shrink: 0;
   border-radius: 10px;
   overflow: hidden;
   background: #111;
@@ -1709,38 +1717,35 @@ p {
   color: var(--muted);
 }
 
-.image-picker-compact .image-picker-side {
-  display: grid;
-  gap: 6px;
+.image-picker-compact .image-picker-actions {
+  display: flex;
+  flex: 1 1 180px;
+  flex-wrap: wrap;
+  gap: 8px;
   min-width: 0;
 }
 
-.image-picker-compact .image-picker-label {
-  font-size: 0.78rem;
-}
-
-.image-picker-compact .image-picker-actions {
-  display: grid;
-  gap: 6px;
-}
-
 .image-picker-compact .image-picker-actions .btn {
-  width: 100%;
-  padding: 7px 8px;
-  font-size: 0.78rem;
+  width: auto;
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 8px 12px;
+  font-size: 0.82rem;
+  white-space: nowrap;
 }
 
 @media (max-width: 560px) {
-  .gallery-write-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .image-picker-compact .image-picker-body {
-    grid-template-columns: 80px minmax(0, 1fr);
-  }
-
   .image-picker-thumb {
-    width: 80px;
+    width: 72px;
+  }
+
+  .image-picker-compact .image-picker-actions {
+    flex: 1 1 140px;
+  }
+
+  .image-picker-compact .image-picker-actions .btn {
+    font-size: 0.78rem;
+    padding: 7px 10px;
   }
 
   .gallery-taxonomy-row {

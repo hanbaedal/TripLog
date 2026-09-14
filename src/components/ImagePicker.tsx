@@ -128,17 +128,14 @@ export function ImagePicker({
     <div className={compact ? 'image-picker image-picker-compact' : 'image-picker'}>
       {compact ? (
         <div className="image-picker-body">
-          <div className="image-picker-thumb">
+          <div className="image-picker-thumb" aria-label={label}>
             {previewSrc ? (
               <img className="image-picker-thumb-img" src={previewSrc} alt="" />
             ) : (
-              <span className="image-picker-thumb-empty">사진</span>
+              <span className="image-picker-thumb-empty">미리보기</span>
             )}
           </div>
-          <div className="image-picker-side">
-            <span className="image-picker-label">{label}</span>
-            {actions}
-          </div>
+          {actions}
         </div>
       ) : (
         <>

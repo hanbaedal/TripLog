@@ -9,6 +9,7 @@ export type AppView =
   | 'info'
   | 'infoPlace'
   | 'gallery'
+  | 'catalog'
   | 'galleryWrite'
   | 'board'
   | 'inquiry'
@@ -27,6 +28,7 @@ export type SiteGo = {
   info: () => void
   infoPlace: (cityId: string) => void
   gallery: (photoId?: string) => void
+  catalog: (photoId?: string) => void
   galleryWrite: (photoId?: string) => void
   board: () => void
   inquiry: () => void
@@ -66,6 +68,7 @@ export const TAXONOMY_ADMIN_LINKS: { id: AppView; label: string }[] = [
 ]
 
 export const SUPERVISOR_LINKS: { id: AppView; label: string }[] = [
+  { id: 'catalog', label: '카탈로그' },
   ...TAXONOMY_ADMIN_LINKS,
   { id: 'usersAdmin', label: '회원 관리' },
 ]
@@ -94,6 +97,7 @@ export function goSite(nav: SiteNav, id: AppView) {
   else if (id === 'info') nav.go.info()
   else if (id === 'infoPlace') nav.go.info()
   else if (id === 'gallery') nav.go.gallery()
+  else if (id === 'catalog') nav.go.catalog()
   else if (id === 'board') nav.go.board()
   else if (id === 'inquiry') nav.go.inquiry()
   else if (id === 'sitemap') nav.go.sitemap()
