@@ -1,17 +1,25 @@
-import { useState, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
-import type { ItemKind, MealSlot, TransportMode, TripItem, User } from '../types'
+import type { ItemKind, MealSlot, SightType, TransportMode, TripItem, User } from '../types'
 import { ImagePicker } from './ImagePicker'
+import { SIGHT_TYPES } from '../data/galleryTaxonomy.js'
 import { citySlugFromPlace, guessSightType } from '../data/galleryTaxonomy.js'
 import { itemKindToGalleryCategory } from '../lib/galleryFilter'
 import type { GalleryUploadMeta } from '../lib/galleryResolve'
+import { loadTaxonomy, type TaxonomyRow } from '../lib/taxonomy'
 import { KIND_LABEL, MEAL_LABEL, TRANSPORT_LABEL } from '../lib/costs'
 import { composeFlightItem, parseFlightForm } from '../lib/flightFields'
+import { itemBudget, normalizeTransportMode, withItemBudget } from '../lib/tripItem'
 
 type Props = {
   dayIndex: number
   initial?: TripItem
-  preset?: { kind: ItemKind; mealSlot?: MealSlot }
+  preset?: {
+    kind: ItemKind
+    mealSlot?: MealSlot
+    sightType?: SightType | ''
+    transportMode?: TransportMode
+  }
   user?: User | null
   tripDestination?: string
   onClose: () => void
@@ -20,14 +28,19 @@ type Props = {
 }
 
 const KINDS: ItemKind[] = ['flight', 'hotel', 'meal', 'sight', 'transport']
-const MEALS: MealSlot[] = ['breakfast', 'lunch', 'dinner', 'latenight']
-const MODES: TransportMode[] = ['train', 'bus', 'ferry', 'car', 'walk', 'other']
+const MEALS: MealSlot[] = ['breakfast', 'lunch', 'dinner', 'latenight', 'snack']
+const MODES: TransportMode[] = ['train', 'subway', 'bus', 'tourbus', 'ferry', 'taxi', 'walk', 'other']
+
+function needsSubMenu(kind: ItemKind): boolean {
+  return kind === 'meal' || kind === 'sight' || kind === 'transport'
+}
 
 function defaultTime(kind: ItemKind, mealSlot?: MealSlot): string {
   if (kind === 'meal') {
     if (mealSlot === 'breakfast') return '08:00'
     if (mealSlot === 'lunch') return '12:30'
     if (mealSlot === 'dinner') return '18:30'
+    if (mealSlot === 'snack') return '15:00'
     return '21:30'
   }
   if (kind === 'flight') return '09:00'
@@ -40,32 +53,82 @@ function uid(): string {
   return crypto.randomUUID()
 }
 
+function buildItemPayload(
+  base: Omit<TripItem, 'budgetCost' | 'cost'>,
+  budgetCost: number,
+  actualCost: number | undefined,
+  actualPeople: number | undefined,
+): TripItem {
+  return withItemBudget(
+    {
+      ...base,
+      actualCost,
+      actualPeople,
+    },
+    budgetCost,
+  )
+}
+
 export function ItemModal({ dayIndex, initial, preset, user, tripDestination, onClose, onSave, onDelete }: Props) {
-  const [kind, setKind] = useState<ItemKind>(initial?.kind ?? preset?.kind ?? 'sight')
+  const startKind = initial?.kind ?? preset?.kind ?? 'sight'
+  const [kind, setKind] = useState<ItemKind>(startKind)
+  const [menuLevel, setMenuLevel] = useState<'kind' | 'sub'>(() =>
+    needsSubMenu(startKind) ? 'sub' : 'kind',
+  )
   const [mealSlot, setMealSlot] = useState<MealSlot>(
     initial?.mealSlot ?? preset?.mealSlot ?? 'lunch',
   )
+  const [sightType, setSightType] = useState<SightType | ''>(
+    initial?.sightType ?? preset?.sightType ?? '',
+  )
   const [transportMode, setTransportMode] = useState<TransportMode>(
-    initial?.transportMode ?? 'train',
+    normalizeTransportMode(initial?.transportMode ?? preset?.transportMode) ?? 'train',
+  )
+  const [sightTypes, setSightTypes] = useState<TaxonomyRow[]>(
+    SIGHT_TYPES.map((row, index) => ({
+      slug: row.slug,
+      label: row.label,
+      labelZh: row.labelZh,
+      sort: index + 1,
+    })),
   )
   const [time, setTime] = useState(
-    initial?.time ?? defaultTime(initial?.kind ?? preset?.kind ?? 'sight', preset?.mealSlot),
+    initial?.time ?? defaultTime(startKind, preset?.mealSlot),
   )
   const [title, setTitle] = useState(initial?.title ?? '')
   const [place, setPlace] = useState(initial?.place ?? '')
   const [subtitle, setSubtitle] = useState(initial?.subtitle ?? '')
   const [note, setNote] = useState(initial?.note ?? '')
   const [photoId, setPhotoId] = useState(initial?.photoId ?? initial?.photo ?? '')
-  const [cost, setCost] = useState(initial ? String(initial.cost) : '')
+  const [budgetCost, setBudgetCost] = useState(() =>
+    initial ? String(itemBudget(initial) || '') : '',
+  )
+  const [actualCost, setActualCost] = useState(
+    initial?.actualCost != null ? String(initial.actualCost) : '',
+  )
+  const [actualPeople, setActualPeople] = useState(
+    initial?.actualPeople != null ? String(initial.actualPeople) : '',
+  )
+
+  useEffect(() => {
+    void loadTaxonomy().then((bundle) => {
+      if (bundle.sightTypes.length) setSightTypes(bundle.sightTypes)
+    })
+  }, [])
+
   const uploadMeta = useMemo((): GalleryUploadMeta | undefined => {
     const category = itemKindToGalleryCategory(kind)
     if (!category) return undefined
     return {
       city: citySlugFromPlace(tripDestination) || 'dalian',
       category,
-      sightType: category === 'sight' ? guessSightType(title) || 'town' : '',
+      sightType:
+        category === 'sight'
+          ? sightType || guessSightType(title) || 'town'
+          : '',
     }
-  }, [kind, tripDestination, title])
+  }, [kind, tripDestination, title, sightType])
+
   const parsed = parseFlightForm(initial?.kind === 'flight' ? initial : undefined)
   const [departTerminal, setDepartTerminal] = useState(parsed.departTerminal)
   const [destination, setDestination] = useState(parsed.destination)
@@ -77,6 +140,8 @@ export function ItemModal({ dayIndex, initial, preset, user, tripDestination, on
   function changeKind(next: ItemKind) {
     setKind(next)
     if (!initial) setTime(defaultTime(next, mealSlot))
+    if (needsSubMenu(next)) setMenuLevel('sub')
+    else setMenuLevel('kind')
   }
 
   function changeMeal(next: MealSlot) {
@@ -84,8 +149,23 @@ export function ItemModal({ dayIndex, initial, preset, user, tripDestination, on
     if (!initial) setTime(defaultTime('meal', next))
   }
 
+  function parseMoney(raw: string): number {
+    return Number(raw) || 0
+  }
+
+  function parseOptionalCount(raw: string): number | undefined {
+    const trimmed = raw.trim()
+    if (!trimmed) return undefined
+    const n = Number(trimmed)
+    return n > 0 ? Math.round(n) : undefined
+  }
+
   function submit(e: FormEvent) {
     e.preventDefault()
+    const budget = parseMoney(budgetCost)
+    const actual = parseOptionalCount(actualCost)
+    const people = parseOptionalCount(actualPeople)
+
     if (kind === 'flight') {
       const composed = composeFlightItem({
         departTime: time,
@@ -97,47 +177,61 @@ export function ItemModal({ dayIndex, initial, preset, user, tripDestination, on
         airline,
       })
       if (!composed.flight.flightNo && !composed.flight.destination) return
-      onSave({
-        id: initial?.id ?? uid(),
-        dayIndex: initial?.dayIndex ?? dayIndex,
-        time: composed.time,
-        kind: 'flight',
-        title: composed.title,
-        place: composed.place,
-        subtitle: composed.subtitle,
-        note: note.trim() || undefined,
-        cost: Number(cost) || 0,
-        flight: composed.flight,
-        source: initial?.source,
-      })
+      onSave(
+        buildItemPayload(
+          {
+            id: initial?.id ?? uid(),
+            dayIndex: initial?.dayIndex ?? dayIndex,
+            time: composed.time,
+            kind: 'flight',
+            title: composed.title,
+            place: composed.place,
+            subtitle: composed.subtitle,
+            note: note.trim() || undefined,
+            flight: composed.flight,
+            source: initial?.source,
+          },
+          budget,
+          actual,
+          people,
+        ),
+      )
       return
     }
+
     const trimmed = title.trim()
     if (!trimmed) return
-    const item: TripItem = {
-      id: initial?.id ?? uid(),
-      dayIndex: initial?.dayIndex ?? dayIndex,
-      time,
-      kind,
-      title: trimmed,
-      place: place.trim() || undefined,
-      subtitle: subtitle.trim() || undefined,
-      note: note.trim() || undefined,
-      cost: Number(cost) || 0,
-      mealSlot: kind === 'meal' ? mealSlot : undefined,
-      transportMode: kind === 'transport' ? transportMode : undefined,
-      photoId:
-        kind === 'sight' || kind === 'meal' || kind === 'hotel' || kind === 'transport'
-          ? photoId.trim() || undefined
-          : undefined,
-    }
-    onSave(item)
+    onSave(
+      buildItemPayload(
+        {
+          id: initial?.id ?? uid(),
+          dayIndex: initial?.dayIndex ?? dayIndex,
+          time,
+          kind,
+          title: trimmed,
+          place: place.trim() || undefined,
+          subtitle: subtitle.trim() || undefined,
+          note: note.trim() || undefined,
+          mealSlot: kind === 'meal' ? mealSlot : undefined,
+          sightType: kind === 'sight' && sightType ? sightType : undefined,
+          transportMode: kind === 'transport' ? transportMode : undefined,
+          photoId:
+            kind === 'sight' || kind === 'meal' || kind === 'hotel' || kind === 'transport'
+              ? photoId.trim() || undefined
+              : undefined,
+          source: initial?.source,
+        },
+        budget,
+        actual,
+        people,
+      ),
+    )
   }
 
   return (
     <div className="modal-back" onClick={onClose} role="presentation">
       <form
-        className="modal"
+        className="modal item-modal"
         role="dialog"
         aria-modal="true"
         aria-labelledby="item-modal-title"
@@ -145,19 +239,30 @@ export function ItemModal({ dayIndex, initial, preset, user, tripDestination, on
         onSubmit={submit}
       >
         <h2 id="item-modal-title">{initial ? '일정 수정' : '일정 추가'}</h2>
-        <div className="kind-grid">
-          {KINDS.map((k) => (
-            <button
-              key={k}
-              type="button"
-              className={kind === k ? 'on' : ''}
-              onClick={() => changeKind(k)}
-            >
-              {KIND_LABEL[k]}
+
+        {menuLevel === 'kind' ? (
+          <div className="kind-grid">
+            {KINDS.map((k) => (
+              <button
+                key={k}
+                type="button"
+                className={kind === k ? 'on' : ''}
+                onClick={() => changeKind(k)}
+              >
+                {KIND_LABEL[k]}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div className="item-modal-subhead">
+            <button className="btn ghost item-modal-back" type="button" onClick={() => setMenuLevel('kind')}>
+              ← 항목
             </button>
-          ))}
-        </div>
-        {kind === 'meal' ? (
+            <span className="item-modal-subtitle">{KIND_LABEL[kind]}</span>
+          </div>
+        )}
+
+        {menuLevel === 'sub' && kind === 'meal' ? (
           <div className="slot-grid">
             {MEALS.map((slot) => (
               <button
@@ -171,8 +276,24 @@ export function ItemModal({ dayIndex, initial, preset, user, tripDestination, on
             ))}
           </div>
         ) : null}
-        {kind === 'transport' ? (
-          <div className="slot-grid">
+
+        {menuLevel === 'sub' && kind === 'sight' ? (
+          <div className="slot-grid slot-grid-wide">
+            {sightTypes.map((row) => (
+              <button
+                key={row.slug}
+                type="button"
+                className={sightType === row.slug ? 'on' : ''}
+                onClick={() => setSightType(row.slug as SightType)}
+              >
+                {row.label}
+              </button>
+            ))}
+          </div>
+        ) : null}
+
+        {menuLevel === 'sub' && kind === 'transport' ? (
+          <div className="slot-grid slot-grid-wide">
             {MODES.map((mode) => (
               <button
                 key={mode}
@@ -185,6 +306,7 @@ export function ItemModal({ dayIndex, initial, preset, user, tripDestination, on
             ))}
           </div>
         ) : null}
+
         <div className={kind === 'flight' ? 'form-grid flight-fields' : 'form-grid'}>
           {kind === 'flight' ? (
             <>
@@ -275,22 +397,57 @@ export function ItemModal({ dayIndex, initial, preset, user, tripDestination, on
                 <input
                   value={subtitle}
                   onChange={(e) => setSubtitle(e.target.value)}
-                  placeholder="인원, 객실 타입"
+                  placeholder="객실 타입, 메뉴 등"
                 />
               </label>
             </>
           )}
-          <label className={kind === 'flight' ? 'span-2' : undefined}>
-            예상 비용 (원, 일행 합계)
-            <input
-              type="number"
-              min="0"
-              step="1000"
-              value={cost}
-              onChange={(e) => setCost(e.target.value)}
-              placeholder="0"
-            />
-          </label>
+
+          <fieldset className="span-2 item-cost-fieldset">
+            <legend>예산 (여행 전)</legend>
+            <div className="item-cost-row">
+              <label>
+                비용 (원, 일행 합계)
+                <input
+                  type="number"
+                  min="0"
+                  step="1000"
+                  value={budgetCost}
+                  onChange={(e) => setBudgetCost(e.target.value)}
+                  placeholder="0"
+                />
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset className="span-2 item-cost-fieldset item-cost-actual">
+            <legend>집행 (여행 후)</legend>
+            <div className="item-cost-row">
+              <label>
+                실제 비용 (원)
+                <input
+                  type="number"
+                  min="0"
+                  step="1000"
+                  value={actualCost}
+                  onChange={(e) => setActualCost(e.target.value)}
+                  placeholder="미입력"
+                />
+              </label>
+              <label>
+                실제 인원 (명)
+                <input
+                  type="number"
+                  min="1"
+                  max="99"
+                  value={actualPeople}
+                  onChange={(e) => setActualPeople(e.target.value)}
+                  placeholder="미입력"
+                />
+              </label>
+            </div>
+          </fieldset>
+
           {kind === 'sight' || kind === 'meal' || kind === 'hotel' || kind === 'transport' ? (
             <div className="span-2">
               <ImagePicker

@@ -13,6 +13,7 @@ import type { SiteNav } from '../lib/siteNav'
 type Props = SiteNav & {
   editPhotoId?: string | null
   pageMode?: 'catalog' | 'upload'
+  onEditClose?: () => void
 }
 
 function EditableGalleryList({
@@ -188,7 +189,7 @@ const CATALOG_REGISTER: PhotoFormValues = {
   asCatalog: true,
 }
 
-export function GalleryWritePage({ editPhotoId, pageMode = 'upload', ...nav }: Props) {
+export function GalleryWritePage({ editPhotoId, pageMode = 'upload', onEditClose, ...nav }: Props) {
   const catalogMode = pageMode === 'catalog'
   const [photos, setPhotos] = useState<GalleryPhoto[]>([])
   const [register, setRegister] = useState<PhotoFormValues>(catalogMode ? CATALOG_REGISTER : EMPTY_FORM)
@@ -219,6 +220,11 @@ export function GalleryWritePage({ editPhotoId, pageMode = 'upload', ...nav }: P
 
   const catalogPhotos = useMemo(() => editable.filter((photo) => photo.catalog), [editable])
   const memberPhotos = useMemo(() => editable.filter((photo) => !photo.catalog), [editable])
+  const uploadListLabel = catalogMode
+    ? '회원 사진'
+    : supervisor
+      ? '내·회원 사진'
+      : '내가 올린 사진'
 
   function photoToForm(photo: GalleryPhoto): PhotoFormValues {
     return {
@@ -248,6 +254,7 @@ export function GalleryWritePage({ editPhotoId, pageMode = 'upload', ...nav }: P
     setEditing(null)
     setEditForm(EMPTY_FORM)
     setEditError('')
+    onEditClose?.()
   }
 
   async function persistPhoto(
@@ -273,11 +280,7 @@ export function GalleryWritePage({ editPhotoId, pageMode = 'upload', ...nav }: P
         setError('갤러리에서 사진을 선택해 주세요.')
         return
       }
-      const existing =
-        target ??
-        (values.photoId
-          ? photos.find((row) => row.id === values.photoId && canEditGallery(row, nav.user))
-          : undefined)
+      const existing = target
       const saved = await saveGalleryPhoto({
         id: existing?.id || '',
         title: values.title.trim(),
@@ -368,7 +371,7 @@ export function GalleryWritePage({ editPhotoId, pageMode = 'upload', ...nav }: P
         ) : (
           <>
             <div className="section-head">
-              <h2>내가 올린 사진</h2>
+              <h2>{uploadListLabel}</h2>
             </div>
             <EditableGalleryList photos={memberPhotos} onEdit={startEdit} onRemove={remove} />
           </>

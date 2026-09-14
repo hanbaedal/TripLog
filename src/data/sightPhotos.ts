@@ -300,8 +300,11 @@ const HOTEL_KEYS: { keys: string[]; url: string }[] = [
 
 const TRANSPORT_BY_MODE: Record<string, string> = {
   train: wm('China Railway High-speed.jpg'),
+  subway: wm('China Railway High-speed.jpg'),
   bus: wm('Airport bus.jpg'),
+  tourbus: wm('Coach bus China.jpg'),
   ferry: wm('Star Ferry.jpg'),
+  taxi: wm('China highway.jpg'),
   car: wm('China highway.jpg'),
   walk: wm('Pedestrian street China.jpg'),
   other: wm('Cable car.jpg'),

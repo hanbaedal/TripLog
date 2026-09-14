@@ -1,8 +1,18 @@
 export type ItemKind = 'flight' | 'hotel' | 'meal' | 'sight' | 'transport'
 
-export type MealSlot = 'breakfast' | 'lunch' | 'dinner' | 'latenight'
+export type MealSlot = 'breakfast' | 'lunch' | 'dinner' | 'latenight' | 'snack'
 
-export type TransportMode = 'train' | 'bus' | 'ferry' | 'car' | 'walk' | 'other'
+export type TransportMode =
+  | 'train'
+  | 'subway'
+  | 'bus'
+  | 'tourbus'
+  | 'ferry'
+  | 'taxi'
+  | 'walk'
+  | 'other'
+
+export type SightType = 'mountain' | 'lake' | 'beach' | 'palace' | 'temple' | 'town' | 'park'
 
 export type FlightFields = {
   departTerminal?: string
@@ -24,8 +34,13 @@ export type TripItem = {
   note?: string
   photo?: string
   photoId?: string
-  cost: number
+  /** @deprecated budgetCost 사용 */
+  cost?: number
+  budgetCost?: number
+  actualCost?: number
+  actualPeople?: number
   mealSlot?: MealSlot
+  sightType?: SightType
   transportMode?: TransportMode
   source?: 'manual' | 'connect'
   flight?: FlightFields
@@ -67,8 +82,6 @@ export type User = {
 }
 
 export type GalleryCategory = 'sight' | 'meal' | 'hotel' | 'transport' | 'flight'
-
-export type SightType = 'mountain' | 'lake' | 'beach' | 'palace' | 'temple' | 'town' | 'park'
 
 export type FoodType =
   | 'beijingkaoya'

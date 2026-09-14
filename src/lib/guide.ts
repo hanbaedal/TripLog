@@ -1,5 +1,6 @@
 import type { Trip, TripItem } from '../types'
 import { KIND_LABEL, MEAL_LABEL, TRANSPORT_LABEL, krw, summarize } from './costs'
+import { itemActual, itemBudget } from './tripItem'
 import { dayCount, dateOn, formatLong, formatRange } from './dates'
 
 export type GuideBlock = {
@@ -27,9 +28,17 @@ function sortedDay(items: TripItem[], dayIndex: number): TripItem[] {
     .sort((a, b) => a.time.localeCompare(b.time))
 }
 
+function rowCost(item: TripItem): string {
+  const budget = itemBudget(item)
+  const actual = itemActual(item)
+  if (actual != null) return `${krw(budget)} → ${krw(actual)}`
+  return budget ? krw(budget) : '—'
+}
+
 function itemDetail(item: TripItem): string {
   const bits: string[] = []
   if (item.kind === 'meal' && item.mealSlot) bits.push(MEAL_LABEL[item.mealSlot])
+  if (item.actualPeople) bits.push(`집행 ${item.actualPeople}명`)
   if (item.kind === 'transport' && item.transportMode) {
     bits.push(TRANSPORT_LABEL[item.transportMode] ?? item.transportMode)
   }
@@ -96,7 +105,11 @@ export function buildGuidebook(trip: Trip): Guidebook {
   const peopleText = `성인 ${trip.adults}명${trip.children ? ` · 소아 ${trip.children}명` : ''} · 총 ${summary.people}명`
 
   const overview: string[] = [
-    `${trip.destination || '여행지'} ${nights}박 ${days}일 일정입니다. ${peopleText} 기준으로 예상 비용은 합계 ${krw(summary.total)}, 1인당 ${krw(summary.perPerson)}입니다.`,
+    `${trip.destination || '여행지'} ${nights}박 ${days}일 일정입니다. ${peopleText} 기준 예산 합계 ${krw(summary.total)}, 1인당 ${krw(summary.perPerson)}입니다.${
+      summary.actualItemCount
+        ? ` 집행 합계 ${krw(summary.actualTotal)} (차이 ${summary.variance > 0 ? '+' : ''}${krw(Math.abs(summary.variance)).replace('원', '')}원).`
+        : ''
+    }`,
     '항공·호텔·끼니·관광·교통을 하루 타임라인에 모아 두면, 아래 안내서는 그 기록에서 바로 만들어집니다.',
   ]
 
@@ -119,7 +132,7 @@ export function buildGuidebook(trip: Trip): Guidebook {
         time: `${f.dayIndex + 1}일차 ${f.time}`,
         label: f.title,
         detail: itemDetail(f),
-        cost: krw(f.cost),
+        cost: rowCost(f),
       })),
     },
     {
@@ -132,7 +145,7 @@ export function buildGuidebook(trip: Trip): Guidebook {
         time: `${h.dayIndex + 1}일차 ${h.time}`,
         label: h.title,
         detail: itemDetail(h),
-        cost: krw(h.cost),
+        cost: rowCost(h),
       })),
     },
   ]
@@ -147,12 +160,12 @@ export function buildGuidebook(trip: Trip): Guidebook {
         time: item.time,
         label: item.title,
         detail: itemDetail(item),
-        cost: krw(item.cost),
+        cost: rowCost(item),
       })),
     })
   }
 
-  const mealRows = (['breakfast', 'lunch', 'dinner', 'latenight'] as const).map((slot) => ({
+  const mealRows = (['breakfast', 'lunch', 'dinner', 'latenight', 'snack'] as const).map((slot) => ({
     label: MEAL_LABEL[slot],
     detail: '끼니별 합계',
     cost: krw(summary.byMeal[slot]),
@@ -160,23 +173,30 @@ export function buildGuidebook(trip: Trip): Guidebook {
 
   blocks.push({
     kicker: 'Meals',
-    title: '식사 계획 (조·중·석·야)',
-    paragraphs: ['아침부터 밤 간식까지 네 끼를 나눠 적으면, 맛집만 따로 엑셀에 적지 않아도 됩니다.'],
+    title: '식사 계획 (조·중·석·야·간식)',
+    paragraphs: ['끼니별로 나눠 적으면, 맛집만 따로 엑셀에 적지 않아도 됩니다.'],
     rows: mealRows,
   })
 
-  const kindRows = (['flight', 'hotel', 'meal', 'sight', 'transport'] as const).map((kind) => ({
-    label: KIND_LABEL[kind],
-    detail: '카테고리 합계',
-    cost: krw(summary.byKind[kind]),
-  }))
+  const kindRows = (['flight', 'hotel', 'meal', 'sight', 'transport'] as const).map((kind) => {
+    const budget = summary.byKindBudget[kind]
+    const actual = summary.byKindActual[kind]
+    const delta = summary.byKindVariance[kind]
+    return {
+      label: KIND_LABEL[kind],
+      detail: actual ? `집행 ${krw(actual)} · 차이 ${delta > 0 ? '+' : delta < 0 ? '−' : ''}${krw(Math.abs(delta)).replace('원', '')}원` : '예산 합계',
+      cost: budget ? krw(budget) : '—',
+    }
+  })
 
   blocks.push({
     kicker: 'Budget',
-    title: '예상 비용',
+    title: '예산 · 집행',
     paragraphs: [
-      `총 ${krw(summary.total)} · 1인 ${krw(summary.perPerson)} · 하루 평균 ${krw(summary.perDay)}.`,
-      '금액은 항목을 넣을 때마다 다시 계산됩니다. 실제 결제액이 아니라 여행 전 가늠용입니다.',
+      `예산 ${krw(summary.total)} · 1인 ${krw(summary.perPerson)} · 하루 평균 ${krw(summary.perDay)}.${
+        summary.actualItemCount ? ` 집행 ${krw(summary.actualTotal)}.` : ''
+      }`,
+      '집행 금액은 일정 항목에 입력한 실제 비용을 합산합니다.',
     ],
     rows: kindRows,
   })

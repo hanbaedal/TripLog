@@ -57,6 +57,10 @@ export default function App() {
 
   useEffect(() => {
     if ((view === 'trips' || view === 'profile') && !user) setView('home')
+    if (view === 'galleryWrite' && !user) setView('home')
+    if (view === 'catalog' && (!user || !isSupervisor(user))) setView('home')
+    if (view === 'usersAdmin' && (!user || !isSupervisor(user))) setView('home')
+    if (isTaxonomyAdminView(view) && (!user || !isSupervisor(user))) setView('home')
   }, [view, user])
 
   async function persistTrip(next: Trip, forceMine = false, actor: User | null = user): Promise<boolean> {
@@ -292,7 +296,12 @@ export default function App() {
     setView('trips')
   }
 
+  function clearGalleryEdit() {
+    setGalleryEditId(null)
+  }
+
   function goGallery(photoId?: string) {
+    clearGalleryEdit()
     setGalleryFocus(photoId ?? null)
     setView('gallery')
   }
@@ -315,16 +324,16 @@ export default function App() {
       gallery: goGallery,
       catalog: (photoId?: string) => {
         if (!user || !isSupervisor(user)) return
-        setGalleryEditId(photoId || null)
+        setGalleryEditId(photoId ?? null)
         setView('catalog')
       },
       galleryWrite: (photoId?: string) => {
         if (!user) {
-          setGalleryEditId(photoId || null)
+          setGalleryEditId(photoId ?? null)
           askAuth('galleryWrite')
           return
         }
-        setGalleryEditId(photoId || null)
+        setGalleryEditId(photoId ?? null)
         setView('galleryWrite')
       },
       board: () => setView('board'),
@@ -429,10 +438,20 @@ export default function App() {
       ) : null}
       {view === 'gallery' ? <GalleryPage {...nav} focusId={galleryFocus} /> : null}
       {view === 'catalog' && user && isSupervisor(user) ? (
-        <GalleryWritePage pageMode="catalog" {...nav} editPhotoId={galleryEditId} />
+        <GalleryWritePage
+          pageMode="catalog"
+          {...nav}
+          editPhotoId={galleryEditId}
+          onEditClose={clearGalleryEdit}
+        />
       ) : null}
-      {view === 'galleryWrite' ? (
-        <GalleryWritePage pageMode="upload" {...nav} editPhotoId={galleryEditId} />
+      {view === 'galleryWrite' && user ? (
+        <GalleryWritePage
+          pageMode="upload"
+          {...nav}
+          editPhotoId={galleryEditId}
+          onEditClose={clearGalleryEdit}
+        />
       ) : null}
       {view === 'board' ? <BoardPage {...nav} /> : null}
       {view === 'inquiry' ? <InquiryPage {...nav} /> : null}

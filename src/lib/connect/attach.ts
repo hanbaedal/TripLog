@@ -1,6 +1,7 @@
 import type { FlightOffer, HotelOffer, Trip, TripItem } from '../../types'
 import { addDays, dayCount, dayIndexOn } from '../dates'
 import { uid } from '../id'
+import { withItemBudget } from '../tripItem'
 
 export function ensureDate(trip: Trip, date: string): { trip: Trip; dayIndex: number } {
   let next = trip
@@ -43,7 +44,6 @@ export function attachFlight(trip: Trip, offer: FlightOffer): Trip {
       .filter(Boolean)
       .join(' · '),
     note: `연동 검색 · ${offer.cabin} · 잔여 ${offer.seats}석 · ${offer.duration}`,
-    cost: paxCost(offer.price, trip.adults, trip.children),
     source: 'connect',
     flight: {
       departTerminal: koreaBound ? undefined : offer.terminal || undefined,
@@ -54,7 +54,10 @@ export function attachFlight(trip: Trip, offer: FlightOffer): Trip {
       airline: offer.airline,
     },
   }
-  return { ...next, items: [...next.items, item] }
+  return {
+    ...next,
+    items: [...next.items, withItemBudget(item, paxCost(offer.price, trip.adults, trip.children))],
+  }
 }
 
 export function attachHotel(
@@ -87,9 +90,9 @@ export function attachHotel(
         i === 0
           ? `연동 검색 · ${nights}박 ${rooms}객실 · 평점 ${offer.rating}`
           : `${i + 1}박 차 · ${offer.amenities.slice(0, 2).join(', ')}`,
-      cost: offer.nightly * rooms,
       source: 'connect',
     })
+    items[items.length - 1] = withItemBudget(items[items.length - 1], offer.nightly * rooms)
   }
   return { ...next, items: [...next.items, ...items] }
 }
