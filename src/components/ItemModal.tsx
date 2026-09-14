@@ -205,7 +205,7 @@ export function ItemModal({ dayIndex, initial, preset, user, tripDestination, on
                 <input
                   value={destination}
                   onChange={(e) => setDestination(e.target.value)}
-                  placeholder="베이징 다싱 (PKX)"
+                  placeholder="北京 다싱 (PKX)"
                   required
                 />
               </label>

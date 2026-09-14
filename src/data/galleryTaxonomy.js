@@ -3,17 +3,17 @@ export const GALLERY_CITIES = [
   { slug: 'yantai', label: '연태' },
   { slug: 'qingdao', label: '청도' },
   { slug: 'harbin', label: '하얼빈' },
-  { slug: 'beijing', label: '북경' },
-  { slug: 'shanghai', label: '상하이' },
-  { slug: 'hongkong', label: '홍콩' },
-  { slug: 'baekdusan', label: '백두산' },
-  { slug: 'xian', label: '서안' },
-  { slug: 'chengdu', label: '청두' },
-  { slug: 'taihang', label: '태항산' },
-  { slug: 'huangshan', label: '황산' },
-  { slug: 'zhangjiajie', label: '장가계' },
-  { slug: 'yunnan', label: '운남' },
-  { slug: 'guizhou', label: '귀주' },
+  { slug: 'beijing', label: '北京' },
+  { slug: 'shanghai', label: '上海' },
+  { slug: 'hongkong', label: '香港' },
+  { slug: 'baekdusan', label: '长白山' },
+  { slug: 'xian', label: '西安' },
+  { slug: 'chengdu', label: '成都' },
+  { slug: 'taihang', label: '太行山' },
+  { slug: 'huangshan', label: '黄山' },
+  { slug: 'zhangjiajie', label: '张家界' },
+  { slug: 'yunnan', label: '云南' },
+  { slug: 'guizhou', label: '贵州' },
 ]
 
 export const GALLERY_CATEGORIES = [
@@ -49,6 +49,21 @@ export const FOOD_TYPES = [
 ]
 
 const CITY_BY_LABEL = Object.fromEntries(GALLERY_CITIES.map((row) => [row.label, row.slug]))
+const CITY_LEGACY = {
+  북경: 'beijing',
+  베이징: 'beijing',
+  상하이: 'shanghai',
+  홍콩: 'hongkong',
+  백두산: 'baekdusan',
+  서안: 'xian',
+  시안: 'xian',
+  청두: 'chengdu',
+  태항산: 'taihang',
+  황산: 'huangshan',
+  장가계: 'zhangjiajie',
+  운남: 'yunnan',
+  귀주: 'guizhou',
+}
 
 export function citySlugFromPlace(place) {
   const bit = String(place || '')
@@ -56,6 +71,7 @@ export function citySlugFromPlace(place) {
     .trim()
   if (!bit) return ''
   if (CITY_BY_LABEL[bit]) return CITY_BY_LABEL[bit]
+  if (CITY_LEGACY[bit]) return CITY_LEGACY[bit]
   const found = GALLERY_CITIES.find((row) => row.slug === bit)
   return found?.slug || ''
 }

@@ -20,11 +20,10 @@ export async function seedTaxonomy() {
     await TaxonomyOption.updateOne(
       { kind: row.kind, slug: row.slug },
       {
+        $set: { label: row.label, sort: row.sort },
         $setOnInsert: {
           kind: row.kind,
           slug: row.slug,
-          label: row.label,
-          sort: row.sort,
         },
       },
       { upsert: true },

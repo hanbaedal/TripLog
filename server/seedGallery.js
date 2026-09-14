@@ -15,15 +15,14 @@ async function upsertCatalogPhoto(row) {
   await GalleryPhoto.updateOne(
     { photoId: row.id },
     {
+      $set: { title: row.title, ...meta },
       $setOnInsert: {
         photoId: row.id,
-        title: row.title,
         src: row.src,
         catalog: true,
         ownerId: null,
         ownerName: '',
         at: new Date(),
-        ...meta,
       },
     },
     { upsert: true },

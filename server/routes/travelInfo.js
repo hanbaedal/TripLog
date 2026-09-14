@@ -68,10 +68,9 @@ export async function seedTravelInfo() {
     await TravelInfo.updateOne(
       { infoId: row.id },
       {
+        $set: { place: row.place, title: row.title },
         $setOnInsert: {
           infoId: row.id,
-          place: row.place,
-          title: row.title,
           body: row.body,
           photoId,
           src: row.src || '',
