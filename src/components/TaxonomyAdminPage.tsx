@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import { PageShell } from './PageShell'
 import { isSupervisor } from '../lib/auth'
+import { MARKET_SHORT } from '../lib/market'
 import {
   loadTaxonomy,
   nextTaxonomySort,
@@ -11,6 +12,7 @@ import {
   type TaxonomyKind,
   type TaxonomyRow,
 } from '../lib/taxonomy'
+import type { Market } from '../types'
 import type { SiteNav } from '../lib/siteNav'
 
 const KIND_LABEL: Record<TaxonomyKind, string> = {
@@ -20,11 +22,19 @@ const KIND_LABEL: Record<TaxonomyKind, string> = {
   foodType: '음식 종류',
 }
 
-const SLUG_PLACEHOLDER: Record<TaxonomyKind, string> = {
-  city: 'beijing',
-  category: 'sight',
-  sightType: 'mountain',
-  foodType: 'beijingkaoya',
+const SLUG_PLACEHOLDER: Record<Market, Record<TaxonomyKind, string>> = {
+  cn: {
+    city: 'beijing',
+    category: 'sight',
+    sightType: 'mountain',
+    foodType: 'beijingkaoya',
+  },
+  kr: {
+    city: 'kr-seoul',
+    category: 'sight',
+    sightType: 'mountain',
+    foodType: 'bibimbap',
+  },
 }
 
 const ZH_PLACEHOLDER: Record<TaxonomyKind, string> = {
@@ -34,18 +44,28 @@ const ZH_PLACEHOLDER: Record<TaxonomyKind, string> = {
   foodType: '北京烤鸭',
 }
 
-const KO_PLACEHOLDER: Record<TaxonomyKind, string> = {
-  city: '베이징',
-  category: '관광',
-  sightType: '산·협곡',
-  foodType: '베이징 오리구이',
+const KO_PLACEHOLDER: Record<Market, Record<TaxonomyKind, string>> = {
+  cn: {
+    city: '베이징',
+    category: '관광',
+    sightType: '산·협곡',
+    foodType: '베이징 오리구이',
+  },
+  kr: {
+    city: '서울',
+    category: '관광',
+    sightType: '산·협곡',
+    foodType: '비빔밥',
+  },
 }
 
 function TaxonomySection({
+  market,
   kind,
   rows,
   onChange,
 }: {
+  market: Market
   kind: TaxonomyKind
   rows: TaxonomyRow[]
   onChange: (next: TaxonomyBundle) => void
@@ -56,6 +76,7 @@ function TaxonomySection({
   const [sort, setSort] = useState('1')
   const [editing, setEditing] = useState<TaxonomyRow | null>(null)
   const [error, setError] = useState('')
+  const slugLabel = market === 'kr' ? '코드' : '핑yin'
 
   useEffect(() => {
     if (!editing) setSort(String(nextTaxonomySort(rows)))
@@ -83,6 +104,7 @@ function TaxonomySection({
     setError('')
     try {
       const next = await saveTaxonomyRow({
+        market,
         kind,
         slug: slug.trim().toLowerCase(),
         labelZh: labelZh.trim(),
@@ -101,7 +123,7 @@ function TaxonomySection({
     if (!window.confirm(`「${row.label}」 항목을 삭제할까요?`)) return
     setError('')
     try {
-      const next = await removeTaxonomyRow(kind, row.slug)
+      const next = await removeTaxonomyRow(market, kind, row.slug)
       onChange(next)
       if (editing?.slug === row.slug) reset()
     } catch (err) {
@@ -112,30 +134,35 @@ function TaxonomySection({
   return (
     <section className="admin-section">
       <p className="muted taxonomy-admin-count">{rows.length}개 항목</p>
-      <form className="board-form admin-inline-form admin-taxonomy-form" onSubmit={(e) => void submit(e)}>
+      <form
+        className={`board-form admin-inline-form admin-taxonomy-form${market === 'kr' ? ' is-kr' : ''}`}
+        onSubmit={(e) => void submit(e)}
+      >
         <label>
-          핑yin
+          {slugLabel}
           <input
             value={slug}
             onChange={(e) => setSlug(e.target.value)}
-            placeholder={SLUG_PLACEHOLDER[kind]}
+            placeholder={SLUG_PLACEHOLDER[market][kind]}
             required
           />
         </label>
-        <label>
-          중문
-          <input
-            value={labelZh}
-            onChange={(e) => setLabelZh(e.target.value)}
-            placeholder={ZH_PLACEHOLDER[kind]}
-          />
-        </label>
+        {market === 'cn' ? (
+          <label>
+            중문
+            <input
+              value={labelZh}
+              onChange={(e) => setLabelZh(e.target.value)}
+              placeholder={ZH_PLACEHOLDER[kind]}
+            />
+          </label>
+        ) : null}
         <label>
           한글
           <input
             value={label}
             onChange={(e) => setLabel(e.target.value)}
-            placeholder={KO_PLACEHOLDER[kind]}
+            placeholder={KO_PLACEHOLDER[market][kind]}
             required
           />
         </label>
@@ -156,17 +183,17 @@ function TaxonomySection({
       </form>
       {error ? <p className="muted">{error}</p> : null}
       <div className="admin-table admin-taxonomy-table">
-        <div className="admin-row admin-row-taxonomy admin-row-head">
-          <span>핑yin</span>
-          <span>중문</span>
+        <div className={`admin-row admin-row-taxonomy admin-row-head${market === 'kr' ? ' is-kr' : ''}`}>
+          <span>{slugLabel}</span>
+          {market === 'cn' ? <span>중문</span> : null}
           <span>한글</span>
           <span>순번</span>
           <span />
         </div>
         {rows.map((row) => (
-          <div className="admin-row admin-row-taxonomy" key={row.slug}>
+          <div className={`admin-row admin-row-taxonomy${market === 'kr' ? ' is-kr' : ''}`} key={row.slug}>
             <span className="admin-row-code">{row.slug}</span>
-            <span className="admin-row-zh">{row.labelZh || '—'}</span>
+            {market === 'cn' ? <span className="admin-row-zh">{row.labelZh || '—'}</span> : null}
             <span>{row.label}</span>
             <span className="muted">{row.sort ?? ''}</span>
             <div className="nav-actions">
@@ -203,8 +230,9 @@ export function TaxonomyAdminPage({ kind, ...nav }: SiteNav & { kind: TaxonomyKi
       nav.go.home()
       return
     }
-    void loadTaxonomy().then(setBundle)
-  }, [nav.user])
+    setBundle(null)
+    void loadTaxonomy(nav.market).then(setBundle)
+  }, [nav.user, nav.market])
 
   if (!isSupervisor(nav.user)) return null
 
@@ -214,15 +242,21 @@ export function TaxonomyAdminPage({ kind, ...nav }: SiteNav & { kind: TaxonomyKi
     <PageShell {...nav}>
       <section className="wrap section">
         <div className="section-head">
-          <h2>{KIND_LABEL[kind]}</h2>
+          <h2>
+            {KIND_LABEL[kind]}
+            <span className="market-badge">{MARKET_SHORT[nav.market]}</span>
+          </h2>
           <button className="btn ghost" type="button" onClick={() => nav.go.catalog()}>
             카탈로그
           </button>
         </div>
         <p className="muted taxonomy-admin-note">
-          핑yin·중문·한글·순번으로 관리합니다. 저장하면 목록과 갤러리·등록 화면에 바로 반영됩니다.
+          헤더 {nav.market === 'kr' ? '🇰🇷' : '🇨🇳'} 시장별로 관리합니다. 저장하면 해당 시장의 갤러리·등록 화면에
+          바로 반영됩니다.
         </p>
-        {bundle ? <TaxonomySection kind={kind} rows={rows} onChange={setBundle} /> : null}
+        {bundle ? (
+          <TaxonomySection market={nav.market} kind={kind} rows={rows} onChange={setBundle} />
+        ) : null}
       </section>
     </PageShell>
   )

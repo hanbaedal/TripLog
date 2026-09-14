@@ -122,10 +122,11 @@ export function ItemModal({
   )
 
   useEffect(() => {
-    void loadTaxonomy().then((bundle) => {
+    const market = tripMarket === 'kr' ? 'kr' : 'cn'
+    void loadTaxonomy(market).then((bundle) => {
       if (bundle.sightTypes.length) setSightTypes(bundle.sightTypes)
     })
-  }, [])
+  }, [tripMarket])
 
   const uploadMeta = useMemo((): GalleryUploadMeta | undefined => {
     const category = itemKindToGalleryCategory(kind)

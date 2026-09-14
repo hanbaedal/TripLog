@@ -168,6 +168,7 @@ export const TravelSpot = mongoose.models.TravelSpot || mongoose.model('TravelSp
 
 const taxonomySchema = new mongoose.Schema(
   {
+    market: { type: String, enum: ['kr', 'cn'], default: 'cn', required: true, index: true },
     kind: { type: String, enum: ['city', 'category', 'sightType', 'foodType'], required: true, index: true },
     slug: { type: String, required: true, trim: true },
     label: { type: String, required: true, trim: true },
@@ -176,7 +177,7 @@ const taxonomySchema = new mongoose.Schema(
   },
   { timestamps: true },
 )
-taxonomySchema.index({ kind: 1, slug: 1 }, { unique: true })
+taxonomySchema.index({ market: 1, kind: 1, slug: 1 }, { unique: true })
 
 export const TaxonomyOption =
   mongoose.models.TaxonomyOption || mongoose.model('TaxonomyOption', taxonomySchema)

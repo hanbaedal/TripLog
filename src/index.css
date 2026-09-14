@@ -3011,8 +3011,16 @@ p {
   grid-template-columns: repeat(4, minmax(88px, 1fr)) auto;
 }
 
+.admin-taxonomy-form.is-kr {
+  grid-template-columns: repeat(3, minmax(88px, 1fr)) auto;
+}
+
 .admin-row-taxonomy {
   grid-template-columns: minmax(72px, 0.9fr) minmax(56px, 0.8fr) minmax(72px, 0.9fr) 48px auto;
+}
+
+.admin-row-taxonomy.is-kr {
+  grid-template-columns: minmax(72px, 1fr) minmax(88px, 1fr) 48px auto;
 }
 
 .admin-row-taxonomy.admin-row-head {

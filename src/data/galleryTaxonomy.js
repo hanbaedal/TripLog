@@ -36,6 +36,19 @@ export const SIGHT_TYPES = [
   { slug: 'park', label: '공원·테마', labelZh: '公园·主题' },
 ]
 
+export const KR_FOOD_TYPES = [
+  { slug: 'bibimbap', label: '비빔밥' },
+  { slug: 'bulgogi', label: '불고기' },
+  { slug: 'galbi', label: '갈비' },
+  { slug: 'samgyeopsal', label: '삼겹살' },
+  { slug: 'kimchi', label: '김치' },
+  { slug: 'tteokbokki', label: '떡볶이' },
+  { slug: 'naengmyeon', label: '냉면' },
+  { slug: 'jjajangmyeon', label: '짜장면' },
+  { slug: 'bossam', label: '보쌈' },
+  { slug: 'hanjeongsik', label: '한정식' },
+]
+
 export const FOOD_TYPES = [
   { slug: 'beijingkaoya', label: '베이징 오리구이', labelZh: '北京烤鸭' },
   { slug: 'mapodoufu', label: '마파두부', labelZh: '麻婆豆腐' },
@@ -106,8 +119,9 @@ export function guessSightType(name) {
   return 'town'
 }
 
-export function foodTypeLabel(slug) {
-  return FOOD_TYPES.find((row) => row.slug === slug)?.label || slug || ''
+export function foodTypeLabel(slug, market = 'cn') {
+  const list = market === 'kr' ? KR_FOOD_TYPES : FOOD_TYPES
+  return list.find((row) => row.slug === slug)?.label || slug || ''
 }
 
 export function galleryCategoryLabel(slug) {
@@ -152,8 +166,9 @@ export function normalizeSightType(value, category) {
   return 'town'
 }
 
-export function normalizeFoodType(value) {
+export function normalizeFoodType(value, market = 'cn') {
   const slug = String(value || '').trim().toLowerCase()
-  if (FOOD_TYPES.some((row) => row.slug === slug)) return slug
-  return FOOD_TYPES[0]?.slug || 'beijingkaoya'
+  const list = market === 'kr' ? KR_FOOD_TYPES : FOOD_TYPES
+  if (list.some((row) => row.slug === slug)) return slug
+  return list[0]?.slug || (market === 'kr' ? 'bibimbap' : 'beijingkaoya')
 }

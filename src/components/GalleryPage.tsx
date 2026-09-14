@@ -4,8 +4,6 @@ import { listGallery, canEditGallery } from '../lib/community'
 import { galleryMediaSrc } from '../lib/galleryResolve'
 import { isSupervisor } from '../lib/auth'
 import { galleryCityLabel, photoCategoryLabel, photoTaxonomyLabel } from '../lib/galleryFilter'
-import { GALLERY_CATEGORIES, GALLERY_CITIES } from '../data/galleryTaxonomy.js'
-import { KR_GALLERY_CITIES } from '../data/krGalleryCatalog.js'
 import { galleryPhotoMarket } from '../lib/market'
 import { loadTaxonomy, type TaxonomyRow } from '../lib/taxonomy'
 import type { GalleryCategory, GalleryPhoto } from '../types'
@@ -30,34 +28,17 @@ export function GalleryPage({ focusId, ...nav }: Props) {
   const [activeId, setActiveId] = useState<string | null>(() => focusId ?? null)
   const [slideCity, setSlideCity] = useState('')
   const [categoryFilter, setCategoryFilter] = useState<GalleryCategory | ''>('')
-  const citySource = nav.market === 'kr' ? KR_GALLERY_CITIES : GALLERY_CITIES
-  const [cities, setCities] = useState<TaxonomyRow[]>(
-    citySource.map((row, index) => ({
-      slug: row.slug,
-      label: row.label,
-      labelZh: 'labelZh' in row && typeof row.labelZh === 'string' ? row.labelZh : '',
-      sort: index + 1,
-    })),
-  )
+  const [cities, setCities] = useState<TaxonomyRow[]>([])
+  const [categories, setCategories] = useState<TaxonomyRow[]>([])
 
   const supervisor = isSupervisor(nav.user)
 
   useEffect(() => {
     void listGallery(nav.market).then(setPhotos)
-    if (nav.market === 'cn') {
-      void loadTaxonomy().then((bundle) => {
-        if (bundle.cities.length) setCities(bundle.cities)
-      })
-    } else {
-      setCities(
-        KR_GALLERY_CITIES.map((row, index) => ({
-          slug: row.slug,
-          label: row.label,
-          labelZh: '',
-          sort: index + 1,
-        })),
-      )
-    }
+    void loadTaxonomy(nav.market).then((bundle) => {
+      if (bundle.cities.length) setCities(bundle.cities)
+      if (bundle.categories.length) setCategories(bundle.categories)
+    })
   }, [nav.market])
 
   useEffect(() => {
@@ -178,7 +159,7 @@ export function GalleryPage({ focusId, ...nav }: Props) {
                 onChange={(e) => setCategoryFilter(e.target.value as GalleryCategory | '')}
               >
                 <option value="">전체</option>
-                {GALLERY_CATEGORIES.map((row) => (
+                {categories.map((row) => (
                   <option key={row.slug} value={row.slug}>
                     {row.label}
                   </option>
