@@ -14,7 +14,10 @@
     "start": "node server/index.js",
     "preview": "vite preview",
     "android:sync": "npm run build && npx cap sync android",
-    "android:apk": "npm run android:sync && node scripts/build-apk.mjs"
+    "android:apk": "npm run android:sync && node scripts/build-apk.mjs",
+    "seed:catalog-images": "node scripts/seed-catalog-images.mjs all",
+    "seed:catalog-images:food": "node scripts/seed-catalog-images.mjs cn-food",
+    "seed:catalog-images:kr": "node scripts/seed-catalog-images.mjs kr-spots"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.0",

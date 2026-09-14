@@ -23,16 +23,16 @@ export const GALLERY_PHOTOS = [
 
 /** 중국 대표 요리 — 갤러리 meal 카테고리 시드 */
 export const FOOD_PHOTOS = [
-  { id: 'food-beijingkaoya', title: '베이징 오리구이', src: wm('Peking duck.jpg'), catalog: true, city: 'beijing', category: 'meal' },
-  { id: 'food-mapodoufu', title: '마파두부', src: wm('Mapo tofu.jpg'), catalog: true, city: 'chengdu', category: 'meal' },
-  { id: 'food-gongbaojiding', title: '궁보계정', src: wm('Kung Pao chicken.jpg'), catalog: true, city: 'chengdu', category: 'meal' },
-  { id: 'food-tangculiji', title: '탕추리지', src: wm('Sweet and sour pork.jpg'), catalog: true, city: 'shanghai', category: 'meal' },
-  { id: 'food-huoguo', title: '훠궈', src: wm('Hot pot.jpg'), catalog: true, city: 'chengdu', category: 'meal' },
-  { id: 'food-jiaozi', title: '교자', src: wm('Jiaozi.jpg'), catalog: true, city: 'harbin', category: 'meal' },
-  { id: 'food-xiaolongbao', title: '샤오롱바오', src: wm('Xiaolongbao.jpg'), catalog: true, city: 'shanghai', category: 'meal' },
-  { id: 'food-chaofan', title: '볶음밥', src: wm('Yangzhou fried rice.jpg'), catalog: true, city: 'shanghai', category: 'meal' },
-  { id: 'food-chunjuan', title: '춘권', src: wm('Spring rolls.jpg'), catalog: true, city: 'hongkong', category: 'meal' },
-  { id: 'food-lamian', title: '라면(手拉面)', src: wm('Lanzhou lamian.jpg'), catalog: true, city: 'xian', category: 'meal' },
+  { id: 'food-beijingkaoya', title: '베이징 오리구이', src: '/samples/food/food-beijingkaoya.jpg', catalog: true, city: 'beijing', category: 'meal' },
+  { id: 'food-mapodoufu', title: '마파두부', src: '/samples/food/food-mapodoufu.jpg', catalog: true, city: 'chengdu', category: 'meal' },
+  { id: 'food-gongbaojiding', title: '궁보계정', src: '/samples/food/food-gongbaojiding.jpg', catalog: true, city: 'chengdu', category: 'meal' },
+  { id: 'food-tangculiji', title: '탕추리지', src: '/samples/food/food-tangculiji.jpg', catalog: true, city: 'shanghai', category: 'meal' },
+  { id: 'food-huoguo', title: '훠궈', src: '/samples/food/food-huoguo.jpg', catalog: true, city: 'chengdu', category: 'meal' },
+  { id: 'food-jiaozi', title: '교자', src: '/samples/food/food-jiaozi.jpg', catalog: true, city: 'harbin', category: 'meal' },
+  { id: 'food-xiaolongbao', title: '샤오롱바오', src: '/samples/food/food-xiaolongbao.jpg', catalog: true, city: 'shanghai', category: 'meal' },
+  { id: 'food-chaofan', title: '볶음밥', src: '/samples/food/food-chaofan.jpg', catalog: true, city: 'shanghai', category: 'meal' },
+  { id: 'food-chunjuan', title: '춘권', src: '/samples/food/food-chunjuan.jpg', catalog: true, city: 'hongkong', category: 'meal' },
+  { id: 'food-lamian', title: '라면(手拉面)', src: '/samples/food/food-lamian.jpg', catalog: true, city: 'xian', category: 'meal' },
 ]
 
 export const CITY_GALLERY_ID = {
