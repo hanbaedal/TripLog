@@ -77,12 +77,12 @@ export default function App() {
       const owned = { ...next, savedByUser: true }
       const saved = await upsertTrip(owned)
       if (seq !== saveSeq.current) return false
-      setTrip((cur) => (cur.id === saved.id ? saved : cur))
+      setTrip((cur) => (cur.id === saved.id || cur.id === owned.id ? saved : cur))
       setTrips(onlyPersonalTrips(await listTrips()))
-      if (owned.publishedSampleId) {
+      if (saved.publishedSampleId) {
         await saveSample(
           sampleFromTrip(saved, {
-            id: owned.publishedSampleId,
+            id: saved.publishedSampleId,
             sort: 80,
             nights: 1,
             place: saved.destination || '여행',
