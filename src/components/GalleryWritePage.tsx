@@ -5,6 +5,8 @@ import { ImagePicker } from './ImagePicker'
 import { GalleryTaxonomyFields } from './GalleryTaxonomyFields'
 import { isSupervisor } from '../lib/auth'
 import { canEditGallery, listGallery, removeGalleryPhoto, saveGalleryPhoto } from '../lib/community'
+import { galleryPhotoMarket, MARKET_SHORT } from '../lib/market'
+import type { Market } from '../types'
 import { galleryMediaSrc, loadGalleryPhotos, resolvePhotoSrc } from '../lib/galleryResolve'
 import { photoTaxonomyLabel } from '../lib/galleryFilter'
 import type { GalleryCategory, GalleryPhoto, SightType } from '../types'
@@ -84,6 +86,7 @@ function GalleryPhotoForm({
   onCancel,
   submitLabel,
   catalogMode = false,
+  market = 'cn',
 }: {
   values: PhotoFormValues
   onChange: (patch: Partial<PhotoFormValues>) => void
@@ -96,6 +99,7 @@ function GalleryPhotoForm({
   onCancel?: () => void
   submitLabel: string
   catalogMode?: boolean
+  market?: Market
 }) {
   const uploadMeta = useMemo(() => {
     if (!values.city || !values.category) return undefined
@@ -128,6 +132,7 @@ function GalleryPhotoForm({
         <div className="gallery-write-meta">
           <GalleryTaxonomyFields
             compact
+            market={market}
             city={values.city}
             category={values.category}
             sightType={values.sightType}
@@ -211,11 +216,16 @@ export function GalleryWritePage({ editPhotoId, pageMode = 'upload', onEditClose
       return
     }
     void loadGalleryPhotos().then(setPhotos)
-  }, [nav.user, catalogMode])
+  }, [nav.user, catalogMode, nav.market])
+
+  const marketPhotos = useMemo(
+    () => photos.filter((photo) => galleryPhotoMarket(photo) === nav.market),
+    [photos, nav.market],
+  )
 
   const editable = useMemo(
-    () => photos.filter((photo) => canEditGallery(photo, nav.user)),
-    [photos, nav.user],
+    () => marketPhotos.filter((photo) => canEditGallery(photo, nav.user)),
+    [marketPhotos, nav.user],
   )
 
   const catalogPhotos = useMemo(() => editable.filter((photo) => photo.catalog), [editable])
@@ -331,14 +341,18 @@ export function GalleryWritePage({ editPhotoId, pageMode = 'upload', onEditClose
     <PageShell {...nav}>
       <section className="wrap section">
         <div className="section-head">
-          <h2>{catalogMode ? '카탈로그' : '갤러리 등록'}</h2>
+          <h2>
+            {catalogMode ? '카탈로그' : '갤러리 등록'}
+            <span className="market-badge">{MARKET_SHORT[nav.market]}</span>
+          </h2>
           <button className="btn ghost" type="button" onClick={() => nav.go.gallery()}>
             {catalogMode ? '갤러리 보기' : '갤러리'}
           </button>
         </div>
         {catalogMode ? (
           <p className="muted gallery-write-note">
-            사이트 기본 사진(카탈로그)을 등록·수정합니다. 회원 사진은 아래에서 함께 관리할 수 있습니다.
+            {MARKET_SHORT[nav.market]} 시장 기본 사진(카탈로그)을 등록·수정합니다. 다른 시장 사진은 헤더 국기로
+            전환해 관리하세요.
           </p>
         ) : (
           <p className="muted gallery-write-note">도시·분류·제목·사진을 입력한 뒤 등록합니다.</p>
@@ -349,6 +363,7 @@ export function GalleryWritePage({ editPhotoId, pageMode = 'upload', onEditClose
           user={nav.user}
           supervisor={supervisor}
           catalogMode={catalogMode}
+          market={nav.market}
           busy={registerBusy}
           error={registerError}
           onSubmit={submitRegister}
@@ -395,6 +410,7 @@ export function GalleryWritePage({ editPhotoId, pageMode = 'upload', onEditClose
               user={nav.user}
               supervisor={supervisor}
               catalogMode={catalogMode}
+              market={nav.market}
               editing={editing}
               busy={editBusy}
               error={editError}

@@ -34,6 +34,11 @@ export function AppNav({ user, market, setMarket, go, menuOpen, onOpenMenu }: Pr
     <header className="site-header" ref={header}>
       <div className="wrap topnav">
         <div className="header-leading">
+          <button className="brand" type="button" onClick={go.home}>
+            <img className="brand-title" src="/brand/header-brush.png" alt="나만의 맞춤 여행 일지" />
+          </button>
+        </div>
+        <div className="header-user">
           <div className="market-switch" role="group" aria-label="여행 시장 선택">
             <button
               type="button"
@@ -60,11 +65,6 @@ export function AppNav({ user, market, setMarket, go, menuOpen, onOpenMenu }: Pr
               </span>
             </button>
           </div>
-          <button className="brand" type="button" onClick={go.home}>
-            <img className="brand-title" src="/brand/header-brush.png" alt="나만의 맞춤 여행 일지" />
-          </button>
-        </div>
-        <div className="header-user">
           {user ? (
             <button className="header-user-name" type="button" onClick={go.profile}>
               {user.name}

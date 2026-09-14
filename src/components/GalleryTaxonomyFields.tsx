@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react'
 import type { GalleryCategory, SightType } from '../types'
 import { GALLERY_CATEGORIES, GALLERY_CITIES, SIGHT_TYPES } from '../data/galleryTaxonomy.js'
+import { KR_GALLERY_CITIES } from '../data/krGalleryCatalog.js'
 import { loadTaxonomy, type TaxonomyBundle } from '../lib/taxonomy'
+import type { Market } from '../types'
 
 type Props = {
+  market?: Market
   city: string
   category: GalleryCategory | ''
   sightType: SightType | ''
@@ -15,6 +18,7 @@ type Props = {
 }
 
 export function GalleryTaxonomyFields({
+  market = 'cn',
   city,
   category,
   sightType,
@@ -27,10 +31,18 @@ export function GalleryTaxonomyFields({
   const [taxonomy, setTaxonomy] = useState<TaxonomyBundle | null>(null)
 
   useEffect(() => {
+    if (market === 'kr') return
     void loadTaxonomy().then(setTaxonomy)
-  }, [])
+  }, [market])
 
-  const cities = taxonomy?.cities ?? GALLERY_CITIES
+  const cities =
+    market === 'kr'
+      ? KR_GALLERY_CITIES.map((row, index) => ({
+          slug: row.slug,
+          label: row.label,
+          sort: index + 1,
+        }))
+      : taxonomy?.cities ?? GALLERY_CITIES
   const categories = taxonomy?.categories ?? GALLERY_CATEGORIES
   const sightTypes = taxonomy?.sightTypes ?? SIGHT_TYPES
 

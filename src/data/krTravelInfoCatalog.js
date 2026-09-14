@@ -1,7 +1,9 @@
 /** 한국관광100선(2025·2026) 권역별 — 문화체육관광부·한국관광공사 */
 
-function wm(file) {
-  return `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(file)}?width=960`
+import { KR_GALLERY_PHOTOS } from './krGalleryCatalog.js'
+
+function gallerySrc(photoId) {
+  return KR_GALLERY_PHOTOS.find((row) => row.id === photoId)?.src || ''
 }
 
 export const KR_TRAVEL_INFO_CATALOG = [
@@ -12,7 +14,7 @@ export const KR_TRAVEL_INFO_CATALOG = [
     title: '서울',
     body: '한국관광100선 19곳. 경복궁·북촌·N서울타워·한강공원(통합) 등 도심 명소. 지하철·버스 중심 당일·1박 코스에 적합합니다.',
     photoId: 'kr-seoul',
-    src: wm('Gyeongbokgung Palace Korea.jpg'),
+    src: gallerySrc('kr-seoul'),
     catalog: true,
     sort: 0,
     spotCount: 19,
@@ -24,7 +26,7 @@ export const KR_TRAVEL_INFO_CATALOG = [
     title: '강원권',
     body: '한국관광100선 14곳. 설악산·남이섬·속초 바다와 산간 드라이브가 어우러진 권역입니다. 자차·렌터카 이동을 권장합니다.',
     photoId: 'kr-gangwon',
-    src: wm('Seoraksan National Park Korea.jpg'),
+    src: gallerySrc('kr-gangwon'),
     catalog: true,
     sort: 1,
     spotCount: 14,
@@ -36,7 +38,7 @@ export const KR_TRAVEL_INFO_CATALOG = [
     title: '충청권',
     body: '한국관광100선 20곳(대전·세종·충북·충남). 도담삼봉·청남대·공주·부여 등 역사와 호수 여행이 중심입니다.',
     photoId: 'kr-chungcheong',
-    src: wm('Gongju Gongsanseong.jpg'),
+    src: gallerySrc('kr-chungcheong'),
     catalog: true,
     sort: 2,
     spotCount: 20,
@@ -48,7 +50,7 @@ export const KR_TRAVEL_INFO_CATALOG = [
     title: '경기권',
     body: '한국관광100선 경기 15곳. 두물머리·아침고요·헤이리·수원화성 등 수도권 외곽 자연·예술·역사 코스입니다.',
     photoId: 'kr-gyeonggi',
-    src: wm('Suwon Hwaseong.jpg'),
+    src: gallerySrc('kr-gyeonggi'),
     catalog: true,
     sort: 3,
     spotCount: 15,
@@ -60,7 +62,7 @@ export const KR_TRAVEL_INFO_CATALOG = [
     title: '경상권',
     body: '한국관광100선 43곳(부산·대구·울산·경북·경남). 경주 불국사, 부산 해운대, 스페이스워크 등 고도와 바다가 함께합니다.',
     photoId: 'kr-gyeongsang',
-    src: wm('Bulguksa Korea.jpg'),
+    src: gallerySrc('kr-gyeongsang'),
     catalog: true,
     sort: 4,
     spotCount: 43,
@@ -72,7 +74,7 @@ export const KR_TRAVEL_INFO_CATALOG = [
     title: '전라권',
     body: '한국관광100선 25곳(광주·전북·전남). 전주 한옥마을, 순천만, 여수 밤바다 등 미식과 생태가 풍부합니다.',
     photoId: 'kr-jeolla',
-    src: wm('Jeonju Hanok Village.jpg'),
+    src: gallerySrc('kr-jeolla'),
     catalog: true,
     sort: 5,
     spotCount: 25,
@@ -84,7 +86,7 @@ export const KR_TRAVEL_INFO_CATALOG = [
     title: '제주권',
     body: '한국관광100선 6곳. 성산일출봉·우도·비자림·한라산·올레길. 항공+렌터카로 동서부를 알차게 도는 일정에 적합합니다.',
     photoId: 'kr-jeju',
-    src: wm('Seongsan Ilchulbong.jpg'),
+    src: gallerySrc('kr-jeju'),
     catalog: true,
     sort: 6,
     spotCount: 6,

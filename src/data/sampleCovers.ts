@@ -41,15 +41,21 @@ const BY_PLACE: Record<string, string> = {
 
 const KR_FALLBACK: Record<string, string> = {
   'kr-seoul-day':
-    'https://commons.wikimedia.org/wiki/Special:FilePath/Gyeongbokgung%20Palace%20Korea.jpg?width=960',
+    'https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8c/Gyeongbok-gung_palace.jpg/960px-Gyeongbok-gung_palace.jpg',
   'kr-seoul':
-    'https://commons.wikimedia.org/wiki/Special:FilePath/Gyeongbokgung%20Palace%20Korea.jpg?width=960',
-  'kr-gangwon': 'https://commons.wikimedia.org/wiki/Special:FilePath/Seoraksan%20National%20Park%20Korea.jpg?width=960',
-  'kr-chungcheong': 'https://commons.wikimedia.org/wiki/Special:FilePath/Gongju%20Gongsanseong.jpg?width=960',
-  'kr-gyeonggi': 'https://commons.wikimedia.org/wiki/Special:FilePath/Suwon%20Hwaseong.jpg?width=960',
-  'kr-gyeongsang': 'https://commons.wikimedia.org/wiki/Special:FilePath/Bulguksa%20Korea.jpg?width=960',
-  'kr-jeolla': 'https://commons.wikimedia.org/wiki/Special:FilePath/Jeonju%20Hanok%20Village.jpg?width=960',
-  'kr-jeju': 'https://commons.wikimedia.org/wiki/Special:FilePath/Seongsan%20Ilchulbong.jpg?width=960',
+    'https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8c/Gyeongbok-gung_palace.jpg/960px-Gyeongbok-gung_palace.jpg',
+  'kr-gangwon':
+    'https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3a/Footbridge_at_Seoraksan_National_Park.jpg/960px-Footbridge_at_Seoraksan_National_Park.jpg',
+  'kr-chungcheong':
+    'https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1e/View_of_Gongju_02.jpg/960px-View_of_Gongju_02.jpg',
+  'kr-gyeonggi':
+    'https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7a/Suwon_Hwaseong.jpg/960px-Suwon_Hwaseong.jpg',
+  'kr-gyeongsang':
+    'https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b6/Korea-Gyeongju-Bulguksa-04.jpg/960px-Korea-Gyeongju-Bulguksa-04.jpg',
+  'kr-jeolla':
+    'https://thumb.wikimedia.org/wikipedia/commons/thumb/2/22/Jeonju_Hanok_Maeul_02.jpg/960px-Jeonju_Hanok_Maeul_02.jpg',
+  'kr-jeju':
+    'https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b0/Seongsan_Ilchulbong.jpg/960px-Seongsan_Ilchulbong.jpg',
 }
 
 const CATALOG = GALLERY_PHOTOS as GalleryPhoto[]

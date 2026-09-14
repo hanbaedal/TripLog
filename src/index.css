@@ -103,6 +103,7 @@ p {
   align-items: center;
   gap: 8px;
   min-width: 0;
+  flex: 1 1 auto;
 }
 
 .market-switch {
@@ -140,6 +141,30 @@ p {
 .market-flag-emoji {
   font-size: 1.15rem;
   line-height: 1;
+}
+
+.market-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--forest);
+  background: var(--forest-soft);
+  vertical-align: middle;
+}
+
+.market-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--forest);
+  background: var(--forest-soft);
+  vertical-align: middle;
 }
 
 .market-placeholder {

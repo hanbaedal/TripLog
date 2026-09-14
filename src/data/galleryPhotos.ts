@@ -47,5 +47,15 @@ export function galleryPhotoById(id?: string | null): GalleryPhoto | undefined {
 }
 
 export function mergeGallery(userPhotos: GalleryPhoto[]): GalleryPhoto[] {
-  return userPhotos.map(enrichGalleryPhoto).filter(hasDisplayableGallerySrc)
+  const byId = new Map<string, GalleryPhoto>()
+  for (const row of CATALOG_PHOTOS) {
+    if (hasDisplayableGallerySrc(row)) byId.set(row.id, enrichGalleryPhoto(row))
+  }
+  for (const row of userPhotos) {
+    const enriched = enrichGalleryPhoto(row)
+    if (!hasDisplayableGallerySrc(enriched)) continue
+    const seed = byId.get(enriched.id)
+    byId.set(enriched.id, seed ? { ...seed, ...enriched } : enriched)
+  }
+  return [...byId.values()]
 }
