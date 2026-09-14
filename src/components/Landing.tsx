@@ -5,7 +5,7 @@ import { SampleSlider } from './SampleSlider'
 import { SideMenu } from './SideMenu'
 import type { SampleRecord } from '../types'
 import { SAMPLE_CATALOG } from '../data/sampleCatalog.js'
-import { listSamples } from '../data/samples'
+import { compareSamples, listSamples } from '../data/samples'
 import type { SiteNav } from '../lib/siteNav'
 
 type Props = SiteNav & {
@@ -19,10 +19,7 @@ export function Landing({ onPickSample, ...nav }: Props) {
     void listSamples().then(setRows)
   }, [])
 
-  const samples = useMemo(
-    () => [...rows].sort((a, b) => a.sort - b.sort || a.nights - b.nights),
-    [rows],
-  )
+  const samples = useMemo(() => [...rows].sort(compareSamples), [rows])
 
   return (
     <div className="home-shell">

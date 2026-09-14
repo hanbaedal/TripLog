@@ -1,7 +1,6 @@
 import { GalleryPhoto } from './models.js'
-import { GALLERY_PHOTOS, cityGalleryId } from '../src/data/galleryCatalog.js'
-import { TRAVEL_SPOT_CATALOG } from '../src/data/travelSpotCatalog.js'
-import { guessSightType, normalizeCity, normalizeGalleryCategory, normalizeSightType } from '../src/data/galleryTaxonomy.js'
+import { FOOD_PHOTOS, GALLERY_PHOTOS } from '../src/data/galleryCatalog.js'
+import { normalizeCity, normalizeGalleryCategory, normalizeSightType } from '../src/data/galleryTaxonomy.js'
 
 function catalogMeta(row) {
   return {
@@ -11,56 +10,30 @@ function catalogMeta(row) {
   }
 }
 
+async function upsertCatalogPhoto(row) {
+  const meta = catalogMeta(row)
+  await GalleryPhoto.updateOne(
+    { photoId: row.id },
+    {
+      $setOnInsert: {
+        photoId: row.id,
+        title: row.title,
+        src: row.src,
+        catalog: true,
+        ownerId: null,
+        ownerName: '',
+        at: new Date(),
+        ...meta,
+      },
+    },
+    { upsert: true },
+  )
+}
+
 export async function seedGallery() {
-  const srcById = new Map(GALLERY_PHOTOS.map((row) => [row.id, row.src]))
-
-  for (const row of GALLERY_PHOTOS) {
-    const meta = catalogMeta(row)
-    await GalleryPhoto.updateOne(
-      { photoId: row.id },
-      {
-        $set: {
-          title: row.title,
-          src: row.src,
-          catalog: true,
-          ownerName: '',
-          ...meta,
-        },
-        $setOnInsert: {
-          photoId: row.id,
-          ownerId: null,
-          at: new Date(),
-        },
-      },
-      { upsert: true },
-    )
+  for (const row of [...GALLERY_PHOTOS, ...FOOD_PHOTOS]) {
+    await upsertCatalogPhoto(row)
   }
 
-  for (const spot of TRAVEL_SPOT_CATALOG) {
-    const city = normalizeCity(cityGalleryId(spot.cityId))
-    const src = spot.src || srcById.get(city) || ''
-    if (!src) continue
-    const category = 'sight'
-    const sightType = normalizeSightType(guessSightType(spot.name), category)
-    await GalleryPhoto.updateOne(
-      { photoId: spot.id },
-      {
-        $set: {
-          title: spot.name,
-          src,
-          catalog: true,
-          ownerName: '',
-          city,
-          category,
-          sightType,
-        },
-        $setOnInsert: {
-          photoId: spot.id,
-          ownerId: null,
-          at: new Date(),
-        },
-      },
-      { upsert: true },
-    )
-  }
+  await GalleryPhoto.deleteMany({ photoId: /^spot-/ })
 }

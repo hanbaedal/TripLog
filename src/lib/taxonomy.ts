@@ -4,7 +4,7 @@ import {
   GALLERY_CITIES,
   SIGHT_TYPES,
 } from '../data/galleryTaxonomy.js'
-import { api, isRemote } from './remote'
+import { api } from './remote'
 
 export type TaxonomyKind = 'city' | 'category' | 'sightType' | 'foodType'
 
@@ -32,23 +32,19 @@ export function invalidateTaxonomyCache() {
 
 export async function loadTaxonomy(): Promise<TaxonomyBundle> {
   if (cache) return cache
-  if (isRemote()) {
-    try {
-      const data = await api<TaxonomyBundle>('/taxonomy')
-      cache = {
-        cities: data.cities || [],
-        categories: data.categories || [],
-        sightTypes: data.sightTypes || [],
-        foodTypes: data.foodTypes || [],
-      }
-      return cache
-    } catch {
-      cache = FALLBACK
-      return cache
+  try {
+    const data = await api<TaxonomyBundle>('/taxonomy')
+    cache = {
+      cities: data.cities || [],
+      categories: data.categories || [],
+      sightTypes: data.sightTypes || [],
+      foodTypes: data.foodTypes || [],
     }
+    return cache
+  } catch {
+    cache = FALLBACK
+    return cache
   }
-  cache = FALLBACK
-  return cache
 }
 
 export function nextTaxonomySort(rows: TaxonomyRow[]): number {
@@ -63,7 +59,6 @@ export async function saveTaxonomyRow(input: {
   sort?: number
   prevSlug?: string
 }): Promise<TaxonomyBundle> {
-  if (!isRemote()) throw new Error('분류 관리는 서버 연결 시에만 가능합니다.')
   if (input.prevSlug) {
     cache = await api<TaxonomyBundle>(`/taxonomy/${input.kind}/${input.prevSlug}`, {
       method: 'PUT',
@@ -81,7 +76,6 @@ export async function saveTaxonomyRow(input: {
 }
 
 export async function removeTaxonomyRow(kind: TaxonomyKind, slug: string): Promise<TaxonomyBundle> {
-  if (!isRemote()) throw new Error('분류 관리는 서버 연결 시에만 가능합니다.')
   cache = await api<TaxonomyBundle>(`/taxonomy/${kind}/${slug}`, { method: 'DELETE' })
   invalidateTaxonomyCache()
   cache = await loadTaxonomy()

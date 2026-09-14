@@ -30,7 +30,7 @@ export function ProfilePage({ onSaved, ...nav }: Props) {
     setError('')
     setBusy(true)
     try {
-      const available = await checkEmailAvailable(email, user.id)
+      const available = await checkEmailAvailable(email)
       if (!available) {
         setEmailChecked('')
         setError('이미 가입된 이메일입니다.')

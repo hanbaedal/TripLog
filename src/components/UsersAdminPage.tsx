@@ -3,7 +3,6 @@ import type { FormEvent } from 'react'
 import { PageShell } from './PageShell'
 import { isSupervisor } from '../lib/auth'
 import { listUsers, removeUser, updateUser, type AdminUser } from '../lib/admin'
-import { isRemote } from '../lib/remote'
 import type { SiteNav } from '../lib/siteNav'
 
 export function UsersAdminPage(nav: SiteNav) {
@@ -87,71 +86,67 @@ export function UsersAdminPage(nav: SiteNav) {
         <div className="section-head">
           <h2>회원 관리</h2>
         </div>
-        {!isRemote() ? (
-          <p className="muted">회원 관리는 서버(Render) 배포 환경에서 이용할 수 있습니다.</p>
-        ) : (
-          <>
-            {editing ? (
-              <div className="modal-back" onClick={reset} role="presentation">
-                <form
-                  className="modal"
-                  role="dialog"
-                  aria-modal="true"
-                  aria-labelledby="user-edit-title"
-                  onClick={(e) => e.stopPropagation()}
-                  onSubmit={(e) => void submit(e)}
-                >
-                  <h2 id="user-edit-title">회원 수정</h2>
-                  <p className="muted">{editing.name} · {editing.email}</p>
-                  <input value={name} onChange={(e) => setName(e.target.value)} placeholder="이름" required />
-                  <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="이메일" required />
-                  <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="전화번호" />
-                  <label>
-                    역할
-                    <select value={role} onChange={(e) => setRole(e.target.value as 'user' | 'supervisor')}>
-                      <option value="user">회원</option>
-                      <option value="supervisor">슈퍼바이저</option>
-                    </select>
-                  </label>
-                  <input
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="새 비밀번호(선택)"
-                    type="password"
-                  />
-                  {error ? <p className="muted">{error}</p> : null}
-                  <div className="modal-actions">
-                    <button className="btn ghost" type="button" onClick={reset}>
-                      취소
-                    </button>
-                    <button className="btn" type="submit">
-                      저장
-                    </button>
-                  </div>
-                </form>
+        {editing ? (
+          <div className="modal-back" onClick={reset} role="presentation">
+            <form
+              className="modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="user-edit-title"
+              onClick={(e) => e.stopPropagation()}
+              onSubmit={(e) => void submit(e)}
+            >
+              <h2 id="user-edit-title">회원 수정</h2>
+              <p className="muted">
+                {editing.name} · {editing.email}
+              </p>
+              <input value={name} onChange={(e) => setName(e.target.value)} placeholder="이름" required />
+              <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="이메일" required />
+              <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="전화번호" />
+              <label>
+                역할
+                <select value={role} onChange={(e) => setRole(e.target.value as 'user' | 'supervisor')}>
+                  <option value="user">회원</option>
+                  <option value="supervisor">슈퍼바이저</option>
+                </select>
+              </label>
+              <input
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="새 비밀번호(선택)"
+                type="password"
+              />
+              {error ? <p className="muted">{error}</p> : null}
+              <div className="modal-actions">
+                <button className="btn ghost" type="button" onClick={reset}>
+                  취소
+                </button>
+                <button className="btn" type="submit">
+                  저장
+                </button>
               </div>
-            ) : null}
-            <div className="admin-table users-table">
-              {rows.map((user) => (
-                <div className="admin-row" key={user.id}>
-                  <span>{user.name}</span>
-                  <span className="admin-row-email">{user.email}</span>
-                  <span className="muted">{user.role === 'supervisor' ? '슈퍼바이저' : '회원'}</span>
-                  <div className="nav-actions">
-                    <button className="btn ghost" type="button" onClick={() => startEdit(user)}>
-                      수정
-                    </button>
-                    {user.id !== nav.user?.id ? (
-                      <button className="btn ghost" type="button" onClick={() => void remove(user.id)}>
-                        삭제
-                      </button>
-                    ) : null}
-                  </div>
-                </div>
-              ))}
+            </form>
+          </div>
+        ) : null}
+        <div className="admin-table users-table">
+          {rows.map((user) => (
+            <div className="admin-row" key={user.id}>
+              <span>{user.name}</span>
+              <span className="admin-row-email">{user.email}</span>
+              <span className="muted">{user.role === 'supervisor' ? '슈퍼바이저' : '회원'}</span>
+              <div className="nav-actions">
+                <button className="btn ghost" type="button" onClick={() => startEdit(user)}>
+                  수정
+                </button>
+                {user.id !== nav.user?.id ? (
+                  <button className="btn ghost" type="button" onClick={() => void remove(user.id)}>
+                    삭제
+                  </button>
+                ) : null}
+              </div>
             </div>
-          </>
-        )}
+          ))}
+        </div>
       </section>
     </PageShell>
   )

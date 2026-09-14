@@ -4,7 +4,7 @@ import { loadGalleryPhotos } from '../lib/galleryResolve'
 import type { GalleryPhoto, SampleRecord } from '../types'
 import { SAMPLE_GROUPS, SAMPLE_CATALOG } from '../data/sampleCatalog.js'
 import { sampleCover } from '../data/sampleCovers'
-import { canManageSample, listSamples, nightsLabel, removeSample } from '../data/samples'
+import { canManageSample, compareSamples, listSamples, nightsLabel, removeSample } from '../data/samples'
 import { isSupervisor } from '../lib/auth'
 import type { SiteNav } from '../lib/siteNav'
 
@@ -28,7 +28,7 @@ export function SampleGallery({ onPick, onEdit, onCreate, onUnpublish, ...nav }:
   const groups = useMemo(() => {
     const known = SAMPLE_GROUPS.map((group: { nights: number; label: string }) => ({
       ...group,
-      items: rows.filter((row) => row.nights === group.nights).sort((a, b) => a.sort - b.sort),
+      items: rows.filter((row) => row.nights === group.nights).sort(compareSamples),
     }))
     const extraNights = [...new Set(rows.map((row) => row.nights))]
       .filter((n) => !SAMPLE_GROUPS.some((g: { nights: number }) => g.nights === n))
@@ -36,7 +36,7 @@ export function SampleGallery({ onPick, onEdit, onCreate, onUnpublish, ...nav }:
     const extra = extraNights.map((nights) => ({
       nights,
       label: nightsLabel(nights),
-      items: rows.filter((row) => row.nights === nights).sort((a, b) => a.sort - b.sort),
+      items: rows.filter((row) => row.nights === nights).sort(compareSamples),
     }))
     return [...known, ...extra].filter((group) => group.items.length > 0 || supervisor)
   }, [rows, supervisor])

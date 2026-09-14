@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import { PageShell } from './PageShell'
 import { isSupervisor } from '../lib/auth'
-import { isRemote } from '../lib/remote'
 import {
   loadTaxonomy,
   nextTaxonomySort,
@@ -178,9 +177,7 @@ export function TaxonomyAdminPage(nav: SiteNav) {
           </button>
         </div>
         <p className="muted taxonomy-admin-note">코드는 중국어 핑인, 이름은 한글로 입력합니다. 순번은 마지막 번호 다음 값이 자동 표시됩니다.</p>
-        {!isRemote() ? (
-          <p className="muted">분류 관리는 서버(Render) 배포 환경에서 이용할 수 있습니다.</p>
-        ) : bundle ? (
+        {bundle ? (
           <>
             <TaxonomySection kind="city" rows={bundle.cities} onChange={setBundle} />
             <TaxonomySection kind="category" rows={bundle.categories} onChange={setBundle} />

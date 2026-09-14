@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import { PageShell } from './PageShell'
-import { ImagePicker } from './ImagePicker'
 import {
   canEditTravelSpot,
   findTravelInfo,
@@ -11,8 +10,7 @@ import {
 } from '../lib/community'
 import { cityGalleryId } from '../data/galleryCatalog.js'
 import { CITY_REGION_ZH } from '../data/spotLocale.js'
-import { guessSightType } from '../data/galleryTaxonomy.js'
-import { loadGalleryPhotos, resolvePhotoSrc, type GalleryUploadMeta } from '../lib/galleryResolve'
+import { loadGalleryPhotos, resolvePhotoSrc } from '../lib/galleryResolve'
 import { formatSpotLabel, mapSearchLinks } from '../lib/mapLinks'
 import type { GalleryPhoto, TravelInfo, TravelSpot } from '../types'
 import type { SiteNav } from '../lib/siteNav'
@@ -32,7 +30,6 @@ export function InfoPlacePage({ cityId, ...nav }: Props) {
   const [addressZh, setAddressZh] = useState('')
   const [body, setBody] = useState('')
   const [tip, setTip] = useState('')
-  const [photoId, setPhotoId] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
 
@@ -47,13 +44,7 @@ export function InfoPlacePage({ cityId, ...nav }: Props) {
     [spots],
   )
 
-  const uploadMeta = useMemo((): GalleryUploadMeta | undefined => {
-    return {
-      city: cityGalleryId(cityId),
-      category: 'sight',
-      sightType: guessSightType(name || city?.place || '') || 'town',
-    }
-  }, [cityId, name, city?.place])
+  const cityPhotoId = city?.photoId || cityGalleryId(cityId)
 
   function reset() {
     setWriting(false)
@@ -63,7 +54,6 @@ export function InfoPlacePage({ cityId, ...nav }: Props) {
     setAddressZh('')
     setBody('')
     setTip('')
-    setPhotoId('')
     setError('')
   }
 
@@ -79,7 +69,6 @@ export function InfoPlacePage({ cityId, ...nav }: Props) {
     setAddressZh('')
     setBody('')
     setTip('')
-    setPhotoId(city?.photoId || cityGalleryId(cityId))
     setError('')
   }
 
@@ -91,7 +80,6 @@ export function InfoPlacePage({ cityId, ...nav }: Props) {
     setAddressZh(spot.addressZh || '')
     setBody(spot.body)
     setTip(spot.tip)
-    setPhotoId(spot.photoId || spot.id)
     setError('')
   }
 
@@ -101,8 +89,8 @@ export function InfoPlacePage({ cityId, ...nav }: Props) {
       nav.go.auth()
       return
     }
-    if (!name.trim() || !body.trim() || !photoId) {
-      setError('이름, 설명, 사진이 필요합니다.')
+    if (!name.trim() || !body.trim()) {
+      setError('이름과 설명이 필요합니다.')
       return
     }
     setBusy(true)
@@ -116,7 +104,7 @@ export function InfoPlacePage({ cityId, ...nav }: Props) {
         addressZh: addressZh.trim(),
         body: body.trim(),
         tip: tip.trim(),
-        photoId,
+        photoId: cityPhotoId,
         sort: editing?.sort,
         ownerId: nav.user.id,
         ownerName: nav.user.name,
@@ -158,7 +146,7 @@ export function InfoPlacePage({ cityId, ...nav }: Props) {
   }
 
   const place = city.place
-  const cityPhoto = resolvePhotoSrc(city.photoId || cityGalleryId(cityId), photos, city.src)
+  const cityPhoto = resolvePhotoSrc(cityPhotoId, photos, city.src)
 
   return (
     <PageShell {...nav}>
@@ -194,14 +182,6 @@ export function InfoPlacePage({ cityId, ...nav }: Props) {
             />
             <textarea value={body} onChange={(e) => setBody(e.target.value)} rows={4} placeholder="설명" required />
             <textarea value={tip} onChange={(e) => setTip(e.target.value)} rows={2} placeholder="찾아가는 힌트 (교통·입구 등)" />
-            <ImagePicker
-              photoId={photoId}
-              onChange={setPhotoId}
-              user={nav.user}
-              defaultTitle={name || place}
-              disabled={busy}
-              uploadMeta={uploadMeta}
-            />
             <div className="nav-actions">
               <button className="btn" type="submit" disabled={busy}>
                 {editing ? '수정' : '등록'}
@@ -223,10 +203,8 @@ export function InfoPlacePage({ cityId, ...nav }: Props) {
               nameZh: spot.nameZh,
               addressZh: spot.addressZh,
             })
-            const spotPhoto = resolvePhotoSrc(spot.photoId || spot.id, photos, spot.src)
             return (
-              <article className="travel-card" key={spot.id}>
-                <img src={spotPhoto} alt="" />
+              <article className="travel-card travel-card-text" key={spot.id}>
                 <div className="travel-card-body">
                   <h3>{formatSpotLabel(spot)}</h3>
                   {spot.addressZh ? <p className="travel-address">{spot.addressZh}</p> : null}
@@ -237,7 +215,7 @@ export function InfoPlacePage({ cityId, ...nav }: Props) {
                       百度地图
                     </a>
                     <a className="travel-map-link" href={maps.google} target="_blank" rel="noreferrer">
-                      Google Map
+                      Google Maps
                     </a>
                   </div>
                   {canEditTravelSpot(spot, nav.user) ? (

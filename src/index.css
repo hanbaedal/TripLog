@@ -1894,6 +1894,10 @@ p {
   display: grid;
 }
 
+.travel-card-text {
+  padding: 14px 16px;
+}
+
 .travel-card-open {
   display: grid;
   border: 0;

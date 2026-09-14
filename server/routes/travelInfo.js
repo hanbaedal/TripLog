@@ -54,8 +54,8 @@ function canManage(user, doc) {
   return Boolean(doc.ownerId && String(doc.ownerId) === String(user._id))
 }
 
-async function requirePhotoId(photoId) {
-  const id = String(photoId || '').trim()
+async function resolvePhotoRef(photoId, fallbackPhotoId) {
+  const id = String(photoId || fallbackPhotoId || '').trim()
   if (!id) return null
   const photo = await GalleryPhoto.findOne({ photoId: id })
   if (!photo) return null
@@ -85,29 +85,31 @@ export async function seedTravelInfo() {
     )
   }
   for (const row of TRAVEL_SPOT_CATALOG) {
-    const photoId = row.photoId || row.id
+    const cityPhotoId = cityGalleryId(row.cityId)
     await TravelSpot.updateOne(
       { spotId: row.id },
       {
-        $set: {
+        $setOnInsert: {
+          spotId: row.id,
+          cityId: row.cityId,
           name: row.name,
           nameZh: row.nameZh || '',
           addressZh: row.addressZh || '',
           body: row.body,
           tip: row.tip,
-          photoId,
-          src: row.src || '',
+          photoId: cityPhotoId,
+          src: '',
           sort: row.sort,
           catalog: true,
-        },
-        $setOnInsert: {
-          spotId: row.id,
-          cityId: row.cityId,
           ownerName: '',
           at: new Date(),
         },
       },
       { upsert: true },
+    )
+    await TravelSpot.updateOne(
+      { spotId: row.id },
+      { $set: { photoId: cityPhotoId, src: '' } },
     )
   }
 }
@@ -129,9 +131,9 @@ travelInfoRouter.post('/:cityId/spots', requireUser, async (req, res) => {
   const addressZh = String(req.body?.addressZh || '').trim()
   const body = String(req.body?.body || '').trim()
   const tip = String(req.body?.tip || '').trim()
-  const photo = await requirePhotoId(req.body?.photoId)
+  const photo = await resolvePhotoRef(req.body?.photoId, cityGalleryId(cityId))
   if (!cityId || !name || !body || !photo) {
-    res.status(400).json({ error: '이름, 설명, 갤러리 사진이 필요합니다.' })
+    res.status(400).json({ error: '이름, 설명이 필요합니다.' })
     return
   }
   const doc = await TravelSpot.create({
@@ -143,7 +145,7 @@ travelInfoRouter.post('/:cityId/spots', requireUser, async (req, res) => {
     body,
     tip,
     photoId: photo.photoId,
-    src: photo.src,
+    src: '',
     sort: Number(req.body?.sort) || 80,
     catalog: false,
     ownerId: req.user._id,
@@ -164,9 +166,9 @@ travelInfoRouter.put('/spots/:id', requireUser, async (req, res) => {
   const addressZh = String(req.body?.addressZh || '').trim()
   const body = String(req.body?.body || '').trim()
   const tip = String(req.body?.tip || '').trim()
-  const photo = await requirePhotoId(req.body?.photoId)
+  const photo = await resolvePhotoRef(req.body?.photoId, cityGalleryId(doc.cityId))
   if (!name || !body || !photo) {
-    res.status(400).json({ error: '이름, 설명, 갤러리 사진이 필요합니다.' })
+    res.status(400).json({ error: '이름, 설명이 필요합니다.' })
     return
   }
   doc.name = name
@@ -175,7 +177,7 @@ travelInfoRouter.put('/spots/:id', requireUser, async (req, res) => {
   doc.body = body
   doc.tip = tip
   doc.photoId = photo.photoId
-  doc.src = photo.src
+  doc.src = ''
   if (req.body?.sort != null) doc.sort = Number(req.body.sort) || doc.sort
   await doc.save()
   res.json({ spot: toSpot(doc) })
@@ -195,7 +197,7 @@ travelInfoRouter.post('/', requireUser, async (req, res) => {
   const place = String(req.body?.place || '').trim()
   const title = String(req.body?.title || place).trim()
   const body = String(req.body?.body || '').trim()
-  const photo = await requirePhotoId(req.body?.photoId)
+  const photo = await resolvePhotoRef(req.body?.photoId, cityGalleryId(req.body?.id || ''))
   if (!place || !title || !body || !photo) {
     res.status(400).json({ error: '도시, 제목, 설명, 갤러리 사진이 필요합니다.' })
     return
@@ -225,7 +227,7 @@ travelInfoRouter.put('/:id', requireUser, async (req, res) => {
   const place = String(req.body?.place || '').trim()
   const title = String(req.body?.title || place).trim()
   const body = String(req.body?.body || '').trim()
-  const photo = await requirePhotoId(req.body?.photoId)
+  const photo = await resolvePhotoRef(req.body?.photoId, doc.photoId || cityGalleryId(doc.infoId))
   if (!place || !title || !body || !photo) {
     res.status(400).json({ error: '도시, 제목, 설명, 갤러리 사진이 필요합니다.' })
     return

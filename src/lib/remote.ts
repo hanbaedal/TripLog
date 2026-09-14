@@ -3,8 +3,6 @@ import { Capacitor } from '@capacitor/core'
 const TOKEN_KEY = 'triplog.token'
 const NATIVE_API = 'https://triplog-361k.onrender.com'
 
-let remoteReady = false
-
 export function apiUrl(path: string): string {
   const base = Capacitor.isNativePlatform() ? NATIVE_API : ''
   return `${base}${path.startsWith('/') ? path : `/${path}`}`
@@ -19,19 +17,14 @@ export function setToken(token: string): void {
   else localStorage.removeItem(TOKEN_KEY)
 }
 
-export function isRemote(): boolean {
-  return remoteReady
-}
-
 export async function probeRemote(): Promise<boolean> {
   try {
     const res = await fetch(apiUrl('/api/health'), { cache: 'no-store' })
     const data = (await res.json()) as { ok?: boolean; db?: string }
-    remoteReady = Boolean(res.ok && data.ok && data.db === 'up')
+    return Boolean(res.ok && data.ok && data.db === 'up')
   } catch {
-    remoteReady = false
+    return false
   }
-  return remoteReady
 }
 
 export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {

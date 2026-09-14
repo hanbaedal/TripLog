@@ -17,21 +17,9 @@ import { UsersAdminPage } from './components/UsersAdminPage'
 import { TripList } from './components/TripList'
 import { emptyTrip } from './data/demo'
 import { cloneSampleTrip, isBlankDraft, removeSample, sampleFromTrip, saveSample } from './data/samples'
-import { currentUser, isSupervisor, remoteMe, signOut } from './lib/auth'
-import { isRemote, probeRemote } from './lib/remote'
-import {
-  deleteTrip,
-  deleteTripRemote,
-  importGuestTrips,
-  importGuestTripsRemote,
-  listTripsRemote,
-  loadTrips,
-  onlyPersonalTrips,
-  ownerIdOf,
-  purgeSampleCopies,
-  upsertTrip,
-  upsertTripRemote,
-} from './lib/trips'
+import { isSupervisor, remoteMe, signOut } from './lib/auth'
+import { probeRemote } from './lib/remote'
+import { deleteTrip, listTrips, onlyPersonalTrips, purgeSampleCopies, upsertTrip } from './lib/trips'
 import type { AppView, SiteNav } from './lib/siteNav'
 import type { SampleRecord, Trip, User } from './types'
 
@@ -40,10 +28,9 @@ export default function App() {
   const [galleryFocus, setGalleryFocus] = useState<string | null>(null)
   const [galleryEditId, setGalleryEditId] = useState<string | null>(null)
   const [infoPlaceId, setInfoPlaceId] = useState<string | null>(null)
-  const [user, setUser] = useState<User | null>(() => currentUser())
-  const owner = ownerIdOf(user?.id)
-  const [trips, setTrips] = useState<Trip[]>(() => onlyPersonalTrips(loadTrips(owner)))
-  const [trip, setTrip] = useState<Trip>(() => onlyPersonalTrips(loadTrips(owner))[0] ?? emptyTrip())
+  const [user, setUser] = useState<User | null>(null)
+  const [trips, setTrips] = useState<Trip[]>([])
+  const [trip, setTrip] = useState<Trip>(() => emptyTrip())
   const [authOpen, setAuthOpen] = useState(false)
   const [sampleEditId, setSampleEditId] = useState<string | null>(null)
   const [editingSample, setEditingSample] = useState<SampleRecord | null>(null)
@@ -52,19 +39,11 @@ export default function App() {
 
   useEffect(() => {
     void (async () => {
-      if (!(await probeRemote())) {
-        const kept = await purgeSampleCopies(loadTrips(owner), false, owner)
-        setTrips(kept)
-        return
-      }
+      await probeRemote()
       const me = await remoteMe()
-      if (!me) {
-        const kept = await purgeSampleCopies(loadTrips(owner), false, owner)
-        setTrips(kept)
-        return
-      }
+      if (!me) return
       setUser(me)
-      const list = await purgeSampleCopies(await listTripsRemote(), true, me.id)
+      const list = await purgeSampleCopies(await listTrips())
       setTrips(list)
       if (list[0]) setTrip(list[0])
     })()
@@ -97,13 +76,8 @@ export default function App() {
     if (!forceMine && (samplePreview || next.savedByUser === false)) return
     if (isBlankDraft(next)) return
     const owned = { ...next, savedByUser: true }
-    if (isRemote()) {
-      await upsertTripRemote(owned)
-      setTrips(onlyPersonalTrips(await listTripsRemote()))
-    } else {
-      upsertTrip(actor.id, owned)
-      setTrips(onlyPersonalTrips(loadTrips(actor.id)))
-    }
+    await upsertTrip(owned)
+    setTrips(onlyPersonalTrips(await listTrips()))
     if (owned.publishedSampleId) {
       await saveSample(
         sampleFromTrip(owned, {
@@ -199,13 +173,7 @@ export default function App() {
     authIntent.current = null
     setUser(next)
     setAuthOpen(false)
-    if (isRemote()) {
-      await importGuestTripsRemote()
-      setTrips(onlyPersonalTrips(await listTripsRemote()))
-    } else {
-      importGuestTrips(next.id)
-      setTrips(onlyPersonalTrips(loadTrips(next.id)))
-    }
+    setTrips(onlyPersonalTrips(await purgeSampleCopies(await listTrips())))
     if (intent === 'newTrip') {
       openPlanner(emptyTrip())
       return
@@ -230,9 +198,8 @@ export default function App() {
   function handleLogout() {
     signOut()
     setUser(null)
-    const list = onlyPersonalTrips(loadTrips('guest'))
-    setTrips(list)
-    setTrip(list[0] ?? emptyTrip())
+    setTrips([])
+    setTrip(emptyTrip())
     setView('home')
   }
 
@@ -324,9 +291,7 @@ export default function App() {
             void (async () => {
               const target = trips.find((row) => row.id === id)
               if (target?.publishedSampleId) await removeSample(target.publishedSampleId)
-              const next = user && isRemote()
-                ? await deleteTripRemote(id)
-                : deleteTrip(owner, id)
+              const next = await deleteTrip(id)
               setTrips(onlyPersonalTrips(next))
               if (trip.id === id) setTrip(next[0] ?? emptyTrip())
             })()

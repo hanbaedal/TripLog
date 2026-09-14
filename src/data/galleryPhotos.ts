@@ -1,35 +1,17 @@
 import type { GalleryCategory, GalleryPhoto, SightType } from '../types'
-import { GALLERY_PHOTOS, cityGalleryId } from './galleryCatalog.js'
-import { TRAVEL_SPOT_CATALOG } from './travelSpotCatalog.js'
+import { FOOD_PHOTOS, GALLERY_PHOTOS, cityGalleryId } from './galleryCatalog.js'
 import { guessSightType, normalizeGalleryCategory, normalizeSightType } from './galleryTaxonomy.js'
 
 export type { GalleryPhoto }
 
-export { GALLERY_PHOTOS, cityGalleryId }
+export { GALLERY_PHOTOS, FOOD_PHOTOS, cityGalleryId }
 
-type SpotRow = {
-  id: string
-  name: string
-  src?: string
-  cityId: string
-}
+const CATALOG_PHOTOS: GalleryPhoto[] = [
+  ...(GALLERY_PHOTOS as GalleryPhoto[]),
+  ...(FOOD_PHOTOS as GalleryPhoto[]),
+]
 
-const CATALOG_SPOT_PHOTOS: GalleryPhoto[] = (TRAVEL_SPOT_CATALOG as SpotRow[])
-  .filter((spot) => Boolean(spot.src))
-  .map((spot) => ({
-    id: spot.id,
-    title: spot.name,
-    src: spot.src || '',
-    city: cityGalleryId(spot.cityId),
-    category: 'sight' as GalleryCategory,
-    sightType: guessSightType(spot.name) as SightType,
-    catalog: true,
-  }))
-
-const CATALOG_BY_ID = new Map<string, GalleryPhoto>([
-  ...(GALLERY_PHOTOS as GalleryPhoto[]).map((row) => [row.id, row] as const),
-  ...CATALOG_SPOT_PHOTOS.map((row) => [row.id, row] as const),
-])
+const CATALOG_BY_ID = new Map<string, GalleryPhoto>(CATALOG_PHOTOS.map((row) => [row.id, row]))
 
 function enrichGalleryPhoto(photo: GalleryPhoto): GalleryPhoto {
   const seed = CATALOG_BY_ID.get(photo.id)
