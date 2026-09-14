@@ -13,6 +13,10 @@ const CATALOG_PHOTOS: GalleryPhoto[] = [
 
 const CATALOG_BY_ID = new Map<string, GalleryPhoto>(CATALOG_PHOTOS.map((row) => [row.id, row]))
 
+export function hasDisplayableGallerySrc(photo: Pick<GalleryPhoto, 'src'>): boolean {
+  return Boolean((photo.src || '').trim())
+}
+
 function enrichGalleryPhoto(photo: GalleryPhoto): GalleryPhoto {
   const seed = CATALOG_BY_ID.get(photo.id)
   const category = normalizeGalleryCategory(photo.category || seed?.category || 'sight') as GalleryCategory
@@ -41,5 +45,5 @@ export function galleryPhotoById(id?: string | null): GalleryPhoto | undefined {
 }
 
 export function mergeGallery(userPhotos: GalleryPhoto[]): GalleryPhoto[] {
-  return userPhotos.map(enrichGalleryPhoto)
+  return userPhotos.map(enrichGalleryPhoto).filter(hasDisplayableGallerySrc)
 }

@@ -12,7 +12,11 @@ const GROUPS: SitemapGroup[] = [
   { title: '여행', tone: 'travel', ids: ['samples', 'trips'] },
   { title: '정보', tone: 'info', ids: ['info', 'gallery'] },
   { title: '커뮤니티', tone: 'community', ids: ['board', 'inquiry'] },
-  { title: '관리', tone: 'admin', ids: ['taxonomyAdmin', 'usersAdmin'] },
+  {
+    title: '관리',
+    tone: 'admin',
+    ids: ['taxonomyCity', 'taxonomyCategory', 'taxonomySightType', 'taxonomyFoodType', 'usersAdmin'],
+  },
 ]
 
 export function SitemapPage(nav: SiteNav) {

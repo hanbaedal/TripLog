@@ -8,7 +8,7 @@ import { api } from './remote'
 
 export type TaxonomyKind = 'city' | 'category' | 'sightType' | 'foodType'
 
-export type TaxonomyRow = { slug: string; label: string; sort?: number }
+export type TaxonomyRow = { slug: string; label: string; labelZh?: string; sort?: number }
 
 export type TaxonomyBundle = {
   cities: TaxonomyRow[]
@@ -18,10 +18,30 @@ export type TaxonomyBundle = {
 }
 
 const FALLBACK: TaxonomyBundle = {
-  cities: GALLERY_CITIES.map((row, index) => ({ slug: row.slug, label: row.label, sort: index + 1 })),
-  categories: GALLERY_CATEGORIES.map((row, index) => ({ slug: row.slug, label: row.label, sort: index + 1 })),
-  sightTypes: SIGHT_TYPES.map((row, index) => ({ slug: row.slug, label: row.label, sort: index + 1 })),
-  foodTypes: FOOD_TYPES.map((row, index) => ({ slug: row.slug, label: row.label, sort: index + 1 })),
+  cities: GALLERY_CITIES.map((row, index) => ({
+    slug: row.slug,
+    label: row.label,
+    labelZh: row.labelZh || '',
+    sort: index + 1,
+  })),
+  categories: GALLERY_CATEGORIES.map((row, index) => ({
+    slug: row.slug,
+    label: row.label,
+    labelZh: row.labelZh || '',
+    sort: index + 1,
+  })),
+  sightTypes: SIGHT_TYPES.map((row, index) => ({
+    slug: row.slug,
+    label: row.label,
+    labelZh: row.labelZh || '',
+    sort: index + 1,
+  })),
+  foodTypes: FOOD_TYPES.map((row, index) => ({
+    slug: row.slug,
+    label: row.label,
+    labelZh: row.labelZh || '',
+    sort: index + 1,
+  })),
 }
 
 let cache: TaxonomyBundle | null = null
@@ -56,18 +76,26 @@ export async function saveTaxonomyRow(input: {
   kind: TaxonomyKind
   slug: string
   label: string
+  labelZh?: string
   sort?: number
   prevSlug?: string
 }): Promise<TaxonomyBundle> {
+  const body = {
+    kind: input.kind,
+    slug: input.slug,
+    label: input.label,
+    labelZh: input.labelZh || '',
+    sort: input.sort ?? 99,
+  }
   if (input.prevSlug) {
     cache = await api<TaxonomyBundle>(`/taxonomy/${input.kind}/${input.prevSlug}`, {
       method: 'PUT',
-      body: JSON.stringify({ slug: input.slug, label: input.label, sort: input.sort ?? 99 }),
+      body: JSON.stringify(body),
     })
   } else {
     cache = await api<TaxonomyBundle>('/taxonomy', {
       method: 'POST',
-      body: JSON.stringify(input),
+      body: JSON.stringify(body),
     })
   }
   invalidateTaxonomyCache()

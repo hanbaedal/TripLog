@@ -82,7 +82,7 @@ export const galleryRouter = Router()
 
 galleryRouter.get('/', async (_req, res) => {
   const rows = await GalleryPhoto.find().sort({ at: 1 })
-  res.json({ photos: rows.map(toPhoto) })
+  res.json({ photos: rows.map(toPhoto).filter((row) => row.src?.trim()) })
 })
 
 galleryRouter.post('/', requireUser, async (req, res) => {

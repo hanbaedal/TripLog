@@ -11,6 +11,7 @@ type Props = {
   onCategory: (value: GalleryCategory | '') => void
   onSightType: (value: SightType | '') => void
   disabled?: boolean
+  compact?: boolean
 }
 
 export function GalleryTaxonomyFields({
@@ -21,6 +22,7 @@ export function GalleryTaxonomyFields({
   onCategory,
   onSightType,
   disabled,
+  compact = false,
 }: Props) {
   const [taxonomy, setTaxonomy] = useState<TaxonomyBundle | null>(null)
 
@@ -33,34 +35,36 @@ export function GalleryTaxonomyFields({
   const sightTypes = taxonomy?.sightTypes ?? SIGHT_TYPES
 
   return (
-    <>
-      <label>
-        도시
-        <select value={city} onChange={(e) => onCity(e.target.value)} required disabled={disabled}>
-          <option value="">선택</option>
-          {cities.map((row) => (
-            <option key={row.slug} value={row.slug}>
-              {row.label}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label>
-        분류
-        <select
-          value={category}
-          onChange={(e) => onCategory(e.target.value as GalleryCategory | '')}
-          required
-          disabled={disabled}
-        >
-          <option value="">선택</option>
-          {categories.map((row) => (
-            <option key={row.slug} value={row.slug}>
-              {row.label}
-            </option>
-          ))}
-        </select>
-      </label>
+    <div className={compact ? 'gallery-taxonomy-compact' : 'gallery-taxonomy-stack'}>
+      <div className="gallery-taxonomy-row">
+        <label>
+          도시
+          <select value={city} onChange={(e) => onCity(e.target.value)} required disabled={disabled}>
+            <option value="">선택</option>
+            {cities.map((row) => (
+              <option key={row.slug} value={row.slug}>
+                {row.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          분류
+          <select
+            value={category}
+            onChange={(e) => onCategory(e.target.value as GalleryCategory | '')}
+            required
+            disabled={disabled}
+          >
+            <option value="">선택</option>
+            {categories.map((row) => (
+              <option key={row.slug} value={row.slug}>
+                {row.label}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
       {category === 'sight' ? (
         <label>
           관광 유형
@@ -78,6 +82,6 @@ export function GalleryTaxonomyFields({
           </select>
         </label>
       ) : null}
-    </>
+    </div>
   )
 }

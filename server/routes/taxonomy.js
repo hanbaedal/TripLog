@@ -12,7 +12,12 @@ function groupRows(rows) {
   const sightTypes = []
   const foodTypes = []
   for (const row of rows) {
-    const item = { slug: row.slug, label: row.label, sort: row.sort ?? 99 }
+    const item = {
+      slug: row.slug,
+      label: row.label,
+      labelZh: row.labelZh || '',
+      sort: row.sort ?? 99,
+    }
     if (row.kind === 'city') cities.push(item)
     else if (row.kind === 'category') categories.push(item)
     else if (row.kind === 'sightType') sightTypes.push(item)
@@ -36,6 +41,7 @@ taxonomyRouter.post('/', requireSupervisor, async (req, res) => {
   const kind = String(req.body?.kind || '').trim()
   const slug = String(req.body?.slug || '').trim().toLowerCase()
   const label = String(req.body?.label || '').trim()
+  const labelZh = String(req.body?.labelZh || '').trim()
   const sort = Number(req.body?.sort) || 99
   if (!KINDS.includes(kind) || !slug || !label) {
     res.status(400).json({ error: '종류, 코드, 이름이 필요합니다.' })
@@ -50,7 +56,13 @@ taxonomyRouter.post('/', requireSupervisor, async (req, res) => {
     res.status(409).json({ error: '이미 있는 항목입니다.' })
     return
   }
-  await TaxonomyOption.create({ kind, slug, label, sort })
+  await TaxonomyOption.create({
+    kind,
+    slug,
+    label,
+    labelZh,
+    sort,
+  })
   const rows = await TaxonomyOption.find({ slug: { $ne: 'other' } })
   res.status(201).json(groupRows(rows))
 })
@@ -59,6 +71,7 @@ taxonomyRouter.put('/:kind/:slug', requireSupervisor, async (req, res) => {
   const kind = String(req.params.kind || '').trim()
   const slug = String(req.params.slug || '').trim()
   const label = String(req.body?.label || '').trim()
+  const labelZh = String(req.body?.labelZh || '').trim()
   const nextSlug = String(req.body?.slug || slug).trim().toLowerCase()
   const sort = Number(req.body?.sort) || 99
   if (nextSlug === 'other') {
@@ -79,6 +92,7 @@ taxonomyRouter.put('/:kind/:slug', requireSupervisor, async (req, res) => {
     doc.slug = nextSlug
   }
   doc.label = label
+  doc.labelZh = labelZh
   doc.sort = sort
   await doc.save()
   const rows = await TaxonomyOption.find({ slug: { $ne: 'other' } })

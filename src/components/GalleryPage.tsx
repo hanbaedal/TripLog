@@ -5,6 +5,7 @@ import { galleryMediaSrc } from '../lib/galleryResolve'
 import { isSupervisor } from '../lib/auth'
 import { galleryCityLabel, photoCategoryLabel, photoTaxonomyLabel } from '../lib/galleryFilter'
 import { GALLERY_CATEGORIES, GALLERY_CITIES } from '../data/galleryTaxonomy.js'
+import { loadTaxonomy, type TaxonomyRow } from '../lib/taxonomy'
 import type { GalleryCategory, GalleryPhoto } from '../types'
 import type { SiteNav } from '../lib/siteNav'
 
@@ -27,11 +28,17 @@ export function GalleryPage({ focusId, ...nav }: Props) {
   const [activeId, setActiveId] = useState<string | null>(() => focusId ?? null)
   const [slideCity, setSlideCity] = useState('')
   const [categoryFilter, setCategoryFilter] = useState<GalleryCategory | ''>('')
+  const [cities, setCities] = useState<TaxonomyRow[]>(
+    GALLERY_CITIES.map((row, index) => ({ slug: row.slug, label: row.label, labelZh: row.labelZh, sort: index + 1 })),
+  )
 
   const supervisor = isSupervisor(nav.user)
 
   useEffect(() => {
     void listGallery().then(setPhotos)
+    void loadTaxonomy().then((bundle) => {
+      if (bundle.cities.length) setCities(bundle.cities)
+    })
   }, [])
 
   useEffect(() => {
@@ -59,7 +66,7 @@ export function GalleryPage({ focusId, ...nav }: Props) {
     }
 
     const groups: CityGroup[] = []
-    for (const city of GALLERY_CITIES) {
+    for (const city of cities) {
       const rows = buckets.get(city.slug)
       if (!rows?.length) continue
       groups.push({
@@ -80,7 +87,7 @@ export function GalleryPage({ focusId, ...nav }: Props) {
     }
 
     return groups
-  }, [filtered])
+  }, [filtered, cities])
 
   const slideItems = useMemo(() => {
     if (!slideCity) return filtered
@@ -210,7 +217,11 @@ export function GalleryPage({ focusId, ...nav }: Props) {
             <button className="btn ghost" type="button" onClick={backToList}>
               돌아가기
             </button>
-            {slideCity ? <span className="gallery-slide-city">{galleryCityLabel(slideCity)}</span> : null}
+            {slideCity ? (
+              <span className="gallery-slide-city">
+                {cities.find((row) => row.slug === slideCity)?.label || galleryCityLabel(slideCity)}
+              </span>
+            ) : null}
           </div>
           <button className="gallery-arrow prev" type="button" aria-label="이전 사진" onClick={() => step(-1)}>
             ‹

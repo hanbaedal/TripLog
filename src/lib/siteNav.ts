@@ -14,7 +14,10 @@ export type AppView =
   | 'inquiry'
   | 'sitemap'
   | 'profile'
-  | 'taxonomyAdmin'
+  | 'taxonomyCity'
+  | 'taxonomyCategory'
+  | 'taxonomySightType'
+  | 'taxonomyFoodType'
   | 'usersAdmin'
 
 export type SiteGo = {
@@ -29,7 +32,10 @@ export type SiteGo = {
   inquiry: () => void
   sitemap: () => void
   profile: () => void
-  taxonomyAdmin: () => void
+  taxonomyCity: () => void
+  taxonomyCategory: () => void
+  taxonomySightType: () => void
+  taxonomyFoodType: () => void
   usersAdmin: () => void
   auth: () => void
   logout: () => void
@@ -51,10 +57,31 @@ export const SITE_LINKS: { id: AppView; label: string }[] = [
   { id: 'sitemap', label: '사이트맵' },
 ]
 
+/** 슈퍼바이저 탐색기 — 분류 관리 4종 */
+export const TAXONOMY_ADMIN_LINKS: { id: AppView; label: string }[] = [
+  { id: 'taxonomyCity', label: '도시 분류' },
+  { id: 'taxonomyCategory', label: '일정 분류' },
+  { id: 'taxonomySightType', label: '관광 유형' },
+  { id: 'taxonomyFoodType', label: '음식 종류' },
+]
+
 export const SUPERVISOR_LINKS: { id: AppView; label: string }[] = [
-  { id: 'taxonomyAdmin', label: '분류 관리' },
+  ...TAXONOMY_ADMIN_LINKS,
   { id: 'usersAdmin', label: '회원 관리' },
 ]
+
+export type TaxonomyAdminView = (typeof TAXONOMY_ADMIN_LINKS)[number]['id']
+
+export function taxonomyViewToKind(view: TaxonomyAdminView): 'city' | 'category' | 'sightType' | 'foodType' {
+  if (view === 'taxonomyCity') return 'city'
+  if (view === 'taxonomyCategory') return 'category'
+  if (view === 'taxonomySightType') return 'sightType'
+  return 'foodType'
+}
+
+export function isTaxonomyAdminView(view: AppView): view is TaxonomyAdminView {
+  return TAXONOMY_ADMIN_LINKS.some((link) => link.id === view)
+}
 
 export function visibleSiteLinks(user: User | null) {
   return SITE_LINKS.filter((link) => link.id !== 'trips' || Boolean(user))
@@ -71,6 +98,9 @@ export function goSite(nav: SiteNav, id: AppView) {
   else if (id === 'inquiry') nav.go.inquiry()
   else if (id === 'sitemap') nav.go.sitemap()
   else if (id === 'profile') nav.go.profile()
-  else if (id === 'taxonomyAdmin') nav.go.taxonomyAdmin()
+  else if (id === 'taxonomyCity') nav.go.taxonomyCity()
+  else if (id === 'taxonomyCategory') nav.go.taxonomyCategory()
+  else if (id === 'taxonomySightType') nav.go.taxonomySightType()
+  else if (id === 'taxonomyFoodType') nav.go.taxonomyFoodType()
   else if (id === 'usersAdmin') nav.go.usersAdmin()
 }

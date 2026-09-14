@@ -103,52 +103,61 @@ function GalleryPhotoForm({
   }, [values.city, values.category, values.sightType])
 
   return (
-    <form className="board-form gallery-write-form" onSubmit={(e) => void onSubmit(e)}>
-      <GalleryTaxonomyFields
-        city={values.city}
-        category={values.category}
-        sightType={values.sightType}
-        onCity={(city) => onChange({ city })}
-        onCategory={(category) => {
-          onChange({ category, sightType: category === 'sight' ? values.sightType : '' })
-        }}
-        onSightType={(sightType) => onChange({ sightType })}
-        disabled={busy}
-      />
-      <input
-        value={values.title}
-        onChange={(e) => onChange({ title: e.target.value })}
-        placeholder="사진 제목"
-        required
-      />
-      {supervisor && !editing ? (
-        <label className="check-row">
-          <input
-            type="checkbox"
-            checked={values.asCatalog}
-            onChange={(e) => onChange({ asCatalog: e.target.checked })}
+    <form className="board-form gallery-write-form gallery-write-compact" onSubmit={(e) => void onSubmit(e)}>
+      <div className="gallery-write-grid">
+        <ImagePicker
+          photoId={values.photoId}
+          pendingSrc={values.pendingSrc}
+          deferUpload
+          compact
+          onChange={(photoId, pending) => {
+            if (pending === null) onChange({ photoId, pendingSrc: undefined })
+            else if (pending?.src) onChange({ photoId, pendingSrc: pending.src })
+            else onChange({ photoId })
+          }}
+          user={user}
+          defaultTitle={values.title}
+          disabled={busy}
+          scope={supervisor ? 'all' : 'mine'}
+          uploadMeta={uploadMeta}
+        />
+        <div className="gallery-write-meta">
+          <GalleryTaxonomyFields
+            compact
+            city={values.city}
+            category={values.category}
+            sightType={values.sightType}
+            onCity={(city) => onChange({ city })}
+            onCategory={(category) => {
+              onChange({ category, sightType: category === 'sight' ? values.sightType : '' })
+            }}
+            onSightType={(sightType) => onChange({ sightType })}
             disabled={busy}
           />
-          카탈로그 사진으로 등록
-        </label>
-      ) : null}
-      <ImagePicker
-        photoId={values.photoId}
-        pendingSrc={values.pendingSrc}
-        deferUpload
-        onChange={(photoId, pending) => {
-          if (pending === null) onChange({ photoId, pendingSrc: undefined })
-          else if (pending?.src) onChange({ photoId, pendingSrc: pending.src })
-          else onChange({ photoId })
-        }}
-        user={user}
-        defaultTitle={values.title}
-        disabled={busy}
-        scope={supervisor ? 'all' : 'mine'}
-        uploadMeta={uploadMeta}
-      />
-      {error ? <p className="muted">{error}</p> : null}
-      <div className={onCancel ? 'modal-actions' : 'nav-actions'}>
+          <label className="gallery-write-title">
+            사진 제목
+            <input
+              value={values.title}
+              onChange={(e) => onChange({ title: e.target.value })}
+              placeholder="예: 만리장성 전경"
+              required
+            />
+          </label>
+          {supervisor && !editing ? (
+            <label className="check-row gallery-write-catalog">
+              <input
+                type="checkbox"
+                checked={values.asCatalog}
+                onChange={(e) => onChange({ asCatalog: e.target.checked })}
+                disabled={busy}
+              />
+              카탈로그 사진으로 등록
+            </label>
+          ) : null}
+        </div>
+      </div>
+      {error ? <p className="gallery-write-error">{error}</p> : null}
+      <div className={onCancel ? 'modal-actions gallery-write-actions' : 'nav-actions gallery-write-actions'}>
         {onCancel ? (
           <button className="btn ghost" type="button" onClick={onCancel} disabled={busy}>
             취소
@@ -309,9 +318,11 @@ export function GalleryWritePage({ editPhotoId, ...nav }: Props) {
         </div>
         {supervisor ? (
           <p className="muted gallery-write-note">
-            아래 목록에서 사진을 클릭하면 수정 모달이 열립니다. 새 카탈로그 사진은 아래 폼으로 등록할 수 있습니다.
+            목록에서 사진을 누르면 수정합니다. 새 사진은 아래 폼에서 등록합니다.
           </p>
-        ) : null}
+        ) : (
+          <p className="muted gallery-write-note">도시·분류·제목·사진을 입력한 뒤 등록합니다.</p>
+        )}
         <GalleryPhotoForm
           values={register}
           onChange={(patch) => setRegister((prev) => ({ ...prev, ...patch }))}
@@ -349,7 +360,7 @@ export function GalleryWritePage({ editPhotoId, ...nav }: Props) {
       {editing ? (
         <div className="modal-back" onClick={closeEdit} role="presentation">
           <div
-            className="modal gallery-edit-modal"
+            className="modal gallery-edit-modal gallery-write-compact-modal"
             role="dialog"
             aria-modal="true"
             aria-labelledby="gallery-edit-title"

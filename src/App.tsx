@@ -21,6 +21,7 @@ import { isSupervisor, remoteMe, signOut } from './lib/auth'
 import { probeRemote } from './lib/remote'
 import { deleteTrip, listTrips, onlyPersonalTrips, purgeSampleCopies, upsertTrip } from './lib/trips'
 import type { AppView, SiteNav } from './lib/siteNav'
+import { isTaxonomyAdminView, taxonomyViewToKind } from './lib/siteNav'
 import type { SampleRecord, Trip, User } from './types'
 
 export default function App() {
@@ -331,9 +332,21 @@ export default function App() {
         }
         setView('profile')
       },
-      taxonomyAdmin: () => {
+      taxonomyCity: () => {
         if (!user || !isSupervisor(user)) return
-        setView('taxonomyAdmin')
+        setView('taxonomyCity')
+      },
+      taxonomyCategory: () => {
+        if (!user || !isSupervisor(user)) return
+        setView('taxonomyCategory')
+      },
+      taxonomySightType: () => {
+        if (!user || !isSupervisor(user)) return
+        setView('taxonomySightType')
+      },
+      taxonomyFoodType: () => {
+        if (!user || !isSupervisor(user)) return
+        setView('taxonomyFoodType')
       },
       usersAdmin: () => {
         if (!user || !isSupervisor(user)) return
@@ -414,7 +427,9 @@ export default function App() {
       {view === 'board' ? <BoardPage {...nav} /> : null}
       {view === 'inquiry' ? <InquiryPage {...nav} /> : null}
       {view === 'sitemap' ? <SitemapPage {...nav} /> : null}
-      {view === 'taxonomyAdmin' && user && isSupervisor(user) ? <TaxonomyAdminPage {...nav} /> : null}
+      {isTaxonomyAdminView(view) && user && isSupervisor(user) ? (
+        <TaxonomyAdminPage kind={taxonomyViewToKind(view)} {...nav} />
+      ) : null}
       {view === 'usersAdmin' && user && isSupervisor(user) ? <UsersAdminPage {...nav} /> : null}
       {view === 'planner' ? (
         <Planner

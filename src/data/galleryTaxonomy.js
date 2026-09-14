@@ -1,54 +1,59 @@
 export const GALLERY_CITIES = [
-  { slug: 'dalian', label: '대련' },
-  { slug: 'yantai', label: '연태' },
-  { slug: 'qingdao', label: '청도' },
-  { slug: 'harbin', label: '하얼빈' },
-  { slug: 'beijing', label: '北京' },
-  { slug: 'shanghai', label: '上海' },
-  { slug: 'hongkong', label: '香港' },
-  { slug: 'baekdusan', label: '长白山' },
-  { slug: 'xian', label: '西安' },
-  { slug: 'chengdu', label: '成都' },
-  { slug: 'taihang', label: '太行山' },
-  { slug: 'huangshan', label: '黄山' },
-  { slug: 'zhangjiajie', label: '张家界' },
-  { slug: 'yunnan', label: '云南' },
-  { slug: 'guizhou', label: '贵州' },
+  { slug: 'dalian', label: '대련', labelZh: '大连' },
+  { slug: 'yantai', label: '연태', labelZh: '烟台' },
+  { slug: 'qingdao', label: '청도', labelZh: '青岛' },
+  { slug: 'harbin', label: '하얼빈', labelZh: '哈尔滨' },
+  { slug: 'beijing', label: '베이징', labelZh: '北京' },
+  { slug: 'shanghai', label: '상하이', labelZh: '上海' },
+  { slug: 'hongkong', label: '홍콩', labelZh: '香港' },
+  { slug: 'baekdusan', label: '백두산', labelZh: '长白山' },
+  { slug: 'xian', label: '시안', labelZh: '西安' },
+  { slug: 'chengdu', label: '청두', labelZh: '成都' },
+  { slug: 'taihang', label: '태항산', labelZh: '太行山' },
+  { slug: 'huangshan', label: '황산', labelZh: '黄山' },
+  { slug: 'zhangjiajie', label: '장가계', labelZh: '张家界' },
+  { slug: 'yunnan', label: '운남', labelZh: '云南' },
+  { slug: 'guizhou', label: '귀주', labelZh: '贵州' },
 ]
 
 export const GALLERY_CATEGORIES = [
-  { slug: 'sight', label: '관광' },
-  { slug: 'meal', label: '음식' },
-  { slug: 'hotel', label: '호텔' },
-  { slug: 'transport', label: '교통' },
-  { slug: 'flight', label: '항공' },
+  { slug: 'sight', label: '관광', labelZh: '观光' },
+  { slug: 'meal', label: '음식', labelZh: '美食' },
+  { slug: 'hotel', label: '호텔', labelZh: '酒店' },
+  { slug: 'transport', label: '교통', labelZh: '交通' },
+  { slug: 'flight', label: '항공', labelZh: '航空' },
 ]
 
 export const SIGHT_TYPES = [
-  { slug: 'mountain', label: '산·협곡' },
-  { slug: 'lake', label: '호수·강' },
-  { slug: 'beach', label: '해변·해안' },
-  { slug: 'palace', label: '궁궐·유적' },
-  { slug: 'temple', label: '사찰·종교' },
-  { slug: 'town', label: '거리·마을' },
-  { slug: 'park', label: '공원·테마' },
+  { slug: 'mountain', label: '산·협곡', labelZh: '山·峡谷' },
+  { slug: 'lake', label: '호수·강', labelZh: '湖泊·河流' },
+  { slug: 'beach', label: '해변·해안', labelZh: '海滨·海岸' },
+  { slug: 'palace', label: '궁궐·유적', labelZh: '宫殿·遗迹' },
+  { slug: 'temple', label: '사찰·종교', labelZh: '寺庙·宗教' },
+  { slug: 'town', label: '거리·마을', labelZh: '街道·村镇' },
+  { slug: 'park', label: '공원·테마', labelZh: '公园·主题' },
 ]
 
-/** 중국 요리 대표 10선 — 코드는 핑인(slug), 표기는 한글 */
 export const FOOD_TYPES = [
-  { slug: 'beijingkaoya', label: '베이징 오리구이' },
-  { slug: 'mapodoufu', label: '마파두부' },
-  { slug: 'gongbaojiding', label: '궁보계정' },
-  { slug: 'tangculiji', label: '탕추리지' },
-  { slug: 'huoguo', label: '훠궈' },
-  { slug: 'jiaozi', label: '교자' },
-  { slug: 'xiaolongbao', label: '샤오롱바오' },
-  { slug: 'chaofan', label: '볶음밥' },
-  { slug: 'chunjuan', label: '춘권' },
-  { slug: 'lamian', label: '라면(手拉面)' },
+  { slug: 'beijingkaoya', label: '베이징 오리구이', labelZh: '北京烤鸭' },
+  { slug: 'mapodoufu', label: '마파두부', labelZh: '麻婆豆腐' },
+  { slug: 'gongbaojiding', label: '궁보계정', labelZh: '宫保鸡丁' },
+  { slug: 'tangculiji', label: '탕추리지', labelZh: '糖醋里脊' },
+  { slug: 'huoguo', label: '훠궈', labelZh: '火锅' },
+  { slug: 'jiaozi', label: '교자', labelZh: '饺子' },
+  { slug: 'xiaolongbao', label: '샤오롱바오', labelZh: '小笼包' },
+  { slug: 'chaofan', label: '볶음밥', labelZh: '炒饭' },
+  { slug: 'chunjuan', label: '춘권', labelZh: '春卷' },
+  { slug: 'lamian', label: '라면', labelZh: '拉面' },
 ]
 
-const CITY_BY_LABEL = Object.fromEntries(GALLERY_CITIES.map((row) => [row.label, row.slug]))
+const CITY_BY_LABEL = Object.fromEntries(
+  GALLERY_CITIES.flatMap((row) => {
+    const pairs = [[row.label, row.slug]]
+    if (row.labelZh) pairs.push([row.labelZh, row.slug])
+    return pairs
+  }),
+)
 const CITY_LEGACY = {
   북경: 'beijing',
   베이징: 'beijing',
@@ -109,6 +114,10 @@ export function galleryCategoryLabel(slug) {
 
 export function galleryCityLabel(slug) {
   return GALLERY_CITIES.find((row) => row.slug === slug)?.label || slug || ''
+}
+
+export function galleryCityLabelZh(slug) {
+  return GALLERY_CITIES.find((row) => row.slug === slug)?.labelZh || ''
 }
 
 export function sightTypeLabel(slug) {

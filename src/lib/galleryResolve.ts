@@ -1,5 +1,6 @@
 import type { GalleryCategory, GalleryPhoto, SightType, User } from '../types'
 import { GALLERY_PHOTOS } from '../data/galleryCatalog.js'
+import { hasDisplayableGallerySrc } from '../data/galleryPhotos'
 import { compressImage } from './imageFile'
 import { apiUrl } from './remote'
 import type { GalleryFilter } from './galleryFilter'
@@ -46,10 +47,11 @@ export function pickableGalleryPhotos(
   user?: User | null,
   scope: 'default' | 'mine' | 'all' = 'default',
 ): GalleryPhoto[] {
-  if (scope === 'all') return photos
-  if (scope === 'mine' && user) return photos.filter((row) => !row.catalog && row.ownerId === user.id)
-  if (!user) return photos.filter((row) => row.catalog)
-  return photos.filter((row) => row.catalog || row.ownerId === user.id)
+  const visible = photos.filter(hasDisplayableGallerySrc)
+  if (scope === 'all') return visible
+  if (scope === 'mine' && user) return visible.filter((row) => !row.catalog && row.ownerId === user.id)
+  if (!user) return visible.filter((row) => row.catalog)
+  return visible.filter((row) => row.catalog || row.ownerId === user.id)
 }
 
 export type GalleryUploadMeta = {

@@ -21,7 +21,10 @@ const MENU_GROUPS: MenuGroup[] = [
   { title: '커뮤니티', ids: ['board', 'inquiry'] },
 ]
 
-const ADMIN_GROUP: MenuGroup = { title: '관리', ids: ['taxonomyAdmin', 'usersAdmin'] }
+const ADMIN_GROUP: MenuGroup = {
+  title: '관리',
+  ids: ['taxonomyCity', 'taxonomyCategory', 'taxonomySightType', 'taxonomyFoodType', 'usersAdmin'],
+}
 
 export function SideMenu({ drawerOpen, overlay, onDrawerClose, ...nav }: Props) {
   const adminLinks = isSupervisor(nav.user) ? SUPERVISOR_LINKS : []

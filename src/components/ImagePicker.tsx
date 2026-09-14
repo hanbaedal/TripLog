@@ -34,6 +34,7 @@ type Props = {
   itemKind?: ItemKind
   tripDestination?: string
   itemTitle?: string
+  compact?: boolean
 }
 
 export function ImagePicker({
@@ -51,6 +52,7 @@ export function ImagePicker({
   itemKind,
   tripDestination,
   itemTitle,
+  compact = false,
 }: Props) {
   const [photos, setPhotos] = useState<GalleryPhoto[]>([])
   const [open, setOpen] = useState(false)
@@ -109,18 +111,42 @@ export function ImagePicker({
   const pcDisabled =
     disabled || busy || !user || (scope === 'mine' && (!uploadMeta?.city || !uploadMeta?.category))
 
+  const previewSrc = preview ? galleryMediaSrc(preview) : ''
+
+  const actions = (
+    <div className="nav-actions image-picker-actions">
+      <button className="btn ghost" type="button" disabled={pcDisabled} onClick={() => fileRef.current?.click()}>
+        PC에서 선택
+      </button>
+      <button className="btn ghost" type="button" disabled={disabled || busy} onClick={() => setOpen(true)}>
+        갤러리에서 선택
+      </button>
+    </div>
+  )
+
   return (
-    <div className="image-picker">
-      <span className="image-picker-label">{label}</span>
-      {preview ? <img className="gallery-preview" src={preview} alt="" /> : null}
-      <div className="nav-actions image-picker-actions">
-        <button className="btn ghost" type="button" disabled={pcDisabled} onClick={() => fileRef.current?.click()}>
-          PC에서 선택
-        </button>
-        <button className="btn ghost" type="button" disabled={disabled || busy} onClick={() => setOpen(true)}>
-          갤러리에서 선택
-        </button>
-      </div>
+    <div className={compact ? 'image-picker image-picker-compact' : 'image-picker'}>
+      {compact ? (
+        <div className="image-picker-body">
+          <div className="image-picker-thumb">
+            {previewSrc ? (
+              <img className="image-picker-thumb-img" src={previewSrc} alt="" />
+            ) : (
+              <span className="image-picker-thumb-empty">사진</span>
+            )}
+          </div>
+          <div className="image-picker-side">
+            <span className="image-picker-label">{label}</span>
+            {actions}
+          </div>
+        </div>
+      ) : (
+        <>
+          <span className="image-picker-label">{label}</span>
+          {previewSrc ? <img className="gallery-preview" src={previewSrc} alt="" /> : null}
+          {actions}
+        </>
+      )}
       <input
         ref={fileRef}
         type="file"

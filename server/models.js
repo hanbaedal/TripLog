@@ -168,6 +168,7 @@ const taxonomySchema = new mongoose.Schema(
     kind: { type: String, enum: ['city', 'category', 'sightType', 'foodType'], required: true, index: true },
     slug: { type: String, required: true, trim: true },
     label: { type: String, required: true, trim: true },
+    labelZh: { type: String, default: '', trim: true },
     sort: { type: Number, default: 99 },
   },
   { timestamps: true },

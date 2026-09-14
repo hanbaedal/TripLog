@@ -29,7 +29,17 @@ async function upsertCatalogPhoto(row) {
   )
 }
 
+export async function purgeEmptyGalleryPhotos() {
+  const rows = await GalleryPhoto.find({}, { photoId: 1, src: 1 }).lean()
+  const emptyIds = rows.filter((row) => !String(row.src || '').trim()).map((row) => row.photoId)
+  if (!emptyIds.length) return 0
+  await GalleryPhoto.deleteMany({ photoId: { $in: emptyIds } })
+  return emptyIds.length
+}
+
 export async function seedGallery() {
+  await purgeEmptyGalleryPhotos()
+
   for (const row of [...GALLERY_PHOTOS, ...FOOD_PHOTOS]) {
     await upsertCatalogPhoto(row)
   }
