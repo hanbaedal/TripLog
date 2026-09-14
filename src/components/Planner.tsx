@@ -15,10 +15,13 @@ type Props = {
   trip: Trip
   user: User | null
   copyingSample?: boolean
+  saveStatus?: 'idle' | 'saving' | 'saved' | 'error'
   onChange: (trip: Trip) => void
+  onSave?: () => void
   onSaveCopy?: () => void
   nav: SiteNav
-  onGuide: () => void
+  guideHint?: string
+  onViewGuide?: () => void
   onPublish?: () => void
   onUnpublish?: () => void
 }
@@ -80,10 +83,13 @@ export function Planner({
   trip,
   user,
   copyingSample,
+  saveStatus = 'idle',
   onChange,
+  onSave,
   onSaveCopy,
   nav,
-  onGuide,
+  guideHint = '',
+  onViewGuide,
   onPublish,
   onUnpublish,
 }: Props) {
@@ -200,7 +206,24 @@ export function Planner({
               <button className="btn stamp" type="button" onClick={onSaveCopy}>
                 내 여행에 저장
               </button>
+            ) : onSave ? (
+              <button
+                className="btn stamp"
+                type="button"
+                onClick={onSave}
+                disabled={saveStatus === 'saving'}
+              >
+                {saveStatus === 'saving'
+                  ? '저장 중…'
+                  : saveStatus === 'saved'
+                    ? '저장됨'
+                    : '저장'}
+              </button>
             ) : null}
+            {saveStatus === 'error' ? (
+              <span className="planner-save-hint">여행 이름·일정을 입력한 뒤 다시 저장해 주세요.</span>
+            ) : null}
+            {guideHint ? <span className="planner-save-hint">{guideHint}</span> : null}
             {!copyingSample && onPublish && onUnpublish ? (
               <button
                 className="btn ghost"
@@ -210,9 +233,11 @@ export function Planner({
                 {trip.publishedSampleId ? '공개 취소' : '추천 일정에 공개'}
               </button>
             ) : null}
-            <button className="btn forest" type="button" onClick={onGuide}>
-              안내서 만들기
-            </button>
+            {onViewGuide ? (
+              <button className="btn forest" type="button" onClick={onViewGuide}>
+                안내서 보기
+              </button>
+            ) : null}
           </div>
           ) : null}
         </div>
@@ -383,11 +408,13 @@ export function Planner({
               </div>
             )}
           </section>
-          <section>
-            <button className="btn" type="button" onClick={onGuide} style={{ width: '100%' }}>
-              안내서 미리보기
-            </button>
-          </section>
+          {onViewGuide ? (
+            <section>
+              <button className="btn" type="button" onClick={onViewGuide} style={{ width: '100%' }}>
+                안내서 보기
+              </button>
+            </section>
+          ) : null}
         </aside>
       </div>
 

@@ -650,6 +650,13 @@ p {
   font-size: 0.84rem;
 }
 
+.planner-save-hint {
+  flex: 1 1 100%;
+  font-size: 0.78rem;
+  color: var(--rose, #b42318);
+  text-align: right;
+}
+
 .trip-fields {
   display: flex;
   flex-wrap: wrap;

@@ -36,6 +36,11 @@ export default function App() {
   const [editingSample, setEditingSample] = useState<SampleRecord | null>(null)
   const [samplePreview, setSamplePreview] = useState(false)
   const authIntent = useRef<null | 'newTrip' | 'claimSample' | 'trips' | 'galleryWrite'>(null)
+  const saveSeq = useRef(0)
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+  const [tripDirty, setTripDirty] = useState(false)
+  const [guideTrip, setGuideTrip] = useState<Trip | null>(null)
+  const [guideHint, setGuideHint] = useState('')
 
   useEffect(() => {
     void (async () => {
@@ -50,51 +55,110 @@ export default function App() {
   }, [])
 
   useEffect(() => {
-    if (view !== 'planner' && view !== 'guide') return
-    if (!user) return
-    if (samplePreview && !sampleEditId) return
-    const timer = window.setTimeout(() => {
-      void persistTrip(trip)
-    }, 450)
-    return () => window.clearTimeout(timer)
-  }, [trip, view, user, sampleEditId, editingSample, samplePreview])
-
-  useEffect(() => {
     if ((view === 'trips' || view === 'profile') && !user) setView('home')
   }, [view, user])
 
-  async function persistTrip(next: Trip, forceMine = false, actor: User | null = user) {
-    if (sampleEditId && isSupervisor(actor) && !forceMine) {
-      const record = sampleFromTrip(next, editingSample ?? undefined)
-      record.id = sampleEditId === '__new__' ? '' : sampleEditId
-      const saved = await saveSample(record)
-      setEditingSample(saved)
-      if (sampleEditId === '__new__') setSampleEditId(saved.id)
-      return
-    }
-    if (!actor) return
-    if (!forceMine && (samplePreview || next.savedByUser === false)) return
-    if (isBlankDraft(next)) return
-    const owned = { ...next, savedByUser: true }
-    await upsertTrip(owned)
-    setTrips(onlyPersonalTrips(await listTrips()))
-    if (owned.publishedSampleId) {
-      await saveSample(
-        sampleFromTrip(owned, {
-          id: owned.publishedSampleId,
-          sort: 80,
-          nights: 1,
-          place: owned.destination || '여행',
-          title: owned.title,
-          destination: owned.destination,
-          trip: owned,
-          ownerId: actor.id,
-          ownerName: actor.name,
-          sourceTripId: owned.id,
-        }),
-      )
+  async function persistTrip(next: Trip, forceMine = false, actor: User | null = user): Promise<boolean> {
+    const seq = ++saveSeq.current
+    try {
+      if (sampleEditId && isSupervisor(actor) && !forceMine) {
+        const record = sampleFromTrip(next, editingSample ?? undefined)
+        record.id = sampleEditId === '__new__' ? '' : sampleEditId
+        const saved = await saveSample(record)
+        if (seq !== saveSeq.current) return false
+        setEditingSample(saved)
+        if (sampleEditId === '__new__') setSampleEditId(saved.id)
+        setTrip((cur) => ({ ...cur, ...saved.trip, id: cur.id }))
+        return true
+      }
+      if (!actor) return false
+      if (!forceMine && (samplePreview || next.savedByUser === false)) return false
+      if (isBlankDraft(next)) return false
+      const owned = { ...next, savedByUser: true }
+      const saved = await upsertTrip(owned)
+      if (seq !== saveSeq.current) return false
+      setTrip((cur) => (cur.id === saved.id ? saved : cur))
+      setTrips(onlyPersonalTrips(await listTrips()))
+      if (owned.publishedSampleId) {
+        await saveSample(
+          sampleFromTrip(saved, {
+            id: owned.publishedSampleId,
+            sort: 80,
+            nights: 1,
+            place: saved.destination || '여행',
+            title: saved.title,
+            destination: saved.destination,
+            trip: saved,
+            ownerId: actor.id,
+            ownerName: actor.name,
+            sourceTripId: saved.id,
+          }),
+        )
+      }
+      return true
+    } catch {
+      return false
     }
   }
+
+  async function saveTripNow() {
+    if (!user) {
+      askAuth('newTrip')
+      return
+    }
+    setGuideHint('')
+    setSaveStatus('saving')
+    const ok = await persistTrip(trip, false, user)
+    if (ok) {
+      setTripDirty(false)
+      setSaveStatus('saved')
+    } else {
+      setSaveStatus('error')
+    }
+  }
+
+  async function viewGuidebook() {
+    setGuideHint('')
+    if (!user) {
+      askAuth('newTrip')
+      return
+    }
+    if (samplePreview && !sampleEditId) {
+      setGuideHint('내 여행에 저장한 뒤 안내서를 볼 수 있습니다.')
+      return
+    }
+    if (sampleEditId) {
+      setGuideHint('추천 일정 편집 중에는 안내서 보기를 사용할 수 없습니다.')
+      return
+    }
+    if (tripDirty) {
+      setGuideHint('변경 내용을 저장한 뒤 안내서를 볼 수 있습니다.')
+      return
+    }
+    if (isBlankDraft(trip)) {
+      setGuideHint('여행 이름·일정을 입력하고 저장해 주세요.')
+      return
+    }
+    try {
+      const list = onlyPersonalTrips(await listTrips())
+      const saved = list.find((row) => row.id === trip.id)
+      if (!saved) {
+        setGuideHint('저장 버튼으로 일정을 저장한 뒤 안내서를 볼 수 있습니다.')
+        return
+      }
+      setTrips(list)
+      setGuideTrip(saved)
+      setView('guide')
+    } catch {
+      setGuideHint('안내서를 불러오지 못했습니다.')
+    }
+  }
+
+  useEffect(() => {
+    if (saveStatus !== 'saved') return
+    const timer = window.setTimeout(() => setSaveStatus('idle'), 2000)
+    return () => window.clearTimeout(timer)
+  }, [saveStatus])
 
   async function publishTrip(target: Trip) {
     if (!user || isBlankDraft(target)) return
@@ -117,7 +181,7 @@ export default function App() {
     )
     const owned = { ...target, savedByUser: true, publishedSampleId: saved.id }
     setTrip((cur) => (cur.id === owned.id ? owned : cur))
-    await persistTrip(owned, true)
+    if (await persistTrip(owned, true)) setTripDirty(false)
   }
 
   async function unpublishTrip(target: Trip) {
@@ -125,24 +189,31 @@ export default function App() {
     await removeSample(target.publishedSampleId)
     const owned = { ...target, savedByUser: true, publishedSampleId: undefined }
     setTrip((cur) => (cur.id === owned.id ? owned : cur))
-    await persistTrip(owned, true)
+    if (await persistTrip(owned, true)) setTripDirty(false)
   }
 
   function openPlanner(next: Trip, mode: 'mine' | 'preview' = 'mine') {
     setSampleEditId(null)
     setEditingSample(null)
     setSamplePreview(mode === 'preview')
+    setTripDirty(false)
+    setGuideHint('')
+    setSaveStatus('idle')
     setTrip(mode === 'preview' ? { ...next, savedByUser: false } : { ...next, savedByUser: true })
     setView('planner')
   }
 
   function handleTripChange(next: Trip) {
     if (!user) return
+    setSaveStatus((cur) => (cur === 'error' ? 'idle' : cur))
+    setGuideHint('')
     if (samplePreview) {
       setSamplePreview(false)
+      setTripDirty(true)
       setTrip({ ...next, savedByUser: true })
       return
     }
+    setTripDirty(true)
     setTrip(next)
   }
 
@@ -164,7 +235,8 @@ export default function App() {
     const owned = { ...trip, savedByUser: true }
     setSamplePreview(false)
     setTrip(owned)
-    await persistTrip(owned, true, actor)
+    const ok = await persistTrip(owned, true, actor)
+    if (ok) setTripDirty(false)
     setView('trips')
   }
 
@@ -306,6 +378,9 @@ export default function App() {
             setSamplePreview(false)
             setEditingSample(sample)
             setSampleEditId(sample.id)
+            setTripDirty(true)
+            setGuideHint('')
+            setSaveStatus('idle')
             setTrip(sample.trip)
             setView('planner')
           }}
@@ -313,6 +388,9 @@ export default function App() {
             setSamplePreview(false)
             setEditingSample(null)
             setSampleEditId('__new__')
+            setTripDirty(true)
+            setGuideHint('')
+            setSaveStatus('idle')
             setTrip(emptyTrip())
             setView('planner')
           }}
@@ -343,22 +421,23 @@ export default function App() {
           trip={trip}
           user={user}
           copyingSample={samplePreview && !sampleEditId}
+          saveStatus={saveStatus}
           onChange={handleTripChange}
+          onSave={user && !(samplePreview && !sampleEditId) ? () => void saveTripNow() : undefined}
           onSaveCopy={() => void saveSampleCopy()}
           nav={nav}
-          onGuide={() => {
-            if (!user) {
-              askAuth(samplePreview && !sampleEditId ? 'claimSample' : null)
-              return
-            }
-            setView('guide')
-          }}
+          guideHint={guideHint}
+          onViewGuide={
+            user && !(samplePreview && !sampleEditId) && !sampleEditId
+              ? () => void viewGuidebook()
+              : undefined
+          }
           onPublish={user && !samplePreview && !sampleEditId ? () => void publishTrip(trip) : undefined}
           onUnpublish={user && !samplePreview && !sampleEditId ? () => void unpublishTrip(trip) : undefined}
         />
       ) : null}
-      {view === 'guide' && user ? (
-        <Guidebook {...nav} trip={trip} onBack={() => setView('planner')} />
+      {view === 'guide' && user && guideTrip ? (
+        <Guidebook {...nav} trip={guideTrip} onBack={() => setView('planner')} />
       ) : null}
       {authOpen ? (
         <AuthModal onClose={() => setAuthOpen(false)} onAuthed={(next) => void handleAuthed(next)} />
