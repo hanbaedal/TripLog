@@ -16,7 +16,7 @@ async function upsertCatalogPhoto(row) {
   await GalleryPhoto.updateOne(
     { photoId: row.id },
     {
-      $set: { title: row.title, ...meta },
+      $set: { title: row.title, src: row.src, ...meta },
       $setOnInsert: {
         photoId: row.id,
         src: row.src,

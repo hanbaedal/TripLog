@@ -19,6 +19,17 @@ export function hasDisplayableGallerySrc(photo: Pick<GalleryPhoto, 'src'>): bool
   return Boolean((photo.src || '').trim())
 }
 
+function resolveGallerySrc(photo: GalleryPhoto, seed?: GalleryPhoto): string {
+  const fromServer = (photo.src || '').trim()
+  const fromSeed = (seed?.src || '').trim()
+  const catalog = Boolean(photo.catalog ?? seed?.catalog)
+  // DB 시드가 예전 외부 URL일 때 로컬 /samples/ 카탈로그를 우선
+  if (catalog && fromSeed.startsWith('/samples/')) {
+    if (!fromServer || /^https?:/i.test(fromServer)) return fromSeed
+  }
+  return fromServer || fromSeed
+}
+
 function enrichGalleryPhoto(photo: GalleryPhoto): GalleryPhoto {
   const seed = CATALOG_BY_ID.get(photo.id)
   const category = normalizeGalleryCategory(photo.category || seed?.category || 'sight') as GalleryCategory
@@ -35,7 +46,7 @@ function enrichGalleryPhoto(photo: GalleryPhoto): GalleryPhoto {
     city,
     category,
     sightType: sightType || undefined,
-    src: photo.src || seed?.src || '',
+    src: resolveGallerySrc(photo, seed),
     title: photo.title || seed?.title || photo.id,
     catalog: Boolean(photo.catalog ?? seed?.catalog),
   }
