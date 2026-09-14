@@ -40,22 +40,14 @@ const BY_PLACE: Record<string, string> = {
 }
 
 const KR_FALLBACK: Record<string, string> = {
-  'kr-seoul-day':
-    'https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8c/Gyeongbok-gung_palace.jpg/960px-Gyeongbok-gung_palace.jpg',
-  'kr-seoul':
-    'https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8c/Gyeongbok-gung_palace.jpg/960px-Gyeongbok-gung_palace.jpg',
-  'kr-gangwon':
-    'https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3a/Footbridge_at_Seoraksan_National_Park.jpg/960px-Footbridge_at_Seoraksan_National_Park.jpg',
-  'kr-chungcheong':
-    'https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1e/View_of_Gongju_02.jpg/960px-View_of_Gongju_02.jpg',
-  'kr-gyeonggi':
-    'https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7a/Suwon_Hwaseong.jpg/960px-Suwon_Hwaseong.jpg',
-  'kr-gyeongsang':
-    'https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b6/Korea-Gyeongju-Bulguksa-04.jpg/960px-Korea-Gyeongju-Bulguksa-04.jpg',
-  'kr-jeolla':
-    'https://thumb.wikimedia.org/wikipedia/commons/thumb/2/22/Jeonju_Hanok_Maeul_02.jpg/960px-Jeonju_Hanok_Maeul_02.jpg',
-  'kr-jeju':
-    'https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b0/Seongsan_Ilchulbong.jpg/960px-Seongsan_Ilchulbong.jpg',
+  'kr-seoul-day': '/samples/kr-seoul.jpg',
+  'kr-seoul': '/samples/kr-seoul.jpg',
+  'kr-gangwon': '/samples/kr-gangwon.jpg',
+  'kr-chungcheong': '/samples/kr-chungcheong.jpg',
+  'kr-gyeonggi': '/samples/kr-gyeonggi.jpg',
+  'kr-gyeongsang': '/samples/kr-gyeongsang.jpg',
+  'kr-jeolla': '/samples/kr-jeolla.jpg',
+  'kr-jeju': '/samples/kr-jeju.jpg',
 }
 
 const CATALOG = GALLERY_PHOTOS as GalleryPhoto[]
@@ -75,7 +67,7 @@ export function sampleCover(sample: { id?: string; place?: string }, photos?: Ga
     const found = photos.find((row) => row.id === photoId)
     if (found?.src) return galleryMediaSrc(found.src)
   }
-  if (KR_FALLBACK[photoId]) return KR_FALLBACK[photoId]
+  if (KR_FALLBACK[photoId]) return galleryMediaSrc(KR_FALLBACK[photoId])
   const catalog = CATALOG.find((row) => row.id === photoId)
   return galleryMediaSrc(catalog?.src || CATALOG.find((row) => row.id === 'shanghai')?.src || '')
 }
