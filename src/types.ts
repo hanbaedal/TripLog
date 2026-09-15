@@ -78,12 +78,15 @@ export type SampleRecord = {
   sourceTripId?: string
 }
 
+export type AuthProvider = 'email' | 'kakao' | 'google'
+
 export type User = {
   id: string
   email: string
   name: string
   phone?: string
   role?: 'user' | 'supervisor'
+  authProvider?: AuthProvider
 }
 
 export type GalleryCategory = 'sight' | 'meal' | 'hotel' | 'transport' | 'flight'

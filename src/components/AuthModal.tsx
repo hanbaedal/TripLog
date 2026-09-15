@@ -1,12 +1,13 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import type { User } from '../types'
-import { checkEmailAvailable, findEmail, resetPassword, signIn, signUp } from '../lib/auth'
+import { checkEmailAvailable, fetchAuthProviders, findEmail, resetPassword, signIn, signUp, startOAuth } from '../lib/auth'
 import { PasswordField } from './PasswordField'
 
 type Props = {
   onClose: () => void
   onAuthed: (user: User) => void
+  initialError?: string
 }
 
 type Mode = 'in' | 'up' | 'findId' | 'findPw'
@@ -33,7 +34,7 @@ function GoogleIcon() {
   )
 }
 
-export function AuthModal({ onClose, onAuthed }: Props) {
+export function AuthModal({ onClose, onAuthed, initialError = '' }: Props) {
   const [mode, setMode] = useState<Mode>('in')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -42,8 +43,19 @@ export function AuthModal({ onClose, onAuthed }: Props) {
   const [confirm, setConfirm] = useState('')
   const [emailChecked, setEmailChecked] = useState('')
   const [foundEmail, setFoundEmail] = useState('')
-  const [error, setError] = useState('')
+  const [error, setError] = useState(initialError)
   const [busy, setBusy] = useState(false)
+  const [oauthReady, setOauthReady] = useState({ kakao: false, google: false })
+
+  useEffect(() => {
+    void fetchAuthProviders()
+      .then((providers) => setOauthReady({ kakao: providers.kakao, google: providers.google }))
+      .catch(() => setOauthReady({ kakao: false, google: false }))
+  }, [])
+
+  useEffect(() => {
+    if (initialError) setError(initialError)
+  }, [initialError])
 
   function switchMode(next: Mode) {
     setMode(next)
@@ -104,7 +116,11 @@ export function AuthModal({ onClose, onAuthed }: Props) {
   }
 
   function onSocial(provider: 'kakao' | 'google') {
-    setError(`${provider === 'kakao' ? '카카오' : 'Google'} 로그인은 준비 중입니다. 이메일로 로그인해 주세요.`)
+    if (!oauthReady[provider]) {
+      setError(`${provider === 'kakao' ? '카카오' : 'Google'} 로그인은 아직 설정되지 않았습니다.`)
+      return
+    }
+    startOAuth(provider)
   }
 
   const primaryLabel =
@@ -283,11 +299,11 @@ export function AuthModal({ onClose, onAuthed }: Props) {
         </div>
 
         <div className="auth-row auth-row-social">
-          <button className="btn auth-btn-kakao" type="button" onClick={() => onSocial('kakao')}>
+          <button className="btn auth-btn-kakao" type="button" disabled={!oauthReady.kakao} onClick={() => onSocial('kakao')}>
             <KakaoIcon />
             카카오
           </button>
-          <button className="btn auth-btn-google" type="button" onClick={() => onSocial('google')}>
+          <button className="btn auth-btn-google" type="button" disabled={!oauthReady.google} onClick={() => onSocial('google')}>
             <GoogleIcon />
             Google
           </button>

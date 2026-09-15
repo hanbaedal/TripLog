@@ -1,6 +1,6 @@
-import type { User } from '../types'
+import type { AuthProvider, User } from '../types'
 import { isValidPhone, normalizePhone } from './phone'
-import { api, getToken, setToken } from './remote'
+import { api, apiUrl, getToken, setToken } from './remote'
 
 export function isSupervisor(user: User | null): boolean {
   return user?.role === 'supervisor'
@@ -95,6 +95,32 @@ export async function updateProfile(input: {
 
 export function signOut(): void {
   setToken('')
+}
+
+const OAUTH_ERROR_MESSAGES: Record<string, string> = {
+  not_configured: '소셜 로그인 설정이 아직 완료되지 않았습니다.',
+  invalid_state: '로그인 요청이 만료되었습니다. 다시 시도해 주세요.',
+  access_denied: '로그인이 취소되었습니다.',
+  email_account_exists: '이 이메일은 이미 이메일 가입으로 등록되어 있습니다. 이메일로 로그인해 주세요.',
+  email_taken: '이 이메일은 다른 계정에서 사용 중입니다.',
+  kakao_token_failed: '카카오 로그인에 실패했습니다.',
+  kakao_profile_failed: '카카오 프로필을 가져오지 못했습니다.',
+  google_token_failed: 'Google 로그인에 실패했습니다.',
+  google_profile_failed: 'Google 프로필을 가져오지 못했습니다.',
+  oauth_failed: '소셜 로그인에 실패했습니다.',
+}
+
+export function oauthErrorMessage(code: string): string {
+  return OAUTH_ERROR_MESSAGES[code] || OAUTH_ERROR_MESSAGES.oauth_failed
+}
+
+export async function fetchAuthProviders(): Promise<Record<AuthProvider, boolean>> {
+  const data = await api<{ kakao: boolean; google: boolean }>('/auth/providers')
+  return { email: true, kakao: data.kakao, google: data.google }
+}
+
+export function startOAuth(provider: Exclude<AuthProvider, 'email'>): void {
+  window.location.href = apiUrl(`/api/auth/${provider}`)
 }
 
 export async function remoteMe(): Promise<User | null> {

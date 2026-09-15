@@ -22,3 +22,11 @@ services:
         generateValue: true
       - key: UPLOAD_DIR
         value: /opt/render/project/src/uploads
+      - key: APP_URL
+        value: https://triplog-361k.onrender.com
+      - key: KAKAO_REST_API_KEY
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false

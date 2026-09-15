@@ -19,6 +19,7 @@ import { ensureGalleryUploadDir, migrateGalleryDataUrls, uploadRoot } from './ga
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const app = express()
+app.set('trust proxy', 1)
 const port = Number(process.env.PORT) || 3001
 const mongoUri = process.env.MONGODB_URI
 const origin = process.env.CORS_ORIGIN

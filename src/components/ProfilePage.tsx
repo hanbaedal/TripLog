@@ -125,13 +125,23 @@ export function ProfilePage({ onSaved, ...nav }: Props) {
               placeholder="010-0000-0000"
             />
           </label>
-          <PasswordField
-            label="현재 비밀번호"
-            value={currentPassword}
-            onChange={setCurrentPassword}
-            required
-            autoComplete="current-password"
-          />
+          {user.authProvider === 'email' ? (
+            <PasswordField
+              label="현재 비밀번호"
+              value={currentPassword}
+              onChange={setCurrentPassword}
+              required
+              autoComplete="current-password"
+            />
+          ) : (
+            <PasswordField
+              label="현재 비밀번호"
+              value={currentPassword}
+              onChange={setCurrentPassword}
+              autoComplete="current-password"
+              placeholder="비밀번호를 설정한 경우에만 입력"
+            />
+          )}
           <PasswordField
             label="새 비밀번호"
             value={password}

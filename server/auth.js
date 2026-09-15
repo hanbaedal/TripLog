@@ -52,6 +52,7 @@ export function publicUser(user) {
     name: user.name,
     phone: user.phone || '',
     role: user.role === 'supervisor' ? 'supervisor' : 'user',
+    authProvider: user.authProvider || 'email',
   }
 }
 

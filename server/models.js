@@ -5,11 +5,15 @@ const userSchema = new mongoose.Schema(
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
     name: { type: String, required: true, trim: true },
     phone: { type: String, default: '', trim: true, index: true },
-    passwordHash: { type: String, required: true },
+    passwordHash: { type: String, default: '' },
+    authProvider: { type: String, enum: ['email', 'kakao', 'google'], default: 'email' },
+    providerId: { type: String, default: '', index: true },
     role: { type: String, enum: ['user', 'supervisor'], default: 'user' },
   },
   { timestamps: true },
 )
+
+userSchema.index({ authProvider: 1, providerId: 1 }, { unique: true, partialFilterExpression: { providerId: { $type: 'string', $ne: '' } } })
 
 const tripSchema = new mongoose.Schema(
   {

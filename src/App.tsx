@@ -17,8 +17,8 @@ import { UsersAdminPage } from './components/UsersAdminPage'
 import { TripList } from './components/TripList'
 import { emptyTrip } from './data/demo'
 import { cloneSampleTrip, isBlankDraft, removeSample, sampleFromTrip, saveSample } from './data/samples'
-import { isSupervisor, remoteMe, signOut } from './lib/auth'
-import { probeRemote } from './lib/remote'
+import { isSupervisor, oauthErrorMessage, remoteMe, signOut } from './lib/auth'
+import { probeRemote, setToken } from './lib/remote'
 import { deleteTrip, filterTripsByMarket, listTrips, onlyPersonalTrips, purgeSampleCopies, upsertTrip } from './lib/trips'
 import { readMarket, writeMarket } from './lib/market'
 import type { AppView, SiteNav } from './lib/siteNav'
@@ -45,12 +45,41 @@ export default function App() {
   const [tripDirty, setTripDirty] = useState(false)
   const [guideTrip, setGuideTrip] = useState<Trip | null>(null)
   const [guideHint, setGuideHint] = useState('')
+  const [oauthError, setOauthError] = useState('')
 
   useEffect(() => {
     void (async () => {
+      const params = new URLSearchParams(window.location.search)
+      const oauthToken = params.get('token')
+      const oauthErr = params.get('oauth_error')
+      if (oauthToken || oauthErr) {
+        window.history.replaceState({}, '', window.location.pathname)
+      }
+      if (oauthErr) {
+        setOauthError(oauthErrorMessage(oauthErr))
+        setAuthOpen(true)
+      }
+      if (oauthToken) {
+        setToken(oauthToken)
+      }
+
       await probeRemote()
       const me = await remoteMe()
       if (!me) return
+      if (oauthToken) {
+        const storedIntent = sessionStorage.getItem('triplog.authIntent') as
+          | 'newTrip'
+          | 'claimSample'
+          | 'trips'
+          | 'galleryWrite'
+          | null
+        if (storedIntent) {
+          authIntent.current = storedIntent
+          sessionStorage.removeItem('triplog.authIntent')
+        }
+        await handleAuthed(me)
+        return
+      }
       setUser(me)
       const list = await purgeSampleCopies(await listTrips())
       setTrips(list)
@@ -229,6 +258,9 @@ export default function App() {
 
   function askAuth(intent: null | 'newTrip' | 'claimSample' | 'trips' | 'galleryWrite' = null) {
     authIntent.current = intent
+    if (intent) sessionStorage.setItem('triplog.authIntent', intent)
+    else sessionStorage.removeItem('triplog.authIntent')
+    setOauthError('')
     setAuthOpen(true)
   }
 
@@ -516,7 +548,14 @@ export default function App() {
         <Guidebook {...nav} trip={guideTrip} onBack={() => setView('planner')} />
       ) : null}
       {authOpen ? (
-        <AuthModal onClose={() => setAuthOpen(false)} onAuthed={(next) => void handleAuthed(next)} />
+        <AuthModal
+          initialError={oauthError}
+          onClose={() => {
+            setAuthOpen(false)
+            setOauthError('')
+          }}
+          onAuthed={(next) => void handleAuthed(next)}
+        />
       ) : null}
     </>
   )
