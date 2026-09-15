@@ -27,6 +27,8 @@ type Props = {
   user?: User | null
   tripDestination?: string
   tripMarket?: 'kr' | 'cn'
+  tripAdults?: number
+  tripChildren?: number
   onClose: () => void
   onSave: (item: TripItem) => void
   onDelete?: () => void
@@ -81,6 +83,8 @@ export function ItemModal({
   user,
   tripDestination,
   tripMarket,
+  tripAdults = 1,
+  tripChildren = 0,
   onClose,
   onSave,
   onDelete,
@@ -183,6 +187,7 @@ export function ItemModal({
     setPlace(pick.place)
     setNote(pick.note)
     setTransportMode('tourbus')
+    if (pick.budgetKrw) setBudgetCost(String(pick.budgetKrw))
     setTourBusOpen(false)
   }
 
@@ -541,6 +546,8 @@ export function ItemModal({
         ? createPortal(
             <TourBusPicker
               initialCity={tourBusCityHint}
+              tripAdults={tripAdults}
+              tripChildren={tripChildren}
               onClose={() => setTourBusOpen(false)}
               onPick={applyTourBusPick}
             />,

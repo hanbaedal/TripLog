@@ -609,6 +609,8 @@ export function Planner({
           user={user}
           tripDestination={trip.destination}
           tripMarket={trip.market}
+          tripAdults={trip.adults}
+          tripChildren={trip.children}
           onClose={() => {
             setEditing(null)
             setPreset(null)

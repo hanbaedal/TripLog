@@ -1284,9 +1284,42 @@ p {
   font-size: 0.88rem;
 }
 
+.tourbus-city-hint {
+  margin: 0 0 10px;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
 .tourbus-city-chips {
   display: flex;
   flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tourbus-save-panel {
+  display: grid;
+  gap: 10px;
+}
+
+.tourbus-save-title {
+  margin: 0;
+  line-height: 1.45;
+}
+
+.tourbus-save-link {
+  margin: 0;
+  word-break: break-all;
+}
+
+.tourbus-save-preview {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.tourbus-save-actions {
+  display: grid;
   gap: 8px;
 }
 

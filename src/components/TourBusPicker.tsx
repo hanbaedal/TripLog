@@ -1,19 +1,24 @@
 import { useEffect, useMemo, useState } from 'react'
+import { krw } from '../lib/costs'
 import {
   buildTourBusPick,
+  computeTourBusBudget,
+  discoverTourBusCity,
   listTourBusCities,
-  loadTourBusCity,
   resolveTourBusCity,
+  saveTourBusCity,
   type TourBusCityDoc,
   type TourBusCourse,
   type TourBusPick,
   type TourBusStop,
 } from '../lib/tourbus'
 
-type Step = 'city' | 'course' | 'stop' | 'time'
+type Step = 'city' | 'save' | 'course' | 'stop' | 'time'
 
 type Props = {
   initialCity?: string
+  tripAdults?: number
+  tripChildren?: number
   onClose: () => void
   onPick: (pick: TourBusPick) => void
 }
@@ -28,7 +33,13 @@ function hasStops(course: TourBusCourse): course is TourBusCourse & { stops: Tou
   return Boolean(course.stops?.length)
 }
 
-export function TourBusPicker({ initialCity, onClose, onPick }: Props) {
+export function TourBusPicker({
+  initialCity,
+  tripAdults = 1,
+  tripChildren = 0,
+  onClose,
+  onPick,
+}: Props) {
   const [step, setStep] = useState<Step>('city')
   const [cities, setCities] = useState<{ city: string; cityLabel: string }[]>([])
   const [cityInput, setCityInput] = useState(initialCity ?? '')
@@ -37,6 +48,8 @@ export function TourBusPicker({ initialCity, onClose, onPick }: Props) {
   const [stop, setStop] = useState<TourBusStop | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [discoverSource, setDiscoverSource] = useState<'catalog' | 'opendata' | 'db' | null>(null)
+  const [needsSaveChoice, setNeedsSaveChoice] = useState(false)
 
   const resolvedSlug = useMemo(() => resolveTourBusCity(cityInput), [cityInput])
 
@@ -50,22 +63,43 @@ export function TourBusPicker({ initialCity, onClose, onPick }: Props) {
     }
   }, [initialCity])
 
-  async function loadCity(slug: string, label?: string) {
+  async function discoverCity(query: string, label?: string) {
+    const bit = (label || query).trim()
+    if (!bit) {
+      setError('도시명을 입력해 주세요.')
+      return
+    }
     setLoading(true)
     setError('')
+    setNeedsSaveChoice(false)
+    setDiscoverSource(null)
     try {
-      const doc = await loadTourBusCity(slug)
-      if (!doc) {
-        setError('이 도시의 투어버스 참고 일정은 아직 준비 중입니다.')
+      const hit = await discoverTourBusCity(bit)
+      if (hit.status === 'not_found') {
+        setError(hit.message || '이 도시는 시티투어버스를 운영하지 않습니다.')
         setCityDoc(null)
         return
       }
-      setCityDoc(doc)
-      if (label) setCityInput(label)
-      else setCityInput(doc.cityLabel)
+      if (hit.status !== 'found' || !hit.city) {
+        setError(
+          hit.status === 'invalid'
+            ? hit.error || '도시명을 입력해 주세요.'
+            : '투어버스 일정을 불러오지 못했습니다.',
+        )
+        setCityDoc(null)
+        return
+      }
+      setCityDoc(hit.city)
+      setCityInput(hit.city.cityLabel)
+      setDiscoverSource(hit.source)
       setCourse(null)
       setStop(null)
-      setStep('course')
+      if (hit.saved) {
+        setStep('course')
+      } else {
+        setNeedsSaveChoice(true)
+        setStep('save')
+      }
     } catch {
       setError('투어버스 일정을 불러오지 못했습니다.')
       setCityDoc(null)
@@ -75,17 +109,33 @@ export function TourBusPicker({ initialCity, onClose, onPick }: Props) {
   }
 
   function pickCityFromList(row: { city: string; cityLabel: string }) {
-    void loadCity(row.city, row.cityLabel)
+    void discoverCity(row.cityLabel, row.cityLabel)
   }
 
   function submitCity(e: React.FormEvent) {
     e.preventDefault()
-    const slug = resolvedSlug
-    if (!slug) {
-      setError('서울 · 부산 · 제주 · 경주 · 전주 · 동해 중에서 선택하거나 입력해 주세요.')
-      return
+    void discoverCity(cityInput.trim())
+  }
+
+  async function confirmSave(save: boolean) {
+    if (!cityDoc) return
+    if (save) {
+      setLoading(true)
+      const saved = await saveTourBusCity(cityDoc)
+      setLoading(false)
+      if (!saved) {
+        setError('DB 저장에 실패했습니다. 이번만 이용하기로 계속할 수 있습니다.')
+        return
+      }
+      setCityDoc(saved)
     }
-    void loadCity(slug)
+    setNeedsSaveChoice(false)
+    setStep('course')
+  }
+
+  function skipSave() {
+    setNeedsSaveChoice(false)
+    setStep('course')
   }
 
   function pickCourse(row: TourBusCourse) {
@@ -101,7 +151,20 @@ export function TourBusPicker({ initialCity, onClose, onPick }: Props) {
 
   function pickTime(time: string) {
     if (!cityDoc || !course) return
-    onPick(buildTourBusPick(cityDoc, course, time, stop ?? undefined))
+    onPick(
+      buildTourBusPick(cityDoc, course, time, stop ?? undefined, {
+        adults: tripAdults,
+        children: tripChildren,
+      }),
+    )
+  }
+
+  function fareHint(row: TourBusCourse): string {
+    if (!row.fareAdult) return ''
+    const total = computeTourBusBudget(row, tripAdults, tripChildren)
+    const people = Math.max(1, tripAdults + tripChildren)
+    if (people <= 1) return `참고 ${krw(row.fareAdult)}`
+    return `참고 ${krw(row.fareAdult)} · 일행 ${krw(total)}`
   }
 
   function goBack() {
@@ -117,21 +180,35 @@ export function TourBusPicker({ initialCity, onClose, onPick }: Props) {
       return
     }
     if (step === 'course') {
+      setStep(needsSaveChoice ? 'save' : 'city')
+      if (!needsSaveChoice) {
+        setCityDoc(null)
+        setCourse(null)
+        setStop(null)
+      }
+      return
+    }
+    if (step === 'save') {
       setStep('city')
       setCityDoc(null)
       setCourse(null)
       setStop(null)
+      setNeedsSaveChoice(false)
     }
   }
 
   const stepTitle =
     step === 'city'
       ? '① 도시 선택'
-      : step === 'course'
-        ? '② 투어 코스'
-        : step === 'stop'
-          ? '③ 승차 장소'
-          : '④ 출발 시간'
+      : step === 'save'
+        ? '② 정보 확인'
+        : step === 'course'
+          ? needsSaveChoice
+            ? '② 투어 코스'
+            : '② 투어 코스'
+          : step === 'stop'
+            ? '③ 승차 장소'
+            : '④ 출발 시간'
 
   const timeOptions = stop?.times?.length ? stop.times : course?.times ?? []
 
@@ -172,7 +249,7 @@ export function TourBusPicker({ initialCity, onClose, onPick }: Props) {
                     setCityInput(e.target.value)
                     setError('')
                   }}
-                  placeholder="서울 · 부산 · 제주 · 경주 · 전주 · 동해"
+                  placeholder="예: 대구 · 인천 · 여수 · 강릉 · 청주"
                   list="tourbus-city-options"
                   autoFocus
                 />
@@ -186,8 +263,12 @@ export function TourBusPicker({ initialCity, onClose, onPick }: Props) {
                 {loading ? '불러오는 중…' : '코스 보기'}
               </button>
             </form>
+            <p className="muted tourbus-city-hint">
+              전국 시티투어 운영 도시를 입력하면 공공데이터에서 코스를 불러옵니다. 자주 쓰는 도시는 칩에서
+              선택하세요.
+            </p>
             <div className="tourbus-city-chips">
-              {cities.map((row) => (
+              {cities.slice(0, 18).map((row) => (
                 <button
                   key={row.city}
                   type="button"
@@ -200,6 +281,44 @@ export function TourBusPicker({ initialCity, onClose, onPick }: Props) {
               ))}
             </div>
           </>
+        ) : null}
+
+        {step === 'save' && cityDoc ? (
+          <div className="tourbus-save-panel">
+            <p className="tourbus-save-title">
+              <strong>{cityDoc.cityLabel}</strong> 시티투어 정보 {cityDoc.courses.length}개 코스를 불러왔습니다.
+            </p>
+            <p className="muted">
+              {discoverSource === 'opendata'
+                ? '출처: 공공데이터포털 전국시티투어정보 (참고용)'
+                : '상세 일정·시간은 공식 사이트에서 확인하세요.'}
+            </p>
+            {cityDoc.sourceUrl ? (
+              <p className="muted tourbus-save-link">
+                공식:{' '}
+                <a href={cityDoc.sourceUrl} target="_blank" rel="noreferrer">
+                  {cityDoc.sourceUrl}
+                </a>
+              </p>
+            ) : null}
+            <ul className="tourbus-save-preview">
+              {cityDoc.courses.slice(0, 4).map((row) => (
+                <li key={row.id}>{row.title}</li>
+              ))}
+              {cityDoc.courses.length > 4 ? (
+                <li className="muted">외 {cityDoc.courses.length - 4}개 코스</li>
+              ) : null}
+            </ul>
+            <p className="muted">이 도시 정보를 DB에 저장할까요? 저장하면 다음부터 더 빠르게 불러옵니다.</p>
+            <div className="tourbus-save-actions">
+              <button className="btn" type="button" onClick={() => void confirmSave(true)} disabled={loading}>
+                DB에 저장하고 계속
+              </button>
+              <button className="btn ghost" type="button" onClick={skipSave} disabled={loading}>
+                이번만 보기
+              </button>
+            </div>
+          </div>
         ) : null}
 
         {step === 'course' && cityDoc ? (
@@ -217,6 +336,7 @@ export function TourBusPicker({ initialCity, onClose, onPick }: Props) {
                     {row.stops?.length ? (
                       <span className="muted">승차 장소 {row.stops.length}곳 선택 가능</span>
                     ) : null}
+                    {row.fareAdult ? <span className="muted">{fareHint(row)}</span> : null}
                   </button>
                 </li>
               ))}

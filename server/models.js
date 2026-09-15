@@ -206,6 +206,8 @@ const tourBusCourseSchema = new mongoose.Schema(
     closedDays: { type: [String], default: [] },
     closedNote: { type: String, default: '' },
     note: { type: String, default: '' },
+    fareAdult: { type: Number },
+    fareChild: { type: Number },
     times: { type: [String], default: [] },
     stops: { type: [tourBusStopSchema], default: [] },
     bookingUrl: { type: String, default: '' },
