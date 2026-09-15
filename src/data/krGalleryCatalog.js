@@ -12,6 +12,7 @@ export const KR_GALLERY_PHOTOS = [
   { id: 'kr-gyeongsang', title: '경상', src: sampleSrc('kr-gyeongsang'), catalog: true, city: 'kr-gyeongsang', category: 'sight', sightType: 'temple', market: 'kr' },
   { id: 'kr-jeolla', title: '전라', src: sampleSrc('kr-jeolla'), catalog: true, city: 'kr-jeolla', category: 'sight', sightType: 'town', market: 'kr' },
   { id: 'kr-jeju', title: '제주', src: sampleSrc('kr-jeju'), catalog: true, city: 'kr-jeju', category: 'sight', sightType: 'mountain', market: 'kr' },
+  { id: 'kr-subway', title: '전철타고', src: sampleSrc('kr-subway'), catalog: true, city: 'kr-seoul', category: 'sight', sightType: 'town', market: 'kr' },
   { id: 'kr-nami', title: '남이섬', src: sampleSrc('kr-nami'), catalog: true, city: 'kr-gangwon', category: 'sight', sightType: 'park', market: 'kr' },
   { id: 'kr-seorak', title: '설악산', src: sampleSrc('kr-seorak'), catalog: true, city: 'kr-gangwon', category: 'sight', sightType: 'mountain', market: 'kr' },
   { id: 'kr-danyang', title: '단양 도담삼봉', src: sampleSrc('kr-danyang'), catalog: true, city: 'kr-chungcheong', category: 'sight', sightType: 'mountain', market: 'kr' },

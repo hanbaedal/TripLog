@@ -6,6 +6,7 @@ import { TRAVEL_INFO_CATALOG } from '../../src/data/travelInfoCatalog.js'
 import { TRAVEL_SPOT_CATALOG } from '../../src/data/travelSpotCatalog.js'
 import { KR_TRAVEL_INFO_CATALOG } from '../../src/data/krTravelInfoCatalog.js'
 import { KR_TRAVEL_SPOT_CATALOG } from '../../src/data/krTravelSpotCatalog.js'
+import { KR_SUBWAY_TRAVEL_INFO, KR_SUBWAY_SPOT_CATALOG } from '../../src/data/krSubwayTravelCatalog.js'
 import { cityGalleryId } from '../../src/data/galleryCatalog.js'
 
 export const travelInfoRouter = Router()
@@ -46,6 +47,11 @@ function toSpot(doc) {
     addressZh: doc.addressZh || '',
     body: doc.body,
     tip: doc.tip || '',
+    subwayLine: doc.subwayLine || '',
+    subwayStation: doc.subwayStation || '',
+    subwayRegion: doc.subwayRegion || '',
+    subwayExit: doc.subwayExit || '',
+    walkMin: doc.walkMin ?? undefined,
     photoId: doc.photoId || '',
     src: doc.src || '',
     sort: doc.sort,
@@ -95,21 +101,27 @@ async function upsertInfoRow(row) {
 
 async function upsertSpotRow(row) {
   const cityPhotoId = row.photoId || cityGalleryId(row.cityId)
+  const $set = {
+    name: row.name,
+    body: row.body,
+    tip: row.tip || '',
+    sort: row.sort,
+    photoId: cityPhotoId,
+  }
+  if (row.subwayLine) $set.subwayLine = row.subwayLine
+  if (row.subwayStation) $set.subwayStation = row.subwayStation
+  if (row.subwayRegion) $set.subwayRegion = row.subwayRegion
+  if (row.subwayExit) $set.subwayExit = row.subwayExit
+  if (row.walkMin != null) $set.walkMin = row.walkMin
   await TravelSpot.updateOne(
     { spotId: row.id },
     {
-      $set: {
-        name: row.name,
-        body: row.body,
-        tip: row.tip || '',
-        sort: row.sort,
-      },
+      $set,
       $setOnInsert: {
         spotId: row.id,
         cityId: row.cityId,
         nameZh: row.nameZh || '',
         addressZh: row.addressZh || '',
-        photoId: cityPhotoId,
         src: row.src || '',
         catalog: true,
         ownerName: '',
@@ -127,10 +139,14 @@ export async function seedTravelInfo() {
   for (const row of KR_TRAVEL_INFO_CATALOG) {
     await upsertInfoRow(row)
   }
+  await upsertInfoRow(KR_SUBWAY_TRAVEL_INFO)
   for (const row of TRAVEL_SPOT_CATALOG) {
     await upsertSpotRow(row)
   }
   for (const row of KR_TRAVEL_SPOT_CATALOG) {
+    await upsertSpotRow(row)
+  }
+  for (const row of KR_SUBWAY_SPOT_CATALOG) {
     await upsertSpotRow(row)
   }
 }

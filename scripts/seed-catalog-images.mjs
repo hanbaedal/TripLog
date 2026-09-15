@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url'
 import { FOOD_PHOTOS } from '../src/data/galleryCatalog.js'
 import { KR_GALLERY_PHOTOS } from '../src/data/krGalleryCatalog.js'
 import { KR_TRAVEL_SPOT_CATALOG } from '../src/data/krTravelSpotCatalog.js'
+import { KR_SUBWAY_GALLERY_PHOTOS } from '../src/data/krSubwayGalleryCatalog.js'
 import { commonsSearchThumb, commonsThumbForFile, downloadUrl, sleep } from './lib/commons.mjs'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
@@ -173,10 +174,61 @@ export const KR_SPOT_GALLERY_PHOTOS = ${JSON.stringify(rows, null, 2)}
   console.log(`KR spot gallery: ${rows.length} rows (${ok} images, ${miss} missing)`)
 }
 
+async function seedKrSubway() {
+  console.log('\n=== KR subway gallery → public/samples/ ===')
+  const subwayCover = join(samplesDir, 'kr-subway.jpg')
+  if (!existsSync(subwayCover) || readFileSync(subwayCover).length <= 4096) {
+    const fallback = join(samplesDir, 'kr-seoul.jpg')
+    if (existsSync(fallback)) {
+      copyFileSync(fallback, subwayCover)
+      console.log('cover kr-subway ← kr-seoul.jpg')
+    }
+  }
+
+  const rows = []
+  for (const row of KR_SUBWAY_GALLERY_PHOTOS) {
+    const dest = join(spotsDir, `${row.id}.jpg`)
+    const rel = `/samples/spots/${row.id}.jpg`
+    const fallbackPath = regionFallbackPath(row.city || 'kr-seoul')
+    if (existsSync(dest) && readFileSync(dest).length > 4096) {
+      rows.push({ ...row, src: rel })
+      continue
+    }
+    try {
+      let url = await commonsSearchThumb(`${row.title} South Korea`)
+      if (!url) url = await commonsSearchThumb(`${row.title} Korea`)
+      const saved = await ensureLocal({
+        id: row.id,
+        url,
+        destPath: dest,
+        label: row.title,
+        fallbackPath,
+      })
+      if (saved && existsSync(dest) && readFileSync(dest).length > 4096) {
+        rows.push({ ...row, src: rel })
+      }
+    } catch (err) {
+      console.warn(`subway ${row.id}: ${err.message}`)
+      if (existsSync(dest) && readFileSync(dest).length > 4096) {
+        rows.push({ ...row, src: rel })
+      }
+    }
+  }
+
+  const outPath = join(root, 'src', 'data', 'krSubwayGalleryCatalog.js')
+  const body = `/** 전철타고 전용 갤러리 — scripts/seed-catalog-images.mjs kr-subway 로 생성/갱신 */
+
+export const KR_SUBWAY_GALLERY_PHOTOS = ${JSON.stringify(rows, null, 2)}
+`
+  writeFileSync(outPath, body)
+  console.log(`KR subway gallery: ${rows.length} rows`)
+}
+
 async function main() {
   const mode = process.argv[2] || 'all'
   if (mode === 'cn-food' || mode === 'all') await seedCnFood()
   if (mode === 'kr-spots' || mode === 'all') await seedKrSpots()
+  if (mode === 'kr-subway' || mode === 'all') await seedKrSubway()
   console.log('\nDone.')
 }
 

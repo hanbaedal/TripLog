@@ -2618,6 +2618,57 @@ p {
   margin-top: 2px;
 }
 
+.subway-line-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 18px;
+}
+
+.subway-line-chip {
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--ink-soft);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.subway-line-chip.active {
+  border-color: var(--line-color, var(--accent));
+  background: color-mix(in srgb, var(--line-color, var(--accent)) 12%, white);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.subway-line-group {
+  margin-bottom: 22px;
+}
+
+.subway-line-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  font-size: 1.05rem;
+}
+
+.subway-line-heading::before {
+  content: '';
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--line-color, var(--accent));
+}
+
+.subway-access {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+
 .travel-map-link {
   display: inline-flex;
   align-items: center;

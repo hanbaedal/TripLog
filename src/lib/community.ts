@@ -4,6 +4,7 @@ import { TRAVEL_INFO_CATALOG } from '../data/travelInfoCatalog.js'
 import { TRAVEL_SPOT_CATALOG } from '../data/travelSpotCatalog.js'
 import { KR_TRAVEL_INFO_CATALOG } from '../data/krTravelInfoCatalog.js'
 import { KR_TRAVEL_SPOT_CATALOG } from '../data/krTravelSpotCatalog.js'
+import { KR_SUBWAY_TRAVEL_INFO, KR_SUBWAY_SPOT_CATALOG } from '../data/krSubwayTravelCatalog.js'
 import type { BoardPost, GalleryPhoto, Inquiry, Market, TravelInfo, TravelSpot, User } from '../types'
 import { isSupervisor } from './auth'
 import { galleryPhotoMarket, travelInfoMarket } from './market'
@@ -15,6 +16,7 @@ function catalogTravel(): TravelInfo[] {
   return [
     ...(TRAVEL_INFO_CATALOG as TravelInfo[]).map((row) => ({ ...row, market: 'cn' as const, catalog: true })),
     ...(KR_TRAVEL_INFO_CATALOG as TravelInfo[]).map((row) => ({ ...row, catalog: true })),
+    { ...(KR_SUBWAY_TRAVEL_INFO as TravelInfo), catalog: true },
   ]
 }
 
@@ -25,7 +27,10 @@ function catalogSpots(cityId: string): TravelSpot[] {
   const kr = (KR_TRAVEL_SPOT_CATALOG as TravelSpot[])
     .filter((row) => row.cityId === cityId)
     .map((row) => ({ ...row, catalog: true }))
-  return [...cn, ...kr]
+  const subway = (KR_SUBWAY_SPOT_CATALOG as TravelSpot[])
+    .filter((row) => row.cityId === cityId)
+    .map((row) => ({ ...row, catalog: true }))
+  return [...cn, ...kr, ...subway]
 }
 
 function filterTravelInfo(rows: TravelInfo[], market: Market): TravelInfo[] {

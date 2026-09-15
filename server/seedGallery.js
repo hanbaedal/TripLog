@@ -2,6 +2,7 @@ import { GalleryPhoto } from './models.js'
 import { FOOD_PHOTOS, GALLERY_PHOTOS } from '../src/data/galleryCatalog.js'
 import { KR_GALLERY_PHOTOS } from '../src/data/krGalleryCatalog.js'
 import { KR_SPOT_GALLERY_PHOTOS } from '../src/data/krSpotGalleryCatalog.js'
+import { KR_SUBWAY_GALLERY_PHOTOS } from '../src/data/krSubwayGalleryCatalog.js'
 import { normalizeCity, normalizeGalleryCategory, normalizeSightType } from '../src/data/galleryTaxonomy.js'
 
 function catalogMeta(row) {
@@ -41,7 +42,13 @@ export async function purgeEmptyGalleryPhotos() {
 export async function seedGallery() {
   await purgeEmptyGalleryPhotos()
 
-  for (const row of [...GALLERY_PHOTOS, ...FOOD_PHOTOS, ...KR_GALLERY_PHOTOS, ...KR_SPOT_GALLERY_PHOTOS]) {
+  for (const row of [
+    ...GALLERY_PHOTOS,
+    ...FOOD_PHOTOS,
+    ...KR_GALLERY_PHOTOS,
+    ...KR_SPOT_GALLERY_PHOTOS,
+    ...KR_SUBWAY_GALLERY_PHOTOS,
+  ]) {
     await upsertCatalogPhoto(row)
   }
 

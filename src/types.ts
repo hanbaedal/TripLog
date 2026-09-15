@@ -157,6 +157,11 @@ export type TravelSpot = {
   addressZh?: string
   body: string
   tip: string
+  subwayLine?: string
+  subwayStation?: string
+  subwayRegion?: string
+  subwayExit?: string
+  walkMin?: number
   photoId?: string
   src?: string
   sort?: number

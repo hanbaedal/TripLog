@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import type { FormEvent } from 'react'
+import type { CSSProperties, FormEvent } from 'react'
 import { PageShell } from './PageShell'
 import {
   canEditTravelSpot,
@@ -9,6 +9,7 @@ import {
   saveTravelSpot,
 } from '../lib/community'
 import { cityGalleryId } from '../data/galleryCatalog.js'
+import { SUBWAY_LINES } from '../data/krSubwayTravelCatalog.js'
 import { CITY_REGION_ZH } from '../data/spotLocale.js'
 import { loadGalleryPhotos, resolvePhotoSrc } from '../lib/galleryResolve'
 import { formatSpotLabel, mapSearchLinks } from '../lib/mapLinks'
@@ -32,6 +33,9 @@ export function InfoPlacePage({ cityId, ...nav }: Props) {
   const [tip, setTip] = useState('')
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  const [subwayLine, setSubwayLine] = useState<string>('all')
+
+  const isSubwayGuide = cityId === 'info-kr-subway'
 
   useEffect(() => {
     void findTravelInfo(cityId).then((row) => setCity(row ?? null))
@@ -43,6 +47,96 @@ export function InfoPlacePage({ cityId, ...nav }: Props) {
     () => [...spots].sort((a, b) => (a.sort || 80) - (b.sort || 80) || a.name.localeCompare(b.name, 'ko')),
     [spots],
   )
+
+  const subwayLineMap = useMemo(() => new Map(SUBWAY_LINES.map((row) => [row.id, row])), [])
+
+  const filteredCards = useMemo(() => {
+    if (!isSubwayGuide || subwayLine === 'all') return cards
+    return cards.filter((row) => row.subwayLine === subwayLine)
+  }, [cards, isSubwayGuide, subwayLine])
+
+  const groupedSubwayCards = useMemo(() => {
+    if (!isSubwayGuide || subwayLine !== 'all') return null
+    const groups = new Map<string, TravelSpot[]>()
+    for (const row of filteredCards) {
+      const key = row.subwayLine || 'other'
+      const list = groups.get(key) || []
+      list.push(row)
+      groups.set(key, list)
+    }
+    return SUBWAY_LINES.filter((line) => groups.has(line.id)).map((line) => ({
+      line,
+      spots: groups.get(line.id) || [],
+    }))
+  }, [filteredCards, isSubwayGuide, subwayLine, subwayLineMap])
+
+  function subwayAccessLabel(spot: TravelSpot): string {
+    const line = subwayLineMap.get(spot.subwayLine || '')
+    const parts: string[] = []
+    if (line) parts.push(line.label)
+    if (spot.subwayStation) parts.push(spot.subwayStation)
+    if (spot.subwayExit) parts.push(`${spot.subwayExit} 출구`)
+    if (spot.walkMin) parts.push(`도보 ${spot.walkMin}분`)
+    return parts.join(' · ')
+  }
+
+  function renderSpotCard(spot: TravelSpot) {
+    const maps = mapSearchLinks(
+      {
+        cityKo: place,
+        spotKo: spot.name,
+        cityZh: CITY_REGION_ZH[cityId as keyof typeof CITY_REGION_ZH],
+        nameZh: spot.nameZh,
+        addressZh: spot.addressZh,
+      },
+      nav.market,
+    )
+    const spotPhotoId = spot.photoId || cityPhotoId
+    const spotPhoto = isSubwayGuide ? resolvePhotoSrc(spotPhotoId, photos, spot.src) : ''
+    const access = isSubwayGuide ? subwayAccessLabel(spot) : ''
+
+    return (
+      <article className={`travel-card${isSubwayGuide && spotPhoto ? '' : ' travel-card-text'}`} key={spot.id}>
+        {isSubwayGuide && spotPhoto ? <img src={spotPhoto} alt="" /> : null}
+        <div className="travel-card-body">
+          <h3>{formatSpotLabel(spot, nav.market)}</h3>
+          {access ? <p className="subway-access">{access}</p> : null}
+          {nav.market === 'cn' && spot.addressZh ? <p className="travel-address">{spot.addressZh}</p> : null}
+          <p>{spot.body}</p>
+          {spot.tip ? <p className="muted">{spot.tip}</p> : null}
+          <div className="travel-map-links">
+            {nav.market === 'kr' ? (
+              <>
+                <a className="travel-map-link" href={maps.naver} target="_blank" rel="noreferrer">
+                  네이버 지도
+                </a>
+                <a className="travel-map-link" href={maps.kakao} target="_blank" rel="noreferrer">
+                  카카오맵
+                </a>
+              </>
+            ) : (
+              <a className="travel-map-link" href={maps.baidu} target="_blank" rel="noreferrer">
+                百度地图
+              </a>
+            )}
+            <a className="travel-map-link" href={maps.google} target="_blank" rel="noreferrer">
+              Google Maps
+            </a>
+          </div>
+          {canEditTravelSpot(spot, nav.user) ? (
+            <div className="nav-actions">
+              <button className="btn ghost" type="button" onClick={() => startEdit(spot)}>
+                수정
+              </button>
+              <button className="btn ghost" type="button" onClick={() => void remove(spot.id)}>
+                삭제
+              </button>
+            </div>
+          ) : null}
+        </div>
+      </article>
+    )
+  }
 
   const cityPhotoId = city?.photoId || cityGalleryId(cityId)
 
@@ -194,59 +288,41 @@ export function InfoPlacePage({ cityId, ...nav }: Props) {
           </form>
         ) : null}
 
-        <div className="travel-cards">
-          {cards.map((spot) => {
-            const maps = mapSearchLinks(
-              {
-                cityKo: place,
-                spotKo: spot.name,
-                cityZh: CITY_REGION_ZH[cityId as keyof typeof CITY_REGION_ZH],
-                nameZh: spot.nameZh,
-                addressZh: spot.addressZh,
-              },
-              nav.market,
-            )
-            return (
-              <article className="travel-card travel-card-text" key={spot.id}>
-                <div className="travel-card-body">
-                  <h3>{formatSpotLabel(spot, nav.market)}</h3>
-                  {nav.market === 'cn' && spot.addressZh ? <p className="travel-address">{spot.addressZh}</p> : null}
-                  <p>{spot.body}</p>
-                  {spot.tip ? <p className="muted">{spot.tip}</p> : null}
-                  <div className="travel-map-links">
-                    {nav.market === 'kr' ? (
-                      <>
-                        <a className="travel-map-link" href={maps.naver} target="_blank" rel="noreferrer">
-                          네이버 지도
-                        </a>
-                        <a className="travel-map-link" href={maps.kakao} target="_blank" rel="noreferrer">
-                          카카오맵
-                        </a>
-                      </>
-                    ) : (
-                      <a className="travel-map-link" href={maps.baidu} target="_blank" rel="noreferrer">
-                        百度地图
-                      </a>
-                    )}
-                    <a className="travel-map-link" href={maps.google} target="_blank" rel="noreferrer">
-                      Google Maps
-                    </a>
-                  </div>
-                  {canEditTravelSpot(spot, nav.user) ? (
-                    <div className="nav-actions">
-                      <button className="btn ghost" type="button" onClick={() => startEdit(spot)}>
-                        수정
-                      </button>
-                      <button className="btn ghost" type="button" onClick={() => void remove(spot.id)}>
-                        삭제
-                      </button>
-                    </div>
-                  ) : null}
-                </div>
-              </article>
-            )
-          })}
-        </div>
+        {isSubwayGuide ? (
+          <div className="subway-line-filter">
+            <button
+              type="button"
+              className={`subway-line-chip${subwayLine === 'all' ? ' active' : ''}`}
+              onClick={() => setSubwayLine('all')}
+            >
+              전체
+            </button>
+            {SUBWAY_LINES.map((line) => (
+              <button
+                key={line.id}
+                type="button"
+                className={`subway-line-chip${subwayLine === line.id ? ' active' : ''}`}
+                style={{ '--line-color': line.color } as CSSProperties}
+                onClick={() => setSubwayLine(line.id)}
+              >
+                {line.label}
+              </button>
+            ))}
+          </div>
+        ) : null}
+
+        {isSubwayGuide && groupedSubwayCards ? (
+          groupedSubwayCards.map(({ line, spots: lineSpots }) => (
+            <section className="subway-line-group" key={line.id}>
+              <h3 className="subway-line-heading" style={{ '--line-color': line.color } as CSSProperties}>
+                {line.label}
+              </h3>
+              <div className="travel-cards">{lineSpots.map((spot) => renderSpotCard(spot))}</div>
+            </section>
+          ))
+        ) : (
+          <div className="travel-cards">{filteredCards.map((spot) => renderSpotCard(spot))}</div>
+        )}
       </section>
     </PageShell>
   )
