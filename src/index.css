@@ -1218,6 +1218,109 @@ p {
   margin-bottom: 12px;
 }
 
+.auth-modal {
+  position: relative;
+  padding-top: 28px;
+}
+
+.auth-modal-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  border: 0;
+  background: transparent;
+  color: var(--ink-soft);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.auth-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.auth-row-fields {
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.auth-row-fields label,
+.auth-extra label {
+  display: grid;
+  gap: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.auth-row-fields input,
+.auth-extra input {
+  width: 100%;
+}
+
+.auth-extra {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.auth-hint {
+  margin: 8px 0 0;
+  font-size: 0.85rem;
+}
+
+.auth-row-actions .btn,
+.auth-row-social .btn {
+  width: 100%;
+  justify-content: center;
+  padding: 10px 8px;
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.auth-btn-primary {
+  font-weight: 600;
+}
+
+.auth-row-actions .btn.ghost.is-on,
+.auth-btn-switch {
+  border-color: var(--accent);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.auth-btn-kakao {
+  background: #fee500;
+  color: #191919;
+  border-color: #e5cf00;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.auth-btn-kakao:hover {
+  background: #f5dc00;
+}
+
+.auth-btn-google {
+  background: #fff;
+  color: var(--ink);
+  border-color: var(--line);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.auth-btn-google:hover {
+  background: #f8f8f8;
+}
+
 .slot-grid-wide {
   grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
 }
@@ -3286,6 +3389,16 @@ p {
     border-radius: 20px 20px 0 0;
     max-height: 92dvh;
     padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
+  }
+
+  .auth-row-actions .btn,
+  .auth-row-social .btn {
+    font-size: 0.75rem;
+    padding: 9px 4px;
+  }
+
+  .auth-row-social .btn svg {
+    display: none;
   }
 
   .tourbus-picker-back {
