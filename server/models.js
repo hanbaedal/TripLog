@@ -181,3 +181,38 @@ taxonomySchema.index({ market: 1, kind: 1, slug: 1 }, { unique: true })
 
 export const TaxonomyOption =
   mongoose.models.TaxonomyOption || mongoose.model('TaxonomyOption', taxonomySchema)
+
+const tourBusCourseSchema = new mongoose.Schema(
+  {
+    id: { type: String, required: true },
+    title: { type: String, required: true },
+    type: { type: String, enum: ['loop', 'package', 'themed'], default: 'loop' },
+    operator: { type: String, default: '' },
+    departPlace: { type: String, required: true },
+    routeSummary: { type: String, default: '' },
+    intervalMin: { type: Number },
+    durationMin: { type: Number },
+    closedDays: { type: [String], default: [] },
+    closedNote: { type: String, default: '' },
+    note: { type: String, default: '' },
+    times: { type: [String], default: [] },
+    bookingUrl: { type: String, default: '' },
+  },
+  { _id: false },
+)
+
+const tourBusCitySchema = new mongoose.Schema(
+  {
+    city: { type: String, required: true, unique: true, trim: true, index: true },
+    cityLabel: { type: String, required: true, trim: true },
+    disclaimer: { type: String, default: '' },
+    sourceUrl: { type: String, default: '' },
+    validUntil: { type: String, default: '' },
+    courses: { type: [tourBusCourseSchema], default: [] },
+    updatedAt: { type: Date, default: Date.now },
+  },
+  { timestamps: true },
+)
+
+export const TourBusCity =
+  mongoose.models.TourBusCity || mongoose.model('TourBusCity', tourBusCitySchema)

@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef } from 'react'
 import type { Market } from '../types'
 import type { SiteNav } from '../lib/siteNav'
-import { MARKET_SHORT } from '../lib/market'
+import { MARKET_NAV } from '../lib/market'
 
 type Props = SiteNav & {
   menuOpen?: boolean
@@ -43,25 +43,27 @@ export function AppNav({ user, market, setMarket, go, menuOpen, onOpenMenu }: Pr
               type="button"
               className={`market-flag${market === 'kr' ? ' is-on' : ''}`}
               aria-pressed={market === 'kr'}
-              aria-label="국내 여행"
-              title={`${MARKET_SHORT.kr} 여행`}
+              aria-label={MARKET_NAV.kr}
+              title={MARKET_NAV.kr}
               onClick={() => pick('kr')}
             >
               <span className="market-flag-emoji" aria-hidden="true">
                 🇰🇷
               </span>
+              <span className="market-flag-text">{MARKET_NAV.kr}</span>
             </button>
             <button
               type="button"
               className={`market-flag${market === 'cn' ? ' is-on' : ''}`}
               aria-pressed={market === 'cn'}
-              aria-label="중국 여행"
-              title={`${MARKET_SHORT.cn} 여행`}
+              aria-label={MARKET_NAV.cn}
+              title={MARKET_NAV.cn}
               onClick={() => pick('cn')}
             >
               <span className="market-flag-emoji" aria-hidden="true">
                 🇨🇳
               </span>
+              <span className="market-flag-text">{MARKET_NAV.cn}</span>
             </button>
           </div>
           {user ? (

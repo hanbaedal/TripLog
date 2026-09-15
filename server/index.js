@@ -14,6 +14,7 @@ import { seedTravelInfo, travelInfoRouter } from './routes/travelInfo.js'
 import { taxonomyRouter } from './routes/taxonomy.js'
 import { adminRouter } from './routes/admin.js'
 import { seedTaxonomy } from './seedTaxonomy.js'
+import { tourbusRouter, seedTourBus } from './routes/tourbus.js'
 import { ensureGalleryUploadDir, migrateGalleryDataUrls, uploadRoot } from './galleryStorage.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -54,6 +55,7 @@ app.use('/api/board', boardRouter)
 app.use('/api/inquiries', inquiryRouter)
 app.use('/api/travel-info', travelInfoRouter)
 app.use('/api/taxonomy', taxonomyRouter)
+app.use('/api/tourbus', tourbusRouter)
 app.use('/api/admin', adminRouter)
 
 const dist = path.join(__dirname, '..', 'dist')
@@ -87,6 +89,7 @@ async function start() {
   await seedGallery()
   await seedTravelInfo()
   await seedTaxonomy()
+  await seedTourBus()
   app.listen(port, () => {
     console.log(`TripLog listening on ${port}`)
   })

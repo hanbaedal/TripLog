@@ -10,6 +10,9 @@ import { loadTaxonomy, type TaxonomyRow } from '../lib/taxonomy'
 import { KIND_LABEL, MEAL_LABEL, TRANSPORT_LABEL } from '../lib/costs'
 import { composeFlightItem, parseFlightForm } from '../lib/flightFields'
 import { itemBudget, normalizeTransportMode, withItemBudget } from '../lib/tripItem'
+import { resolveTourBusCity } from '../data/krTourBusCatalog.js'
+import { TourBusPicker } from './TourBusPicker'
+import type { TourBusPick } from '../lib/tourbus'
 
 type Props = {
   dayIndex: number
@@ -120,6 +123,7 @@ export function ItemModal({
   const [actualPeople, setActualPeople] = useState(
     initial?.actualPeople != null ? String(initial.actualPeople) : '',
   )
+  const [tourBusOpen, setTourBusOpen] = useState(false)
 
   useEffect(() => {
     const market = tripMarket === 'kr' ? 'kr' : 'cn'
@@ -171,6 +175,22 @@ export function ItemModal({
     const n = Number(trimmed)
     return n > 0 ? Math.round(n) : undefined
   }
+
+  function applyTourBusPick(pick: TourBusPick) {
+    setTitle(pick.title)
+    setTime(pick.time)
+    setPlace(pick.place)
+    setNote(pick.note)
+    setTransportMode('tourbus')
+    setTourBusOpen(false)
+  }
+
+  const tourBusCityHint =
+    resolveTourBusCity(tripDestination) ||
+    resolveTourBusCity(title) ||
+    resolveTourBusCity(place) ||
+    tripDestination ||
+    ''
 
   function submit(e: FormEvent) {
     e.preventDefault()
@@ -318,7 +338,16 @@ export function ItemModal({
                 </button>
               ))}
             </div>
-            {tripMarket === 'kr' ? (
+            {tripMarket === 'kr' && transportMode === 'tourbus' ? (
+              <div className="tourbus-picker-launch">
+                <button className="btn ghost" type="button" onClick={() => setTourBusOpen(true)}>
+                  도시 → 코스 → 시간에서 선택
+                </button>
+                <p className="muted item-kr-transport-tip">
+                  서울·부산·제주·경주·전주 참고 일정입니다. 선택한 내용만 내 여행에 저장됩니다.
+                </p>
+              </div>
+            ) : tripMarket === 'kr' ? (
               <p className="muted item-kr-transport-tip">
                 제주: 항공+렌터카 · 권역 이동: KTX·ITX·고속버스 · 수도권: 지하철·카셰어링 · 외곽: 자차·렌터카
               </p>
@@ -505,6 +534,13 @@ export function ItemModal({
           </button>
         </div>
       </form>
+      {tourBusOpen ? (
+        <TourBusPicker
+          initialCity={tourBusCityHint}
+          onClose={() => setTourBusOpen(false)}
+          onPick={applyTourBusPick}
+        />
+      ) : null}
     </div>
   )
 }

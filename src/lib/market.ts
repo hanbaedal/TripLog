@@ -3,13 +3,19 @@ export type Market = 'kr' | 'cn'
 const STORAGE_KEY = 'triplog.market.v1'
 
 export const MARKET_LABEL: Record<Market, string> = {
-  kr: '국내 여행',
-  cn: '중국 여행',
+  kr: '국내여행',
+  cn: '중국여행',
 }
 
 export const MARKET_SHORT: Record<Market, string> = {
   kr: '국내',
   cn: '중국',
+}
+
+/** PC 헤더 시장 토글 — 국기 + 전체 이름 */
+export const MARKET_NAV: Record<Market, string> = {
+  kr: '국내여행',
+  cn: '중국여행',
 }
 
 export function defaultMarket(): Market {
