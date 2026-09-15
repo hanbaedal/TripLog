@@ -26,7 +26,7 @@ export function Landing({ onPickSample, ...nav }: Props) {
 
   return (
     <PageShell {...nav} shellClass="home-shell">
-      <GalleryHero market={market} onOpen={(id) => nav.go.gallery(id)} />
+      <GalleryHero market={market} onOpen={(id) => nav.go.gallery(id, 'home')} />
       <section className="samples-home">
         <SampleSlider items={samples} auto onPick={onPickSample} />
       </section>

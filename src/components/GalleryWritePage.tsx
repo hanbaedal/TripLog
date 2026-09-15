@@ -7,8 +7,8 @@ import { isSupervisor } from '../lib/auth'
 import { canEditGallery, listGallery, removeGalleryPhoto, saveGalleryPhoto } from '../lib/community'
 import { galleryPhotoMarket, MARKET_SHORT } from '../lib/market'
 import type { Market } from '../types'
-import { galleryMediaSrc, loadGalleryPhotos, resolvePhotoSrc } from '../lib/galleryResolve'
-import { photoManageCardDisplay } from '../lib/galleryFilter'
+import { loadGalleryPhotos, resolvePhotoSrc } from '../lib/galleryResolve'
+import { GalleryManageCardList } from './GalleryManageCardList'
 import type { GalleryCategory, GalleryPhoto, SightType } from '../types'
 import type { SiteNav } from '../lib/siteNav'
 
@@ -16,57 +16,6 @@ type Props = SiteNav & {
   editPhotoId?: string | null
   pageMode?: 'catalog' | 'upload'
   onEditClose?: () => void
-}
-
-function EditableGalleryList({
-  photos,
-  allowCatalogDelete,
-  onEdit,
-  onRemove,
-}: {
-  photos: GalleryPhoto[]
-  allowCatalogDelete?: boolean
-  onEdit: (photo: GalleryPhoto) => void
-  onRemove: (id: string) => void
-}) {
-  if (!photos.length) return <p className="muted">수정할 사진이 없습니다.</p>
-  return (
-    <div className="gallery-mine">
-      {photos.map((photo) => {
-        const display = photoManageCardDisplay(photo)
-        return (
-        <article className="info-card gallery-manage-card" key={photo.id}>
-          <button type="button" className="gallery-manage-open" onClick={() => onEdit(photo)}>
-            <div className="gallery-card-thumb">
-              <img src={galleryMediaSrc(photo.src)} alt={photo.title} loading="lazy" />
-            </div>
-            <div className="gallery-manage-meta">
-              {display.title ? <span className="gallery-manage-title">{display.title}</span> : null}
-              <span className="gallery-manage-taxonomy muted">{display.taxonomy}</span>
-            </div>
-          </button>
-          <div className="nav-actions">
-            <button className="btn ghost" type="button" onClick={() => onEdit(photo)}>
-              수정
-            </button>
-            {!photo.catalog || allowCatalogDelete ? (
-              <button
-                className="btn ghost"
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  void onRemove(photo.id)
-                }}
-              >
-                삭제
-              </button>
-            ) : null}
-          </div>
-        </article>
-        )
-      })}
-    </div>
-  )
 }
 
 type PhotoFormValues = {
@@ -381,19 +330,47 @@ export function GalleryWritePage({ editPhotoId, pageMode = 'upload', onEditClose
               <h2>카탈로그 사진</h2>
               <span className="muted">{catalogPhotos.length}장</span>
             </div>
-            <EditableGalleryList photos={catalogPhotos} allowCatalogDelete onEdit={startEdit} onRemove={remove} />
+            {catalogPhotos.length ? (
+              <GalleryManageCardList
+                photos={catalogPhotos}
+                allowCatalogDelete
+                onOpen={startEdit}
+                onEdit={startEdit}
+                onRemove={remove}
+              />
+            ) : (
+              <p className="muted">카탈로그 사진이 없습니다.</p>
+            )}
             <div className="section-head">
               <h2>회원 사진</h2>
               <span className="muted">{memberPhotos.length}장</span>
             </div>
-            <EditableGalleryList photos={memberPhotos} onEdit={startEdit} onRemove={remove} />
+            {memberPhotos.length ? (
+              <GalleryManageCardList
+                photos={memberPhotos}
+                onOpen={startEdit}
+                onEdit={startEdit}
+                onRemove={remove}
+              />
+            ) : (
+              <p className="muted">회원 사진이 없습니다.</p>
+            )}
           </>
         ) : (
           <>
             <div className="section-head">
               <h2>{uploadListLabel}</h2>
             </div>
-            <EditableGalleryList photos={memberPhotos} onEdit={startEdit} onRemove={remove} />
+            {memberPhotos.length ? (
+              <GalleryManageCardList
+                photos={memberPhotos}
+                onOpen={startEdit}
+                onEdit={startEdit}
+                onRemove={remove}
+              />
+            ) : (
+              <p className="muted">수정할 사진이 없습니다.</p>
+            )}
           </>
         )}
       </section>

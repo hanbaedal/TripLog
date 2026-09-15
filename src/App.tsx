@@ -29,6 +29,7 @@ export default function App() {
   const [market, setMarketState] = useState<Market>(() => readMarket())
   const [view, setView] = useState<AppView>('home')
   const [galleryFocus, setGalleryFocus] = useState<string | null>(null)
+  const [galleryReturnTo, setGalleryReturnTo] = useState<'home' | null>(null)
   const [galleryEditId, setGalleryEditId] = useState<string | null>(null)
   const [infoPlaceId, setInfoPlaceId] = useState<string | null>(null)
   const [user, setUser] = useState<User | null>(null)
@@ -298,6 +299,8 @@ export default function App() {
   }
 
   function goHome() {
+    setGalleryFocus(null)
+    setGalleryReturnTo(null)
     setView('home')
   }
 
@@ -317,9 +320,10 @@ export default function App() {
     setGalleryEditId(null)
   }
 
-  function goGallery(photoId?: string) {
+  function goGallery(photoId?: string, returnTo?: 'home') {
     clearGalleryEdit()
     setGalleryFocus(photoId ?? null)
+    setGalleryReturnTo(photoId && returnTo === 'home' ? 'home' : null)
     setView('gallery')
   }
 
@@ -457,7 +461,9 @@ export default function App() {
       {view === 'profile' && user ? (
         <ProfilePage {...nav} onSaved={setUser} />
       ) : null}
-      {view === 'gallery' ? <GalleryPage {...nav} focusId={galleryFocus} /> : null}
+      {view === 'gallery' ? (
+        <GalleryPage {...nav} focusId={galleryFocus} returnToHome={galleryReturnTo === 'home'} />
+      ) : null}
       {view === 'catalog' && user && isSupervisor(user) ? (
         <GalleryWritePage
           pageMode="catalog"
