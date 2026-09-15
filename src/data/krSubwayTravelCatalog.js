@@ -22,6 +22,17 @@ export const SUBWAY_LINES = [
   { id: 'line-shinbundang', label: '신분당', region: 'seoul', color: '#D31145', sort: 13 },
   { id: 'line-incheon-1', label: '인천1호선', region: 'incheon', color: '#7CA8D5', sort: 20 },
   { id: 'line-incheon-2', label: '인천2호선', region: 'incheon', color: '#ED8B00', sort: 21 },
+  // 경전철
+  { id: 'line-ui-seoul', label: '우이신설선', region: 'seoul', color: '#B7C452', sort: 30, group: 'light' },
+  { id: 'line-sillim', label: '신림선', region: 'seoul', color: '#6789CA', sort: 31, group: 'light' },
+  { id: 'line-gimpo-gold', label: '김포골드라인', region: 'gyeonggi', color: '#A17800', sort: 32, group: 'light' },
+  { id: 'line-everline', label: '에버라인', region: 'gyeonggi', color: '#77C371', sort: 33, group: 'light' },
+  { id: 'line-uijeongbu', label: '의정부경전철', region: 'gyeonggi', color: '#F5A200', sort: 34, group: 'light' },
+  // 광역·광역급행
+  { id: 'line-seohae', label: '서해선', region: 'gyeonggi', color: '#8BC53F', sort: 40, group: 'regional' },
+  { id: 'line-gyeonggang', label: '경강선', region: 'gyeonggi', color: '#0054A6', sort: 41, group: 'regional' },
+  { id: 'line-gyeongchun', label: '경춘선', region: 'gyeonggi', color: '#008577', sort: 42, group: 'regional' },
+  { id: 'line-gtx-a', label: 'GTX-A', region: 'gyeonggi', color: '#9B1C31', sort: 43, group: 'regional' },
 ]
 
 export const KR_SUBWAY_TRAVEL_INFO = {
@@ -29,7 +40,7 @@ export const KR_SUBWAY_TRAVEL_INFO = {
   market: 'kr',
   place: '전철타고',
   title: '전철타고 (서울·인천·경기)',
-  body: '수도권 지하철 노선별 역 주변 관광지입니다. 호선·역·출구·도보 시간을 함께 표시합니다. 당일치기·1박2일 코스 짜기에 활용해 보세요.',
+  body: '수도권 지하철·경전철·광역철도(GTX·경춘·경강·서해) 노선별 역 주변 관광지입니다. 호선·역·출구·도보 시간을 함께 표시합니다.',
   photoId: 'kr-subway',
   src: gallerySrc('kr-subway'),
   catalog: true,
@@ -190,6 +201,72 @@ const RAW = [
   ['line-incheon-2', '인천대공원', '인천대공원', '넓은 공원·동물원·가족 나들이 명소입니다.', '인천2호선 종점 인근', 'spot-kr-subway-34', { region: 'incheon', exit: '1번', walkMin: 10 }],
   ['line-incheon-2', '검단사거리', '검단·서구', '검단신도시·쇼핑·공원 일대입니다.', '인천 서부', 'spot-kr-subway-34', { region: 'incheon', exit: '1번', walkMin: 8 }],
   ['line-incheon-2', '아시아드경기장', '아시아드경기장', '2014 인천 아시안게임 메인 경기장입니다.', '송도 인근', 'spot-kr-subway-35', { region: 'incheon', exit: '1번', walkMin: 8 }],
+
+  // ── 우이신설선 ──
+  ['line-ui-seoul', '신설동', '신설동·동대문', '1·2호선 환승·동대문 상권 접근 거점입니다.', 'DDP·동대문 연계', 'spot-kr-seoul-12', { exit: '1번', walkMin: 10 }],
+  ['line-ui-seoul', '솔샘', '북한산 입구(솔샘)', '북한산 국립공원 등산로 입구입니다.', '우이역 방향 환승', 'spot-kr-subway-58', { exit: '1번', walkMin: 5 }],
+  ['line-ui-seoul', '북한산우이', '북한산국립공원(우이)', '우이탐방지원센터·계곡·봉우리 등산입니다.', '북한산 정상 코스', 'spot-kr-subway-58', { exit: '1번', walkMin: 3 }],
+  ['line-ui-seoul', '4.19민주묘지', '4.19민주묘지', '4·19혁명 기념 묘역과 공원입니다.', '솔샘·북한산우이 인근', 'spot-kr-subway-58', { exit: '1번', walkMin: 8 }],
+
+  // ── 신림선 ──
+  ['line-sillim', '보라매', '보라매공원', '보라매공원·야경·벚꽃 명소입니다.', '보라매병원 인근', 'spot-kr-subway-59', { exit: '1번', walkMin: 5 }],
+  ['line-sillim', '서울대입구', '서울대·봉천', '서울대학교·봉천동 카페·상권입니다.', '2호선 환승', 'spot-kr-subway-60', { exit: '1번', walkMin: 5 }],
+  ['line-sillim', '관악', '관악산', '관악산 국립공원 등산·전망 코스입니다.', '관악역 등산로', 'spot-kr-subway-60', { exit: '1번', walkMin: 10 }],
+  ['line-sillim', '신림', '신림·신사동', '신림역 상권·먹자골목입니다.', '2호선 환승', 'spot-kr-seoul-15', { exit: '1번', walkMin: 5 }],
+  ['line-sillim', '샛강', '샛강·대방', '샛강 생태공원·한강 접근입니다.', '7호선 대방역 연계', 'spot-kr-seoul-10', { exit: '1번', walkMin: 10 }],
+
+  // ── 김포골드라인 ──
+  ['line-gimpo-gold', '김포공항', '김포공항(골드)', '공항철도·5·9호선·골드라인 환승 허브입니다.', '국내선 터미널', 'spot-kr-subway-24', { region: 'gyeonggi', exit: '1번', walkMin: 3 }],
+  ['line-gimpo-gold', '장기', '김포 한강공원(장기)', '한강변 산책·자전거·일몰 명소입니다.', '장기역 한강', 'spot-kr-subway-61', { region: 'gyeonggi', exit: '1번', walkMin: 8 }],
+  ['line-gimpo-gold', '마산', '김포 마산·한강', '김포 한강변 공원과 마을 산책입니다.', '한강변', 'spot-kr-subway-61', { region: 'gyeonggi', exit: '1번', walkMin: 10 }],
+  ['line-gimpo-gold', '양촌', '양촌·구래', '김포 신도시·카페·공원 일대입니다.', '양촌역', 'spot-kr-subway-61', { region: 'gyeonggi', exit: '1번', walkMin: 8 }],
+  ['line-gimpo-gold', '운양', '김포 골드라인 종점', '김포 북부·운양 신도시 접근입니다.', '버스 환승', 'spot-kr-subway-61', { region: 'gyeonggi', exit: '1번', walkMin: 5 }],
+
+  // ── 용인 에버라인 ──
+  ['line-everline', '전대·에버랜드', '에버랜드(에버라인)', '용인 에버랜드 정문·테마파크입니다.', '전대·에버랜드역', 'spot-kr-gyeonggi-1', { region: 'gyeonggi', exit: '1번', walkMin: 5 }],
+  ['line-everline', '동백', '한국민속촌(동백)', '동백역에서 민속촌·캐리비안베이 버스 연계입니다.', '셔틀·버스', 'spot-kr-subway-55', { region: 'gyeonggi', exit: '1번', walkMin: 15 }],
+  ['line-everline', '기흥', '기흥·보정', '기흥역·수인분당선 환승·용인 중심입니다.', '분당선 환승', 'spot-kr-gyeonggi-1', { region: 'gyeonggi', exit: '1번', walkMin: 5 }],
+  ['line-everline', '초당·대원', '용인·초당', '용인 대학가·카페 거리입니다.', '초당·대원역', 'spot-kr-gyeonggi-2', { region: 'gyeonggi', exit: '1번', walkMin: 5 }],
+  ['line-everline', '명지대', '명지대·용인', '명지대학교·용인 외곽 산책입니다.', '명지대역', 'spot-kr-gyeonggi-1', { region: 'gyeonggi', exit: '1번', walkMin: 8 }],
+
+  // ── 의정부 경전철 ──
+  ['line-uijeongbu', '의정부', '의정부역·시가지', '의정부 중심 상권·먹자골목입니다.', '1호선·경전철 환승', 'spot-kr-subway-65', { region: 'gyeonggi', exit: '1번', walkMin: 3 }],
+  ['line-uijeongbu', '범골', '의정부 범골', '의정부 동부·범골 상권입니다.', '경전철 순환', 'spot-kr-subway-65', { region: 'gyeonggi', exit: '1번', walkMin: 5 }],
+  ['line-uijeongbu', '회룡', '회룡·의정부', '회룡역·의정부 북부 접근입니다.', '경전철', 'spot-kr-subway-65', { region: 'gyeonggi', exit: '1번', walkMin: 5 }],
+  ['line-uijeongbu', '발곡', '발곡·탑석', '발곡·탑석 일대 공원·주거지입니다.', '경전철', 'spot-kr-subway-65', { region: 'gyeonggi', exit: '1번', walkMin: 5 }],
+
+  // ── 서해선 ──
+  ['line-seohae', '소사', '소사역·부천', '1호선·서해선 환승 거점입니다.', '부천 접근', 'spot-kr-subway-66', { region: 'gyeonggi', exit: '1번', walkMin: 3 }],
+  ['line-seohae', '시흥시청', '시흥·거북섬', '시흥시청·오이도·거북섬 연계입니다.', '버스 환승', 'spot-kr-subway-67', { region: 'gyeonggi', exit: '1번', walkMin: 15 }],
+  ['line-seohae', '신천', '시흥 신천', '시흥 신도시·쇼핑·공원 일대입니다.', '신천역', 'spot-kr-subway-67', { region: 'gyeonggi', exit: '1번', walkMin: 5 }],
+  ['line-seohae', '원시', '원시·김포', '원시역·김포골드라인 환승입니다.', '골드라인 환승', 'spot-kr-subway-61', { region: 'gyeonggi', exit: '1번', walkMin: 5 }],
+  ['line-seohae', '안산', '안산·대부도', '안산·대부도·선갑도 ferry 연계입니다.', '버스·페리', 'spot-kr-subway-68', { region: 'gyeonggi', exit: '1번', walkMin: 20 }],
+
+  // ── 경강선 ──
+  ['line-gyeonggang', '판교', '판교(경강)', '판교·신분당·경강선 환승 허브입니다.', 'IT밸리·카페', 'spot-kr-seoul-17', { region: 'gyeonggi', exit: '1번', walkMin: 5 }],
+  ['line-gyeonggang', '세곡', '세곡·수서', '세곡역·수서·GTX-A 환승 연계입니다.', 'GTX·3호선', 'spot-kr-seoul-17', { region: 'gyeonggi', exit: '1번', walkMin: 8 }],
+  ['line-gyeonggang', '이천', '이천·도자기', '이천 도자기·온천·세라피아 마을입니다.', '이천역 버스', 'spot-kr-subway-69', { region: 'gyeonggi', exit: '1번', walkMin: 15 }],
+  ['line-gyeonggang', '여주', '여주·세종대왕릉', '세종대왕릉·신륵사·여주 남한강입니다.', '여주역 버스', 'spot-kr-subway-70', { region: 'gyeonggi', exit: '1번', walkMin: 20 }],
+  ['line-gyeonggang', '부발', '이천·부발', '부발역·이천 남부 접근입니다.', '이천 연계', 'spot-kr-subway-69', { region: 'gyeonggi', exit: '1번', walkMin: 10 }],
+
+  // ── 경춘선 ──
+  ['line-gyeongchun', '청량리', '청량리·KTX', 'KTX·1호선·경춘선·중앙선 환승 허브입니다.', '동대문·왕십리 연계', 'spot-kr-subway-38', { exit: '1번', walkMin: 3 }],
+  ['line-gyeongchun', '망우', '망우·중랑', '망우역·중랑캠핑숲·장미공원 연계입니다.', '망우역', 'spot-kr-seoul-11', { exit: '1번', walkMin: 10 }],
+  ['line-gyeongchun', '가평', '아침고요수목원', '사계절 수목원과 전망대입니다.', '가평역 버스·택시', 'spot-kr-gyeonggi-3', { region: 'gyeonggi', exit: '1번', walkMin: 25 }],
+  ['line-gyeongchun', '가평', '쁘띠프랑스', '가평 쁘띠프랑스·남이섬 연계 코스입니다.', '가평역 버스', 'spot-kr-gangwon-4', { region: 'gyeonggi', exit: '1번', walkMin: 30 }],
+  ['line-gyeongchun', '남이섬', '남이섬', '소나무길과 드라마 촬영지로 유명합니다.', '남이섬역·ferry', 'spot-kr-gangwon-4', { region: 'gyeonggi', exit: '1번', walkMin: 10 }],
+  ['line-gyeongchun', '강촌', '강촌·레일바이크', '강촌 레일바이크·추억의 거리입니다.', '강촌역', 'spot-kr-subway-64', { region: 'gyeonggi', exit: '1번', walkMin: 5 }],
+  ['line-gyeongchun', '춘천', '춘천·명동닭갈비', '춘천 닭갈비·호수·소양강스카이워크입니다.', '춘천역', 'spot-kr-subway-63', { region: 'gyeonggi', exit: '1번', walkMin: 10 }],
+  ['line-gyeongchun', '김유정', '김유정·춘천', '김유정 문학촌·레일바이크 출발역입니다.', '김유정역', 'spot-kr-subway-63', { region: 'gyeonggi', exit: '1번', walkMin: 5 }],
+
+  // ── GTX-A ──
+  ['line-gtx-a', '운정', '파주·운정', '운정신도시·헤이리·임진각 버스 연계입니다.', '파주 접근', 'spot-kr-gyeonggi-14', { region: 'gyeonggi', exit: '1번', walkMin: 15 }],
+  ['line-gtx-a', '서울역', '서울역(GTX)', 'GTX-A·KTX·공항철도·1·4호선 환승입니다.', '문화역서울284', 'spot-kr-subway-38', { exit: '14번', walkMin: 3 }],
+  ['line-gtx-a', '수서', '수서역·GTX', 'SRT·3호선·GTX-A 환승 허브입니다.', '수서역', 'spot-kr-seoul-17', { exit: '1번', walkMin: 3 }],
+  ['line-gtx-a', '성남', '성남·탄천', '성남·탄천·분당 접근 거점입니다.', '성남역', 'spot-kr-subway-71', { region: 'gyeonggi', exit: '1번', walkMin: 8 }],
+  ['line-gtx-a', '판교', '판교(GTX)', '판교·IT밸리·신분당 환승입니다.', '판교역', 'spot-kr-seoul-17', { region: 'gyeonggi', exit: '1번', walkMin: 5 }],
+  ['line-gtx-a', '기흥', '기흥(GTX)', '기흥·에버랜드 셔틀·분당선 환승입니다.', '에버랜드 셔틀', 'spot-kr-gyeonggi-1', { region: 'gyeonggi', exit: '1번', walkMin: 5 }],
+  ['line-gtx-a', '동탄', '동탄신도시', '동탄·삼성·신도시 쇼핑·공원 일대입니다.', '동탄역', 'spot-kr-subway-72', { region: 'gyeonggi', exit: '1번', walkMin: 5 }],
 ]
 
 /** @type {import('../types').TravelSpot[]} */

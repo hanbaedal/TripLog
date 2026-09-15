@@ -300,17 +300,30 @@ export function InfoPlacePage({ cityId, ...nav }: Props) {
             >
               전체
             </button>
-            {SUBWAY_LINES.map((line) => (
-              <button
-                key={line.id}
-                type="button"
-                className={`subway-line-chip${subwayLine === line.id ? ' active' : ''}`}
-                style={{ '--line-color': line.color } as CSSProperties}
-                onClick={() => setSubwayLine(line.id)}
-              >
-                {line.label}
-              </button>
-            ))}
+            {(
+              [
+                { key: 'metro', label: '지하철·철도', lines: SUBWAY_LINES.filter((row) => !row.group) },
+                { key: 'light', label: '경전철', lines: SUBWAY_LINES.filter((row) => row.group === 'light') },
+                { key: 'regional', label: '광역철도', lines: SUBWAY_LINES.filter((row) => row.group === 'regional') },
+              ] as const
+            ).map((group) =>
+              group.lines.length ? (
+                <div className="subway-line-filter-group" key={group.key}>
+                  <span className="subway-line-filter-label">{group.label}</span>
+                  {group.lines.map((line) => (
+                    <button
+                      key={line.id}
+                      type="button"
+                      className={`subway-line-chip${subwayLine === line.id ? ' active' : ''}`}
+                      style={{ '--line-color': line.color } as CSSProperties}
+                      onClick={() => setSubwayLine(line.id)}
+                    >
+                      {line.label}
+                    </button>
+                  ))}
+                </div>
+              ) : null,
+            )}
           </div>
         ) : null}
 

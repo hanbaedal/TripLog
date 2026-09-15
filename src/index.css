@@ -2620,9 +2620,23 @@ p {
 
 .subway-line-filter {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  flex-direction: column;
+  gap: 10px;
   margin: 0 0 18px;
+}
+
+.subway-line-filter-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.subway-line-filter-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  min-width: 4.5rem;
 }
 
 .subway-line-chip {
