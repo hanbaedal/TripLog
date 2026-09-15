@@ -95,6 +95,7 @@ p {
 
 .site-header .topnav {
   flex-wrap: nowrap;
+  gap: 8px;
   padding: max(8px, env(safe-area-inset-top)) 0 8px;
 }
 
@@ -104,6 +105,7 @@ p {
   gap: 8px;
   min-width: 0;
   flex: 1 1 auto;
+  overflow: hidden;
 }
 
 .market-switch {
@@ -176,7 +178,9 @@ p {
 }
 
 .site-header .brand {
-  flex: 0 0 auto;
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .brand-title {
@@ -185,6 +189,7 @@ p {
   width: auto;
   max-width: min(260px, 46vw);
   object-fit: contain;
+  object-position: left center;
 }
 
 .header-user {
@@ -192,6 +197,8 @@ p {
   align-items: center;
   gap: 10px;
   margin-left: auto;
+  flex: 0 0 auto;
+  min-width: 0;
 }
 
 .header-user-name {
@@ -205,17 +212,15 @@ p {
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  max-width: 5.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 0 1 auto;
 }
 
 .header-user-name:hover {
   background: rgba(23, 32, 51, 0.06);
-}
-
-.header-user-role {
-  font-size: 0.72rem;
-  font-weight: 500;
-  color: var(--muted);
 }
 
 .header-auth-btn {
@@ -2205,13 +2210,24 @@ p {
   min-width: 0;
 }
 
-.gallery-manage-open h3 {
-  margin: 0;
-  font-size: 0.95rem;
+.gallery-manage-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+  min-width: 0;
 }
 
-.gallery-manage-open p {
+.gallery-manage-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  flex: 0 0 auto;
+}
+
+.gallery-manage-taxonomy {
   margin: 0;
+  font-size: 0.84rem;
+  min-width: 0;
 }
 
 .gallery-edit-modal {
@@ -2807,6 +2823,31 @@ p {
   .nav-menu-toggle {
     display: inline-flex;
   }
+
+  .site-header .topnav {
+    flex-wrap: nowrap;
+    gap: 8px;
+  }
+
+  .brand-title {
+    height: 30px;
+    max-width: min(148px, 36vw);
+  }
+
+  .header-user {
+    gap: 8px;
+  }
+
+  .header-user-name {
+    padding: 6px 10px;
+    max-width: 4.8rem;
+    font-size: 0.9rem;
+  }
+
+  .market-flag {
+    width: 32px;
+    height: 32px;
+  }
 }
 
 @media (max-width: 720px) {
@@ -2821,6 +2862,47 @@ p {
   .topnav {
     flex-wrap: wrap;
     gap: 10px;
+  }
+
+  .site-header .topnav {
+    flex-wrap: nowrap;
+    gap: 6px;
+    padding: max(6px, env(safe-area-inset-top)) 0 6px;
+  }
+
+  .brand-title {
+    height: 26px;
+    max-width: min(118px, 32vw);
+  }
+
+  .header-user {
+    gap: 6px;
+  }
+
+  .header-user-name {
+    padding: 6px 8px;
+    max-width: 4.2rem;
+    font-size: 0.88rem;
+  }
+
+  .market-switch {
+    padding: 2px;
+    gap: 2px;
+  }
+
+  .market-flag {
+    width: 30px;
+    height: 30px;
+  }
+
+  .market-flag-emoji {
+    font-size: 1rem;
+  }
+
+  .nav-menu-toggle {
+    width: 36px;
+    height: 36px;
+    margin-left: 0;
   }
 
   .brand-name small {

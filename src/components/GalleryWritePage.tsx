@@ -8,7 +8,7 @@ import { canEditGallery, listGallery, removeGalleryPhoto, saveGalleryPhoto } fro
 import { galleryPhotoMarket, MARKET_SHORT } from '../lib/market'
 import type { Market } from '../types'
 import { galleryMediaSrc, loadGalleryPhotos, resolvePhotoSrc } from '../lib/galleryResolve'
-import { photoTaxonomyLabel } from '../lib/galleryFilter'
+import { photoManageCardDisplay } from '../lib/galleryFilter'
 import type { GalleryCategory, GalleryPhoto, SightType } from '../types'
 import type { SiteNav } from '../lib/siteNav'
 
@@ -32,14 +32,18 @@ function EditableGalleryList({
   if (!photos.length) return <p className="muted">수정할 사진이 없습니다.</p>
   return (
     <div className="gallery-mine">
-      {photos.map((photo) => (
+      {photos.map((photo) => {
+        const display = photoManageCardDisplay(photo)
+        return (
         <article className="info-card gallery-manage-card" key={photo.id}>
           <button type="button" className="gallery-manage-open" onClick={() => onEdit(photo)}>
             <div className="gallery-card-thumb">
               <img src={galleryMediaSrc(photo.src)} alt={photo.title} loading="lazy" />
             </div>
-            <h3>{photo.title}</h3>
-            <p className="muted">{photoTaxonomyLabel(photo)}</p>
+            <div className="gallery-manage-meta">
+              {display.title ? <span className="gallery-manage-title">{display.title}</span> : null}
+              <span className="gallery-manage-taxonomy muted">{display.taxonomy}</span>
+            </div>
           </button>
           <div className="nav-actions">
             <button className="btn ghost" type="button" onClick={() => onEdit(photo)}>
@@ -59,7 +63,8 @@ function EditableGalleryList({
             ) : null}
           </div>
         </article>
-      ))}
+        )
+      })}
     </div>
   )
 }

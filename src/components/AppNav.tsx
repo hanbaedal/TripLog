@@ -1,7 +1,6 @@
 import { useLayoutEffect, useRef } from 'react'
 import type { Market } from '../types'
 import type { SiteNav } from '../lib/siteNav'
-import { isSupervisor } from '../lib/auth'
 import { MARKET_SHORT } from '../lib/market'
 
 type Props = SiteNav & {
@@ -68,7 +67,6 @@ export function AppNav({ user, market, setMarket, go, menuOpen, onOpenMenu }: Pr
           {user ? (
             <button className="header-user-name" type="button" onClick={go.profile}>
               {user.name}
-              {isSupervisor(user) ? <span className="header-user-role">슈퍼바이저</span> : null}
             </button>
           ) : (
             <button className="btn ghost header-auth-btn" type="button" onClick={go.auth}>

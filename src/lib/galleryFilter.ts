@@ -95,6 +95,21 @@ export function photoTaxonomyLabel(photo: GalleryPhoto): string {
   return bits.filter(Boolean).join(' · ')
 }
 
+/** 제목이 도시명과 같으면 권역 대표 카드(서울·강원 등) */
+export function photoTitleDuplicatesCity(photo: GalleryPhoto): boolean {
+  const city = galleryCityLabel(photo.city)
+  return Boolean(city && photo.title.trim() === city.trim())
+}
+
+/** 카탈로그·관리 카드 — 제목·분류 중복 없이 한 줄 표시용 */
+export function photoManageCardDisplay(photo: GalleryPhoto): { title: string | null; taxonomy: string } {
+  const taxonomy = photoTaxonomyLabel(photo)
+  if (photoTitleDuplicatesCity(photo)) {
+    return { title: null, taxonomy }
+  }
+  return { title: photo.title, taxonomy }
+}
+
 export function photoCategoryLabel(photo: GalleryPhoto): string {
   const category = normalizeGalleryCategory(photo.category || 'sight')
   const bits = [galleryCategoryLabel(category)]
