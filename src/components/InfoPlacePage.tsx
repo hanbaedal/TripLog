@@ -36,6 +36,7 @@ export function InfoPlacePage({ cityId, ...nav }: Props) {
   const [subwayLine, setSubwayLine] = useState<string>('all')
 
   const isSubwayGuide = cityId === 'info-kr-subway'
+  const isSubwayMenu = isSubwayGuide && nav.view === 'subway'
 
   useEffect(() => {
     void findTravelInfo(cityId).then((row) => setCity(row ?? null))
@@ -246,11 +247,13 @@ export function InfoPlacePage({ cityId, ...nav }: Props) {
     <PageShell {...nav}>
       <section className="wrap section">
         <div className="section-head">
-          <h2>{place} 관광지</h2>
+          <h2>{isSubwayMenu ? '전철타고 (서울·인천·경기)' : `${place} 관광지`}</h2>
           <div className="nav-actions">
-            <button className="btn ghost" type="button" onClick={nav.go.info}>
-              목록
-            </button>
+            {!isSubwayMenu ? (
+              <button className="btn ghost" type="button" onClick={nav.go.info}>
+                목록
+              </button>
+            ) : null}
             {nav.user ? (
               <button className="btn" type="button" onClick={startWrite}>
                 추가

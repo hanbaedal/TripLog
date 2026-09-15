@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url'
 import { FOOD_PHOTOS } from '../src/data/galleryCatalog.js'
 import { KR_GALLERY_PHOTOS } from '../src/data/krGalleryCatalog.js'
 import { KR_TRAVEL_SPOT_CATALOG } from '../src/data/krTravelSpotCatalog.js'
-import { KR_SUBWAY_GALLERY_PHOTOS } from '../src/data/krSubwayGalleryCatalog.js'
+import { KR_SUBWAY_SPOT_CATALOG } from '../src/data/krSubwayTravelCatalog.js'
 import { commonsSearchThumb, commonsThumbForFile, downloadUrl, sleep } from './lib/commons.mjs'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
@@ -185,13 +185,33 @@ async function seedKrSubway() {
     }
   }
 
+  const byId = new Map()
+  for (const spot of KR_SUBWAY_SPOT_CATALOG) {
+    const id = String(spot.photoId || '')
+    if (!id.startsWith('spot-kr-subway-') || byId.has(id)) continue
+    byId.set(id, {
+      id,
+      title: spot.name,
+      city: spot.subwayRegion === 'incheon' || spot.subwayRegion === 'gyeonggi' ? 'kr-gyeonggi' : 'kr-seoul',
+    })
+  }
+
   const rows = []
-  for (const row of KR_SUBWAY_GALLERY_PHOTOS) {
+  for (const row of byId.values()) {
     const dest = join(spotsDir, `${row.id}.jpg`)
     const rel = `/samples/spots/${row.id}.jpg`
     const fallbackPath = regionFallbackPath(row.city || 'kr-seoul')
     if (existsSync(dest) && readFileSync(dest).length > 4096) {
-      rows.push({ ...row, src: rel })
+      rows.push({
+        id: row.id,
+        title: row.title,
+        src: rel,
+        catalog: true,
+        city: row.city,
+        category: 'sight',
+        sightType: guessSightType(row.title),
+        market: 'kr',
+      })
       continue
     }
     try {
@@ -205,12 +225,30 @@ async function seedKrSubway() {
         fallbackPath,
       })
       if (saved && existsSync(dest) && readFileSync(dest).length > 4096) {
-        rows.push({ ...row, src: rel })
+        rows.push({
+          id: row.id,
+          title: row.title,
+          src: rel,
+          catalog: true,
+          city: row.city,
+          category: 'sight',
+          sightType: guessSightType(row.title),
+          market: 'kr',
+        })
       }
     } catch (err) {
       console.warn(`subway ${row.id}: ${err.message}`)
       if (existsSync(dest) && readFileSync(dest).length > 4096) {
-        rows.push({ ...row, src: rel })
+        rows.push({
+          id: row.id,
+          title: row.title,
+          src: rel,
+          catalog: true,
+          city: row.city,
+          category: 'sight',
+          sightType: guessSightType(row.title),
+          market: 'kr',
+        })
       }
     }
   }

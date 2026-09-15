@@ -17,7 +17,7 @@ type MenuGroup = { title: string; ids: AppView[] }
 
 const MENU_GROUPS: MenuGroup[] = [
   { title: '여행', ids: ['samples', 'trips'] },
-  { title: '정보', ids: ['info', 'gallery'] },
+  { title: '정보', ids: ['subway', 'info', 'gallery'] },
   { title: '커뮤니티', ids: ['board', 'inquiry'] },
 ]
 
@@ -38,7 +38,10 @@ export function SideMenu({ drawerOpen, overlay, onDrawerClose, ...nav }: Props) 
   }
 
   function renderGroup(group: MenuGroup) {
-    const items = group.ids.filter((id) => linkMap.has(id))
+    const items = group.ids.filter((id) => {
+      if (id === 'subway' && nav.market !== 'kr') return false
+      return linkMap.has(id)
+    })
     if (!items.length) return null
     return (
       <div key={group.title} className="side-menu-group">

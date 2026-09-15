@@ -346,6 +346,10 @@ export default function App() {
         setInfoPlaceId(cityId)
         setView('infoPlace')
       },
+      subway: () => {
+        setInfoPlaceId('info-kr-subway')
+        setView('subway')
+      },
       gallery: goGallery,
       catalog: (photoId?: string) => {
         if (!user || !isSupervisor(user)) return
@@ -457,6 +461,7 @@ export default function App() {
         />
       ) : null}
       {view === 'info' ? <InfoPage {...nav} /> : null}
+      {view === 'subway' ? <InfoPlacePage {...nav} cityId="info-kr-subway" /> : null}
       {view === 'infoPlace' && infoPlaceId ? <InfoPlacePage {...nav} cityId={infoPlaceId} /> : null}
       {view === 'profile' && user ? (
         <ProfilePage {...nav} onSaved={setUser} />

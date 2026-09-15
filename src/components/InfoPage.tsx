@@ -35,7 +35,7 @@ export function InfoPage(nav: SiteNav) {
   const cards = useMemo(
     () =>
       [...items]
-        .filter((row) => travelInfoMarket(row) === nav.market)
+        .filter((row) => travelInfoMarket(row) === nav.market && row.id !== 'info-kr-subway')
         .sort((a, b) => (a.sort || 80) - (b.sort || 80) || a.place.localeCompare(b.place, 'ko')),
     [items, nav.market],
   )

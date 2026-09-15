@@ -8,6 +8,7 @@ export type AppView =
   | 'guide'
   | 'info'
   | 'infoPlace'
+  | 'subway'
   | 'gallery'
   | 'catalog'
   | 'galleryWrite'
@@ -27,6 +28,7 @@ export type SiteGo = {
   trips: () => void
   info: () => void
   infoPlace: (cityId: string) => void
+  subway: () => void
   gallery: (photoId?: string, returnTo?: 'home') => void
   catalog: (photoId?: string) => void
   galleryWrite: (photoId?: string) => void
@@ -54,6 +56,7 @@ export type SiteNav = {
 export const SITE_LINKS: { id: AppView; label: string }[] = [
   { id: 'samples', label: '추천 일정' },
   { id: 'trips', label: '내 여행' },
+  { id: 'subway', label: '전철타고' },
   { id: 'info', label: '여행 정보' },
   { id: 'gallery', label: '갤러리' },
   { id: 'board', label: '자유게시판' },
@@ -98,6 +101,7 @@ export function goSite(nav: SiteNav, id: AppView) {
   else if (id === 'trips') nav.go.trips()
   else if (id === 'info') nav.go.info()
   else if (id === 'infoPlace') nav.go.info()
+  else if (id === 'subway') nav.go.subway()
   else if (id === 'gallery') nav.go.gallery()
   else if (id === 'catalog') nav.go.catalog()
   else if (id === 'board') nav.go.board()

@@ -10,7 +10,7 @@ type SitemapGroup = {
 
 const GROUPS: SitemapGroup[] = [
   { title: '여행', tone: 'travel', ids: ['samples', 'trips'] },
-  { title: '정보', tone: 'info', ids: ['info', 'gallery'] },
+  { title: '정보', tone: 'info', ids: ['subway', 'info', 'gallery'] },
   { title: '커뮤니티', tone: 'community', ids: ['board', 'inquiry'] },
   {
     title: '관리',
@@ -28,7 +28,10 @@ export function SitemapPage(nav: SiteNav) {
   )
 
   function renderCard(group: SitemapGroup) {
-    const items = group.ids.filter((id) => linkMap.has(id))
+    const items = group.ids.filter((id) => {
+      if (id === 'subway' && nav.market !== 'kr') return false
+      return linkMap.has(id)
+    })
     if (!items.length) return null
     return (
       <article key={group.title} className={`sitemap-card sitemap-card-${group.tone}`}>
