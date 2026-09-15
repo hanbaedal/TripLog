@@ -1230,10 +1230,17 @@ p {
 
 .tourbus-picker-back {
   z-index: 25;
+  overflow: hidden;
+  overscroll-behavior: contain;
 }
 
 .tourbus-picker {
   width: min(520px, 100%);
+  max-height: min(88dvh, 760px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 20px 20px 0;
 }
 
 .tourbus-picker-head {
@@ -1242,6 +1249,16 @@ p {
   align-items: center;
   gap: 8px;
   margin-bottom: 4px;
+  flex-shrink: 0;
+}
+
+.tourbus-picker-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 20px;
 }
 
 .tourbus-picker-head h2 {
@@ -3152,6 +3169,22 @@ p {
     border-radius: 20px 20px 0 0;
     max-height: 92dvh;
     padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
+  }
+
+  .tourbus-picker-back {
+    place-items: end center;
+    padding: 0;
+  }
+
+  .tourbus-picker {
+    width: 100%;
+    max-height: 92dvh;
+    border-radius: 20px 20px 0 0;
+    padding: 16px 16px 0;
+  }
+
+  .tourbus-picker-body {
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
   }
 
   .planner-bar-inner,

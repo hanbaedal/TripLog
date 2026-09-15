@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { createPortal } from 'react-dom'
 import type { FormEvent } from 'react'
 import type { ItemKind, MealSlot, SightType, TransportMode, TripItem, User } from '../types'
 import { ImagePicker } from './ImagePicker'
@@ -261,15 +262,16 @@ export function ItemModal({
   }
 
   return (
-    <div className="modal-back" onClick={onClose} role="presentation">
-      <form
-        className="modal item-modal"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="item-modal-title"
-        onClick={(e) => e.stopPropagation()}
-        onSubmit={submit}
-      >
+    <>
+      <div className="modal-back" onClick={onClose} role="presentation">
+        <form
+          className="modal item-modal"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="item-modal-title"
+          onClick={(e) => e.stopPropagation()}
+          onSubmit={submit}
+        >
         <h2 id="item-modal-title">{initial ? '일정 수정' : '일정 추가'}</h2>
 
         {menuLevel === 'kind' ? (
@@ -344,7 +346,7 @@ export function ItemModal({
                   도시 → 코스 → 시간에서 선택
                 </button>
                 <p className="muted item-kr-transport-tip">
-                  서울·부산·제주·경주·전주 참고 일정입니다. 선택한 내용만 내 여행에 저장됩니다.
+                  서울·부산·제주·경주·전주·동해 참고 일정입니다. 선택한 내용만 내 여행에 저장됩니다.
                 </p>
               </div>
             ) : tripMarket === 'kr' ? (
@@ -533,14 +535,18 @@ export function ItemModal({
             저장
           </button>
         </div>
-      </form>
-      {tourBusOpen ? (
-        <TourBusPicker
-          initialCity={tourBusCityHint}
-          onClose={() => setTourBusOpen(false)}
-          onPick={applyTourBusPick}
-        />
-      ) : null}
-    </div>
+        </form>
+      </div>
+      {tourBusOpen
+        ? createPortal(
+            <TourBusPicker
+              initialCity={tourBusCityHint}
+              onClose={() => setTourBusOpen(false)}
+              onPick={applyTourBusPick}
+            />,
+            document.body,
+          )
+        : null}
+    </>
   )
 }

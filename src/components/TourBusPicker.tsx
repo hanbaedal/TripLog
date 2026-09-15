@@ -160,6 +160,7 @@ export function TourBusPicker({ initialCity, onClose, onPick }: Props) {
 
         <p className="muted tourbus-picker-step">{stepTitle}</p>
 
+        <div className="tourbus-picker-body">
         {step === 'city' ? (
           <>
             <form className="tourbus-city-form" onSubmit={submitCity}>
@@ -263,6 +264,7 @@ export function TourBusPicker({ initialCity, onClose, onPick }: Props) {
         ) : null}
 
         {error ? <p className="tourbus-error">{error}</p> : null}
+        </div>
       </div>
     </div>
   )
