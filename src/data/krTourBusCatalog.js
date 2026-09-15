@@ -16,6 +16,11 @@ export const TOUR_BUS_CITY_ALIASES = {
   'kr-jeolla': 'kr-jeonju',
   제주: 'kr-jeju',
   'kr-jeju': 'kr-jeju',
+  동해: 'kr-donghae',
+  'kr-donghae': 'kr-donghae',
+  동해역: 'kr-donghae',
+  묵호: 'kr-donghae',
+  묵호역: 'kr-donghae',
 }
 
 export function resolveTourBusCity(input) {
@@ -31,6 +36,8 @@ export function resolveTourBusCity(input) {
   if (bit.includes('경주')) return 'kr-gyeongju'
   if (bit.includes('전주')) return 'kr-jeonju'
   if (bit.includes('제주')) return 'kr-jeju'
+  if (bit.includes('동해')) return 'kr-donghae'
+  if (bit.includes('묵호')) return 'kr-donghae'
   return ''
 }
 
@@ -299,6 +306,66 @@ export const KR_TOUR_BUS_CATALOG = [
         note: '09:30 출발 · 1일 1회',
         times: ['09:30'],
         bookingUrl: 'https://www.jeonbuk.go.kr/',
+      },
+    ],
+  },
+  {
+    city: 'kr-donghae',
+    cityLabel: '동해',
+    disclaimer:
+      '참고용 일정입니다. 2026.2.7~12.20 토·일·공휴일 운행 · 네이버 예약 권장 · 만석 시 탑승 제한.',
+    sourceUrl: 'http://dcitybus.com/',
+    validUntil: '2026-12-20',
+    courses: [
+      {
+        id: 'donghae-loop',
+        title: '동해 순환코스',
+        type: 'loop',
+        operator: '동해문화관광재단',
+        departPlace: '묵호역(KTX) 앞 · 순환 시·종점',
+        routeSummary:
+          '묵호역 → 수변공원 → 망상해변 → 동해시종합버스터미널 → 무릉별유천지 → 추암·감추사 → 묵호역',
+        intervalMin: 90,
+        durationMin: 105,
+        closedDays: ['월', '화', '수', '목', '금'],
+        closedNote: '토·일·공휴일 운행 (2026.2.7~12.20)',
+        note: '정류장별 도착·출발 시각은 공식 시간표 확인 · 2026.3.7~ 묵호역 1회차 09:40',
+        times: ['09:40', '10:30', '12:10', '13:30', '15:10', '15:50', '17:50'],
+        stops: [
+          {
+            id: 'mukho',
+            label: '묵호역(KTX)',
+            place: '묵호역 앞 버스승강장',
+            hint: '공식 순환 시·종점',
+            times: ['09:40', '10:30', '12:10', '13:30', '15:10', '15:50', '17:50'],
+          },
+          {
+            id: 'donghae-ktx',
+            label: '동해역(KTX) 이용',
+            place: '동해시종합버스터미널 정류장',
+            hint: '동해역은 정류장이 아닙니다. KTX 동해역 하차 후 터미널 정류장에서 탑승(버스·택시 약 5~10분).',
+            times: ['10:15', '11:05', '12:45', '14:05', '15:45', '16:25', '18:25'],
+          },
+          {
+            id: 'suwon-park',
+            label: '묵호시장·수변공원',
+            place: '묵호시장 수변공원 정류장',
+            times: ['09:50', '10:40', '12:20', '13:40', '15:20', '16:00', '18:00'],
+          },
+          {
+            id: 'mangsan',
+            label: '망상해변',
+            place: '망상해변 정류장(보양온천 맞은편)',
+            times: ['10:05', '10:55', '12:35', '13:55', '15:35', '16:15', '18:15'],
+          },
+          {
+            id: 'mureung',
+            label: '무릉별유천지',
+            place: '무릉별유천지 정류장',
+            times: ['10:45', '11:35', '13:15', '14:35', '16:15', '16:55', '18:55'],
+          },
+        ],
+        bookingUrl: 'https://booking.naver.com/booking/5/bizes/677658',
       },
     ],
   },

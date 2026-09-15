@@ -182,6 +182,17 @@ taxonomySchema.index({ market: 1, kind: 1, slug: 1 }, { unique: true })
 export const TaxonomyOption =
   mongoose.models.TaxonomyOption || mongoose.model('TaxonomyOption', taxonomySchema)
 
+const tourBusStopSchema = new mongoose.Schema(
+  {
+    id: { type: String, required: true },
+    label: { type: String, required: true },
+    place: { type: String, required: true },
+    hint: { type: String, default: '' },
+    times: { type: [String], default: [] },
+  },
+  { _id: false },
+)
+
 const tourBusCourseSchema = new mongoose.Schema(
   {
     id: { type: String, required: true },
@@ -196,6 +207,7 @@ const tourBusCourseSchema = new mongoose.Schema(
     closedNote: { type: String, default: '' },
     note: { type: String, default: '' },
     times: { type: [String], default: [] },
+    stops: { type: [tourBusStopSchema], default: [] },
     bookingUrl: { type: String, default: '' },
   },
   { _id: false },

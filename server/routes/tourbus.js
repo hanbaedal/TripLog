@@ -25,20 +25,11 @@ function toCity(doc) {
   }
 }
 
-function isStale(doc) {
-  if (!doc?.validUntil) return false
-  const end = new Date(`${doc.validUntil}T23:59:59`)
-  return !Number.isNaN(end.getTime()) && end < new Date()
-}
-
 async function ensureCity(citySlug) {
   const seed = catalogRow(citySlug)
   if (!seed) return null
 
-  let doc = await TourBusCity.findOne({ city: citySlug })
-  if (doc && !isStale(doc)) return doc
-
-  doc = await TourBusCity.findOneAndUpdate(
+  const doc = await TourBusCity.findOneAndUpdate(
     { city: citySlug },
     {
       city: seed.city,

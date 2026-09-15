@@ -7,9 +7,10 @@ import {
   type TourBusCityDoc,
   type TourBusCourse,
   type TourBusPick,
+  type TourBusStop,
 } from '../lib/tourbus'
 
-type Step = 'city' | 'course' | 'time'
+type Step = 'city' | 'course' | 'stop' | 'time'
 
 type Props = {
   initialCity?: string
@@ -23,12 +24,17 @@ const TYPE_LABEL: Record<string, string> = {
   themed: '테마',
 }
 
+function hasStops(course: TourBusCourse): course is TourBusCourse & { stops: TourBusStop[] } {
+  return Boolean(course.stops?.length)
+}
+
 export function TourBusPicker({ initialCity, onClose, onPick }: Props) {
   const [step, setStep] = useState<Step>('city')
   const [cities, setCities] = useState<{ city: string; cityLabel: string }[]>([])
   const [cityInput, setCityInput] = useState(initialCity ?? '')
   const [cityDoc, setCityDoc] = useState<TourBusCityDoc | null>(null)
   const [course, setCourse] = useState<TourBusCourse | null>(null)
+  const [stop, setStop] = useState<TourBusStop | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -58,6 +64,7 @@ export function TourBusPicker({ initialCity, onClose, onPick }: Props) {
       if (label) setCityInput(label)
       else setCityInput(doc.cityLabel)
       setCourse(null)
+      setStop(null)
       setStep('course')
     } catch {
       setError('투어버스 일정을 불러오지 못했습니다.')
@@ -75,7 +82,7 @@ export function TourBusPicker({ initialCity, onClose, onPick }: Props) {
     e.preventDefault()
     const slug = resolvedSlug
     if (!slug) {
-      setError('서울 · 부산 · 제주 · 경주 · 전주 중에서 선택하거나 입력해 주세요.')
+      setError('서울 · 부산 · 제주 · 경주 · 전주 · 동해 중에서 선택하거나 입력해 주세요.')
       return
     }
     void loadCity(slug)
@@ -83,28 +90,50 @@ export function TourBusPicker({ initialCity, onClose, onPick }: Props) {
 
   function pickCourse(row: TourBusCourse) {
     setCourse(row)
+    setStop(null)
+    setStep(hasStops(row) ? 'stop' : 'time')
+  }
+
+  function pickStop(row: TourBusStop) {
+    setStop(row)
     setStep('time')
   }
 
   function pickTime(time: string) {
     if (!cityDoc || !course) return
-    onPick(buildTourBusPick(cityDoc, course, time))
+    onPick(buildTourBusPick(cityDoc, course, time, stop ?? undefined))
   }
 
   function goBack() {
     if (step === 'time') {
+      setStep(hasStops(course!) ? 'stop' : 'course')
+      if (hasStops(course!)) setStop(null)
+      return
+    }
+    if (step === 'stop') {
       setStep('course')
+      setCourse(null)
+      setStop(null)
       return
     }
     if (step === 'course') {
       setStep('city')
       setCityDoc(null)
       setCourse(null)
+      setStop(null)
     }
   }
 
   const stepTitle =
-    step === 'city' ? '① 도시 선택' : step === 'course' ? '② 투어 코스' : '③ 출발 시간'
+    step === 'city'
+      ? '① 도시 선택'
+      : step === 'course'
+        ? '② 투어 코스'
+        : step === 'stop'
+          ? '③ 승차 장소'
+          : '④ 출발 시간'
+
+  const timeOptions = stop?.times?.length ? stop.times : course?.times ?? []
 
   return (
     <div className="modal-back tourbus-picker-back" onClick={onClose} role="presentation">
@@ -142,7 +171,7 @@ export function TourBusPicker({ initialCity, onClose, onPick }: Props) {
                     setCityInput(e.target.value)
                     setError('')
                   }}
-                  placeholder="서울 · 부산 · 제주 · 경주 · 전주"
+                  placeholder="서울 · 부산 · 제주 · 경주 · 전주 · 동해"
                   list="tourbus-city-options"
                   autoFocus
                 />
@@ -183,7 +212,29 @@ export function TourBusPicker({ initialCity, onClose, onPick }: Props) {
                     <strong>{row.title}</strong>
                     {row.operator ? <span className="muted">{row.operator}</span> : null}
                     {row.routeSummary ? <span className="muted">{row.routeSummary}</span> : null}
-                    <span className="muted">출발: {row.departPlace}</span>
+                    <span className="muted">기준: {row.departPlace}</span>
+                    {row.stops?.length ? (
+                      <span className="muted">승차 장소 {row.stops.length}곳 선택 가능</span>
+                    ) : null}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </>
+        ) : null}
+
+        {step === 'stop' && course?.stops?.length ? (
+          <>
+            <div className="tourbus-time-summary">
+              <strong>{course.title}</strong>
+            </div>
+            <ul className="tourbus-course-list">
+              {course.stops.map((row) => (
+                <li key={row.id}>
+                  <button type="button" className="tourbus-course-card" onClick={() => pickStop(row)}>
+                    <strong>{row.label}</strong>
+                    <span className="muted">{row.place}</span>
+                    {row.hint ? <span className="muted">{row.hint}</span> : null}
                   </button>
                 </li>
               ))}
@@ -195,17 +246,19 @@ export function TourBusPicker({ initialCity, onClose, onPick }: Props) {
           <>
             <div className="tourbus-time-summary">
               <strong>{course.title}</strong>
-              <span className="muted">{course.departPlace}</span>
+              <span className="muted">{stop?.label || course.departPlace}</span>
+              <span className="muted">{stop?.place || course.departPlace}</span>
             </div>
             <p className="muted tourbus-disclaimer">{cityDoc.disclaimer}</p>
             <div className="tourbus-time-grid">
-              {course.times.map((time) => (
+              {timeOptions.map((time) => (
                 <button key={time} type="button" className="btn ghost tourbus-time-btn" onClick={() => pickTime(time)}>
                   {time}
                 </button>
               ))}
             </div>
-            {course.note ? <p className="muted tourbus-course-note">{course.note}</p> : null}
+            {stop?.hint ? <p className="muted tourbus-course-note">{stop.hint}</p> : null}
+            {!stop && course.note ? <p className="muted tourbus-course-note">{course.note}</p> : null}
           </>
         ) : null}
 

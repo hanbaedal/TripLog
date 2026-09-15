@@ -3,6 +3,14 @@ import { resolveTourBusCity, TOUR_BUS_PILOT_CITIES } from '../data/krTourBusCata
 
 export type TourBusCourseType = 'loop' | 'package' | 'themed'
 
+export type TourBusStop = {
+  id: string
+  label: string
+  place: string
+  hint?: string
+  times: string[]
+}
+
 export type TourBusCourse = {
   id: string
   title: string
@@ -16,6 +24,7 @@ export type TourBusCourse = {
   closedNote?: string
   note?: string
   times: string[]
+  stops?: TourBusStop[]
   bookingUrl?: string
 }
 
@@ -33,6 +42,7 @@ export type TourBusPick = {
   city: string
   cityLabel: string
   course: TourBusCourse
+  stop?: TourBusStop
   time: string
   title: string
   place: string
@@ -60,9 +70,15 @@ export async function loadTourBusCity(city: string): Promise<TourBusCityDoc | nu
   }
 }
 
-export function buildTourBusPick(cityDoc: TourBusCityDoc, course: TourBusCourse, time: string): TourBusPick {
+export function buildTourBusPick(
+  cityDoc: TourBusCityDoc,
+  course: TourBusCourse,
+  time: string,
+  stop?: TourBusStop,
+): TourBusPick {
   const noteBits = [
     `[참고용] ${cityDoc.disclaimer}`,
+    stop?.hint || '',
     course.operator ? `운영: ${course.operator}` : '',
     course.routeSummary ? `코스: ${course.routeSummary}` : '',
     course.closedNote || (course.closedDays?.length ? `휴무: ${course.closedDays.join('·')}` : ''),
@@ -70,13 +86,18 @@ export function buildTourBusPick(cityDoc: TourBusCityDoc, course: TourBusCourse,
     cityDoc.sourceUrl ? `공식: ${cityDoc.sourceUrl}` : '',
   ].filter(Boolean)
 
+  const title = stop
+    ? `투어버스 · ${course.title} · ${stop.label}`
+    : `투어버스 · ${course.title}`
+
   return {
     city: cityDoc.city,
     cityLabel: cityDoc.cityLabel,
     course,
+    stop,
     time,
-    title: `투어버스 · ${course.title}`,
-    place: course.departPlace,
+    title,
+    place: stop?.place || course.departPlace,
     note: noteBits.join('\n'),
   }
 }
