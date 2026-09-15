@@ -8,7 +8,7 @@ export const KR_SUBWAY_GALLERY_PHOTOS = [
     "catalog": true,
     "city": "kr-seoul",
     "category": "sight",
-    "sightType": "park",
+    "sightType": "town",
     "market": "kr"
   },
   {
@@ -16,9 +16,9 @@ export const KR_SUBWAY_GALLERY_PHOTOS = [
     "title": "김포공항",
     "src": "/samples/spots/spot-kr-subway-24.jpg",
     "catalog": true,
-    "city": "kr-seoul",
+    "city": "kr-gyeonggi",
     "category": "sight",
-    "sightType": "town",
+    "sightType": "beach",
     "market": "kr"
   },
   {
@@ -28,7 +28,7 @@ export const KR_SUBWAY_GALLERY_PHOTOS = [
     "catalog": true,
     "city": "kr-gyeonggi",
     "category": "sight",
-    "sightType": "town",
+    "sightType": "beach",
     "market": "kr"
   },
   {
@@ -58,7 +58,7 @@ export const KR_SUBWAY_GALLERY_PHOTOS = [
     "catalog": true,
     "city": "kr-gyeonggi",
     "category": "sight",
-    "sightType": "town",
+    "sightType": "park",
     "market": "kr"
   },
   {
@@ -68,7 +68,7 @@ export const KR_SUBWAY_GALLERY_PHOTOS = [
     "catalog": true,
     "city": "kr-gyeonggi",
     "category": "sight",
-    "sightType": "park",
+    "sightType": "town",
     "market": "kr"
   },
   {
@@ -118,7 +118,7 @@ export const KR_SUBWAY_GALLERY_PHOTOS = [
     "catalog": true,
     "city": "kr-seoul",
     "category": "sight",
-    "sightType": "town",
+    "sightType": "palace",
     "market": "kr"
   },
   {
@@ -128,7 +128,7 @@ export const KR_SUBWAY_GALLERY_PHOTOS = [
     "catalog": true,
     "city": "kr-seoul",
     "category": "sight",
-    "sightType": "palace",
+    "sightType": "town",
     "market": "kr"
   },
   {
@@ -148,7 +148,7 @@ export const KR_SUBWAY_GALLERY_PHOTOS = [
     "catalog": true,
     "city": "kr-seoul",
     "category": "sight",
-    "sightType": "park",
+    "sightType": "town",
     "market": "kr"
   },
   {
@@ -158,7 +158,7 @@ export const KR_SUBWAY_GALLERY_PHOTOS = [
     "catalog": true,
     "city": "kr-seoul",
     "category": "sight",
-    "sightType": "park",
+    "sightType": "town",
     "market": "kr"
   },
   {
@@ -168,7 +168,7 @@ export const KR_SUBWAY_GALLERY_PHOTOS = [
     "catalog": true,
     "city": "kr-seoul",
     "category": "sight",
-    "sightType": "town",
+    "sightType": "park",
     "market": "kr"
   },
   {
@@ -183,7 +183,7 @@ export const KR_SUBWAY_GALLERY_PHOTOS = [
   },
   {
     "id": "spot-kr-subway-49",
-    "title": "창경궁",
+    "title": "대학로",
     "src": "/samples/spots/spot-kr-subway-49.jpg",
     "catalog": true,
     "city": "kr-seoul",
@@ -198,7 +198,7 @@ export const KR_SUBWAY_GALLERY_PHOTOS = [
     "catalog": true,
     "city": "kr-seoul",
     "category": "sight",
-    "sightType": "park",
+    "sightType": "temple",
     "market": "kr"
   },
   {
@@ -218,7 +218,7 @@ export const KR_SUBWAY_GALLERY_PHOTOS = [
     "catalog": true,
     "city": "kr-seoul",
     "category": "sight",
-    "sightType": "park",
+    "sightType": "town",
     "market": "kr"
   },
   {
@@ -248,7 +248,7 @@ export const KR_SUBWAY_GALLERY_PHOTOS = [
     "catalog": true,
     "city": "kr-seoul",
     "category": "sight",
-    "sightType": "town",
+    "sightType": "palace",
     "market": "kr"
   },
   {
@@ -288,7 +288,7 @@ export const KR_SUBWAY_GALLERY_PHOTOS = [
     "catalog": true,
     "city": "kr-seoul",
     "category": "sight",
-    "sightType": "town",
+    "sightType": "mountain",
     "market": "kr"
   },
   {
@@ -378,7 +378,7 @@ export const KR_SUBWAY_GALLERY_PHOTOS = [
     "catalog": true,
     "city": "kr-gyeonggi",
     "category": "sight",
-    "sightType": "town",
+    "sightType": "palace",
     "market": "kr"
   },
   {

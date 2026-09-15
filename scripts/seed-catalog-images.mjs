@@ -2,7 +2,7 @@
  * 카탈로그 이미지 다운로드 + 갤러리 카탈로그 생성
  * Usage: node scripts/seed-catalog-images.mjs [cn-food|kr-spots|all]
  */
-import { mkdirSync, writeFileSync, existsSync, readFileSync, copyFileSync } from 'node:fs'
+import { mkdirSync, writeFileSync, existsSync, readFileSync, copyFileSync, unlinkSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { FOOD_PHOTOS } from '../src/data/galleryCatalog.js'
@@ -174,6 +174,45 @@ export const KR_SPOT_GALLERY_PHOTOS = ${JSON.stringify(rows, null, 2)}
   console.log(`KR spot gallery: ${rows.length} rows (${ok} images, ${miss} missing)`)
 }
 
+const SUBWAY_COMMONS_HINTS = {
+  'spot-kr-subway-50': 'Jongmyo Seoul Korea',
+  'spot-kr-subway-47': 'Dongdaemun Market Seoul',
+  'spot-kr-subway-42': 'Seongsu-dong Seoul',
+  'spot-kr-subway-43': 'Konkuk University Seoul',
+  'spot-kr-subway-52': 'Mangwon Hangang Park Seoul',
+  'spot-kr-subway-56': 'Taereung royal tomb Seoul',
+  'spot-kr-subway-58': 'Bukhansan National Park Korea',
+  'spot-kr-subway-59': 'Boramae Park Seoul',
+  'spot-kr-subway-60': 'Gwanaksan Seoul',
+  'spot-kr-subway-61': 'Gimpo Hangang Park Korea',
+  'spot-kr-subway-34': 'Songdo Central Park Incheon',
+  'spot-kr-subway-35': 'Songdo moonlight festival park Incheon',
+  'spot-kr-subway-36': 'Songdo Convensia Incheon',
+  'spot-kr-subway-57': 'Bupyeong station Incheon',
+  'spot-kr-subway-63': 'Chuncheon city Korea',
+  'spot-kr-subway-64': 'Gangchon rail bike Chuncheon',
+  'spot-kr-subway-65': 'Uijeongbu city Korea',
+  'spot-kr-subway-66': 'Bucheon city Korea',
+  'spot-kr-subway-67': 'Oeg island Siheung Korea',
+  'spot-kr-subway-68': 'Daebudo island Ansan Korea',
+  'spot-kr-subway-69': 'Icheon ceramics village Korea',
+  'spot-kr-subway-70': 'Yeoju King Sejong tomb Korea',
+  'spot-kr-subway-71': 'Seongnam city Korea',
+  'spot-kr-subway-72': 'Dongtan Hwaseong Korea',
+}
+
+function isFallbackCopy(destPath, city) {
+  if (!existsSync(destPath)) return false
+  for (const slug of [city || 'kr-seoul', 'kr-seoul', 'kr-gyeonggi']) {
+    const fb = regionFallbackPath(slug)
+    if (!fb || !existsSync(fb)) continue
+    const a = readFileSync(destPath)
+    const b = readFileSync(fb)
+    if (a.length === b.length && a.equals(b)) return true
+  }
+  return false
+}
+
 async function seedKrSubway() {
   console.log('\n=== KR subway gallery → public/samples/ ===')
   const subwayCover = join(samplesDir, 'kr-subway.jpg')
@@ -201,7 +240,8 @@ async function seedKrSubway() {
     const dest = join(spotsDir, `${row.id}.jpg`)
     const rel = `/samples/spots/${row.id}.jpg`
     const fallbackPath = regionFallbackPath(row.city || 'kr-seoul')
-    if (existsSync(dest) && readFileSync(dest).length > 4096) {
+    const needsRefresh = !existsSync(dest) || readFileSync(dest).length <= 4096 || isFallbackCopy(dest, row.city)
+    if (!needsRefresh) {
       rows.push({
         id: row.id,
         title: row.title,
@@ -214,8 +254,17 @@ async function seedKrSubway() {
       })
       continue
     }
+    if (needsRefresh && existsSync(dest)) {
+      try {
+        unlinkSync(dest)
+      } catch {
+        /* ignore */
+      }
+    }
     try {
-      let url = await commonsSearchThumb(`${row.title} South Korea`)
+      const hint = SUBWAY_COMMONS_HINTS[row.id]
+      let url = hint ? await commonsSearchThumb(hint) : null
+      if (!url) url = await commonsSearchThumb(`${row.title} South Korea`)
       if (!url) url = await commonsSearchThumb(`${row.title} Korea`)
       const saved = await ensureLocal({
         id: row.id,
@@ -235,6 +284,7 @@ async function seedKrSubway() {
           sightType: guessSightType(row.title),
           market: 'kr',
         })
+        await sleep(3500)
       }
     } catch (err) {
       console.warn(`subway ${row.id}: ${err.message}`)
