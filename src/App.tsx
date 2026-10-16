@@ -8,6 +8,7 @@ import { InfoPage } from './components/InfoPage'
 import { InfoPlacePage } from './components/InfoPlacePage'
 import { ProfilePage } from './components/ProfilePage'
 import { InquiryPage } from './components/InquiryPage'
+import { UserManualPage } from './components/UserManualPage'
 import { Landing } from './components/Landing'
 import { Planner } from './components/Planner'
 import { SampleGallery } from './components/SampleGallery'
@@ -417,6 +418,7 @@ export default function App() {
       },
       board: () => setView('board'),
       inquiry: () => setView('inquiry'),
+      manual: () => setView('manual'),
       sitemap: () => setView('sitemap'),
       profile: () => {
         if (!user) {
@@ -537,6 +539,7 @@ export default function App() {
       ) : null}
       {view === 'board' ? <BoardPage {...nav} /> : null}
       {view === 'inquiry' ? <InquiryPage {...nav} /> : null}
+      {view === 'manual' ? <UserManualPage {...nav} /> : null}
       {view === 'sitemap' ? <SitemapPage {...nav} /> : null}
       {isTaxonomyAdminView(view) && user && isSupervisor(user) ? (
         <TaxonomyAdminPage kind={taxonomyViewToKind(view)} {...nav} />

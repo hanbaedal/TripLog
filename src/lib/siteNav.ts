@@ -14,6 +14,7 @@ export type AppView =
   | 'galleryWrite'
   | 'board'
   | 'inquiry'
+  | 'manual'
   | 'sitemap'
   | 'profile'
   | 'taxonomyCity'
@@ -34,6 +35,7 @@ export type SiteGo = {
   galleryWrite: (photoId?: string) => void
   board: () => void
   inquiry: () => void
+  manual: () => void
   sitemap: () => void
   profile: () => void
   taxonomyCity: () => void
@@ -61,6 +63,7 @@ export const SITE_LINKS: { id: AppView; label: string }[] = [
   { id: 'gallery', label: '갤러리' },
   { id: 'board', label: '자유게시판' },
   { id: 'inquiry', label: '문의사항' },
+  { id: 'manual', label: '사용자메뉴얼' },
   { id: 'sitemap', label: '사이트맵' },
 ]
 
@@ -106,6 +109,7 @@ export function goSite(nav: SiteNav, id: AppView) {
   else if (id === 'catalog') nav.go.catalog()
   else if (id === 'board') nav.go.board()
   else if (id === 'inquiry') nav.go.inquiry()
+  else if (id === 'manual') nav.go.manual()
   else if (id === 'sitemap') nav.go.sitemap()
   else if (id === 'profile') nav.go.profile()
   else if (id === 'taxonomyCity') nav.go.taxonomyCity()

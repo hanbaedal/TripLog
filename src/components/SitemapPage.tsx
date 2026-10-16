@@ -11,7 +11,7 @@ type SitemapGroup = {
 const GROUPS: SitemapGroup[] = [
   { title: '여행', tone: 'travel', ids: ['samples', 'trips'] },
   { title: '정보', tone: 'info', ids: ['subway', 'info', 'gallery'] },
-  { title: '커뮤니티', tone: 'community', ids: ['board', 'inquiry'] },
+  { title: '커뮤니티', tone: 'community', ids: ['board', 'inquiry', 'manual'] },
   {
     title: '관리',
     tone: 'admin',

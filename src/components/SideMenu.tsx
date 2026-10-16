@@ -18,7 +18,7 @@ type MenuGroup = { title: string; ids: AppView[] }
 const MENU_GROUPS: MenuGroup[] = [
   { title: '여행', ids: ['samples', 'trips'] },
   { title: '정보', ids: ['subway', 'info', 'gallery'] },
-  { title: '커뮤니티', ids: ['board', 'inquiry'] },
+  { title: '커뮤니티', ids: ['board', 'inquiry', 'manual'] },
 ]
 
 const ADMIN_GROUP: MenuGroup = {
