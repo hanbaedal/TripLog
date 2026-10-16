@@ -1,17 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import type { User } from '../types'
-import {
-  checkEmailAvailable,
-  fetchAuthProviders,
-  fetchOAuthSetup,
-  findEmail,
-  resetPassword,
-  signIn,
-  signUp,
-  startOAuth,
-  type OAuthSetupInfo,
-} from '../lib/auth'
+import { checkEmailAvailable, fetchAuthProviders, findEmail, resetPassword, signIn, signUp, startOAuth } from '../lib/auth'
 import { PasswordField } from './PasswordField'
 
 type Props = {
@@ -56,20 +46,12 @@ export function AuthModal({ onClose, onAuthed, initialError = '' }: Props) {
   const [error, setError] = useState(initialError)
   const [busy, setBusy] = useState(false)
   const [oauthReady, setOauthReady] = useState({ kakao: false, google: false })
-  const [oauthSetup, setOauthSetup] = useState<OAuthSetupInfo | null>(null)
 
   useEffect(() => {
     void fetchAuthProviders()
       .then((providers) => setOauthReady({ kakao: providers.kakao, google: providers.google }))
       .catch(() => setOauthReady({ kakao: false, google: false }))
   }, [])
-
-  useEffect(() => {
-    if (!oauthReady.kakao && !oauthReady.google) return
-    void fetchOAuthSetup()
-      .then(setOauthSetup)
-      .catch(() => setOauthSetup(null))
-  }, [oauthReady.google, oauthReady.kakao])
 
   useEffect(() => {
     if (initialError) setError(initialError)
@@ -131,10 +113,6 @@ export function AuthModal({ onClose, onAuthed, initialError = '' }: Props) {
     } finally {
       setBusy(false)
     }
-  }
-
-  function copyOAuth(text: string) {
-    void navigator.clipboard.writeText(text)
   }
 
   function onSocial(provider: 'kakao' | 'google') {
@@ -333,52 +311,6 @@ export function AuthModal({ onClose, onAuthed, initialError = '' }: Props) {
             {thirdLabel}
           </button>
         </div>
-
-        {oauthSetup ? (
-          <details className="auth-oauth-help">
-            <summary>
-              카카오 KOE006 · Google redirect 오류 (관리자){' '}
-              <a href="/kakao-koe006.html" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
-                카카오
-              </a>
-              {' · '}
-              <a href="/google-oauth.html" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
-                Google
-              </a>
-            </summary>
-            <p className="muted auth-oauth-help-lead">
-              앱은 아래 주소로만 로그인합니다. 카카오·Google 콘솔에 <strong>한 글자도 틀리지 않게</strong> 등록해야 합니다.
-            </p>
-            {oauthSetup.kakaoRestApiKey ? (
-              <p className="auth-oauth-kv">
-                <span>카카오 REST API 키</span>
-                <code>{oauthSetup.kakaoRestApiKey}</code>
-                <button type="button" className="btn ghost auth-oauth-copy" onClick={() => copyOAuth(oauthSetup.kakaoRestApiKey!)}>
-                  복사
-                </button>
-              </p>
-            ) : null}
-            <p className="auth-oauth-kv">
-              <span>카카오 Redirect URI</span>
-              <code>{oauthSetup.kakao}</code>
-              <button type="button" className="btn ghost auth-oauth-copy" onClick={() => copyOAuth(oauthSetup.kakao)}>
-                복사
-              </button>
-            </p>
-            <p className="auth-oauth-kv">
-              <span>Google Redirect URI</span>
-              <code>{oauthSetup.google}</code>
-              <button type="button" className="btn ghost auth-oauth-copy" onClick={() => copyOAuth(oauthSetup.google)}>
-                복사
-              </button>
-            </p>
-            <ol className="auth-oauth-steps">
-              {oauthSetup.kakaoConsoleSteps.map((step) => (
-                <li key={step}>{step}</li>
-              ))}
-            </ol>
-          </details>
-        ) : null}
       </form>
     </div>
   )
