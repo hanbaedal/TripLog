@@ -125,7 +125,27 @@ export async function exchangeKakaoCode(req, code) {
   })
   const tokenData = await tokenRes.json()
   if (!tokenRes.ok || !tokenData.access_token) {
-    throw new Error('kakao_token_failed')
+    const errCode = String(tokenData.error || '')
+    const desc = String(tokenData.error_description || tokenData.error_code || '')
+    console.error('[kakao token]', { status: tokenRes.status, errCode, desc, redirectUri })
+    if (errCode === 'invalid_client') {
+      const hint = new Error('kakao_client_auth')
+      hint.cause = desc
+      throw hint
+    }
+    if (errCode === 'invalid_grant' && /redirect/i.test(desc)) {
+      const hint = new Error('kakao_redirect_mismatch')
+      hint.cause = desc
+      throw hint
+    }
+    if (errCode === 'invalid_grant') {
+      const hint = new Error('kakao_code_invalid')
+      hint.cause = desc
+      throw hint
+    }
+    const hint = new Error('kakao_token_failed')
+    hint.cause = desc || errCode
+    throw hint
   }
 
   const profileRes = await fetch('https://kapi.kakao.com/v2/user/me', {
@@ -183,11 +203,12 @@ export async function exchangeGoogleCode(req, code) {
   }
 }
 
-export function finishOAuthRedirect(req, res, { token, error }) {
+export function finishOAuthRedirect(req, res, { token, error, detail }) {
   const base = appBaseUrl(req)
   const url = new URL('/', base)
   if (token) url.searchParams.set('token', token)
   if (error) url.searchParams.set('oauth_error', error)
+  if (detail) url.searchParams.set('oauth_detail', String(detail).slice(0, 200))
   res.redirect(url.toString())
 }
 
@@ -204,6 +225,11 @@ export function oauthErrorMessage(code) {
     email_account_exists: '이 이메일은 이미 이메일 가입으로 등록되어 있습니다. 이메일로 로그인해 주세요.',
     email_taken: '이 이메일은 다른 계정에서 사용 중입니다.',
     kakao_token_failed: '카카오 로그인에 실패했습니다.',
+    kakao_client_auth:
+      '카카오 REST API 키 또는 Client Secret이 맞지 않습니다. 카카오 콘솔「Client Secret 사용」과 Render KAKAO_CLIENT_SECRET을 같이 맞춰 주세요.',
+    kakao_redirect_mismatch:
+      '카카오 Redirect URI가 인가 요청과 다릅니다. Render APP_URL·KAKAO_REDIRECT_URI와 카카오 콘솔 등록 URI가 같은지 확인해 주세요.',
+    kakao_code_invalid: '카카오 로그인 시간이 지났습니다. 다시 시도해 주세요.',
     kakao_profile_failed: '카카오 프로필을 가져오지 못했습니다.',
     google_token_failed: 'Google 로그인에 실패했습니다.',
     google_profile_failed: 'Google 프로필을 가져오지 못했습니다.',

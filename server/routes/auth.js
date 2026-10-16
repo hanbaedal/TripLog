@@ -158,6 +158,7 @@ authRouter.get('/oauth-setup', (req, res) => {
   res.json({
     ...hints,
     kakaoRestApiKey: kakaoKey || null,
+    kakaoClientSecretConfigured: Boolean(String(process.env.KAKAO_CLIENT_SECRET || '').trim()),
     kakaoConsoleSteps: [
       'developers.kakao.com → 앱(해수의 여행일지) 선택',
       '제품 설정 → 카카오 로그인 → 상태 ON',
@@ -200,7 +201,12 @@ authRouter.get('/kakao/callback', async (req, res) => {
     await completeOAuthLogin(req, res, profile)
   } catch (err) {
     const code = err instanceof Error ? err.message : 'oauth_failed'
-    finishOAuthRedirect(req, res, { error: code })
+    const detail = err instanceof Error && err.cause ? String(err.cause) : ''
+    if (err && typeof err === 'object' && 'code' in err && err.code === 11000) {
+      finishOAuthRedirect(req, res, { error: 'oauth_failed', detail: 'account_duplicate' })
+      return
+    }
+    finishOAuthRedirect(req, res, { error: code, detail })
   }
 })
 

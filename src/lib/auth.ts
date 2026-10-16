@@ -104,6 +104,11 @@ const OAUTH_ERROR_MESSAGES: Record<string, string> = {
   email_account_exists: '이 이메일은 이미 이메일 가입으로 등록되어 있습니다. 이메일로 로그인해 주세요.',
   email_taken: '이 이메일은 다른 계정에서 사용 중입니다.',
   kakao_token_failed: '카카오 로그인에 실패했습니다.',
+  kakao_client_auth:
+    '카카오 REST API 키 또는 Client Secret이 맞지 않습니다. 카카오 콘솔「Client Secret」과 Render KAKAO_CLIENT_SECRET을 확인해 주세요.',
+  kakao_redirect_mismatch:
+    '카카오 Redirect URI가 맞지 않습니다. triplog.my 콜백 URL과 Render KAKAO_REDIRECT_URI를 확인해 주세요.',
+  kakao_code_invalid: '카카오 로그인 시간이 지났습니다. 다시 시도해 주세요.',
   kakao_profile_failed: '카카오 프로필을 가져오지 못했습니다.',
   google_token_failed: 'Google 로그인에 실패했습니다.',
   google_profile_failed: 'Google 프로필을 가져오지 못했습니다.',

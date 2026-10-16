@@ -75,7 +75,10 @@ export default function App() {
         window.history.replaceState({}, '', window.location.pathname)
       }
       if (oauthErr) {
-        setOauthError(oauthErrorMessage(oauthErr))
+        const detail = params.get('oauth_detail')
+        let msg = oauthErrorMessage(oauthErr)
+        if (detail) msg += ` (${detail})`
+        setOauthError(msg)
         setAuthOpen(true)
       }
       if (oauthToken) {

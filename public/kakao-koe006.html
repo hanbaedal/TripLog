@@ -86,6 +86,21 @@
       <li>저장 후 1~2분 기다렸다가 시크릿 창에서 다시 로그인</li>
     </ol>
 
+    <h2>「카카오 로그인에 실패했습니다」가 뜰 때</h2>
+    <p>인가(KOE006)는 통과했지만 <strong>토큰 교환</strong>에서 실패한 경우입니다.</p>
+    <ol>
+      <li>
+        <strong>REST API 키 → Client Secret</strong>: 「사용」이 <strong>ON</strong>이면 Render에
+        <code>KAKAO_CLIENT_SECRET</code>을 콘솔과 동일하게 넣으세요. <strong>OFF</strong>면 Render에서 해당 변수를
+        <strong>삭제</strong>하세요.
+      </li>
+      <li>
+        Render <code>KAKAO_REDIRECT_URI</code> = 위 Redirect URI와 <strong>완전히 동일</strong>한지 확인
+      </li>
+      <li>로그인을 오래 두었다면 다시 「카카오」 버튼부터 시도</li>
+    </ol>
+    <p id="secret-hint" class="warn"></p>
+
     <p><a href="/">← TripLog 홈</a></p>
 
     <script>
@@ -95,6 +110,12 @@
           const data = await res.json()
           document.getElementById('redirect-uri').textContent = data.kakao || '(없음)'
           document.getElementById('rest-key').textContent = data.kakaoRestApiKey || '(환경 변수 없음)'
+          const hint = document.getElementById('secret-hint')
+          if (hint) {
+            hint.textContent = data.kakaoClientSecretConfigured
+              ? '서버: KAKAO_CLIENT_SECRET 설정됨 — 카카오 콘솔 Client Secret「사용 ON」과 값이 같아야 합니다.'
+              : '서버: KAKAO_CLIENT_SECRET 없음 — 카카오 콘솔 Client Secret은「사용 OFF」여야 합니다.'
+          }
         } catch {
           document.getElementById('redirect-uri').textContent = 'https://triplog.my/api/auth/kakao/callback'
           document.getElementById('rest-key').textContent = '(API 호출 실패 — Render KAKAO_REST_API_KEY 확인)'
