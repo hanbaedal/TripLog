@@ -34,7 +34,7 @@ export function AppNav({ user, market, setMarket, go, menuOpen, onOpenMenu }: Pr
       <div className="wrap topnav">
         <div className="header-leading">
           <button className="brand" type="button" onClick={go.home}>
-            <img className="brand-avatar" src="/brand/haesu.jpg" alt="" />
+            <img className="brand-avatar" src="/brand/haesu.jpg" alt="해수 프로필" />
             <span className="brand-label">해수의 여행일지</span>
           </button>
         </div>
