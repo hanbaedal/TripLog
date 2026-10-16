@@ -155,10 +155,12 @@ authRouter.get('/oauth-redirects', (req, res) => {
 authRouter.get('/oauth-setup', (req, res) => {
   const hints = oauthRedirectHints(req)
   const kakaoKey = String(process.env.KAKAO_REST_API_KEY || '').trim()
+  const googleClientId = String(process.env.GOOGLE_CLIENT_ID || '').trim()
   res.json({
     ...hints,
     kakaoRestApiKey: kakaoKey || null,
     kakaoClientSecretConfigured: Boolean(String(process.env.KAKAO_CLIENT_SECRET || '').trim()),
+    googleClientId: googleClientId || null,
     kakaoConsoleSteps: [
       'developers.kakao.com → 앱(해수의 여행일지) 선택',
       '제품 설정 → 카카오 로그인 → 상태 ON',

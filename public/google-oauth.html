@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Google redirect_uri_mismatch — 해수의 여행일지</title>
+    <style>
+      body {
+        font-family: 'Noto Sans KR', system-ui, sans-serif;
+        line-height: 1.55;
+        max-width: 640px;
+        margin: 0 auto;
+        padding: 1.25rem;
+        color: #1a2233;
+      }
+      h1 {
+        font-size: 1.25rem;
+      }
+      .box {
+        background: #f4f7fb;
+        border: 1px solid #d8e0ea;
+        border-radius: 10px;
+        padding: 12px;
+        margin: 12px 0;
+        word-break: break-all;
+      }
+      code {
+        font-size: 0.85rem;
+      }
+      button {
+        margin-top: 8px;
+        padding: 8px 14px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        background: #fff;
+        cursor: pointer;
+      }
+      ol {
+        padding-left: 1.2rem;
+      }
+      li {
+        margin: 0.5rem 0;
+      }
+      .warn {
+        color: #b42318;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Google redirect_uri_mismatch 해결</h1>
+    <p>
+      TripLog이 Google에 보내는 주소와 <strong>Google Cloud Console에 등록한 Redirect URI</strong>가 다를 때 납니다. 아래
+      값을 <strong>그대로</strong> 등록하세요.
+    </p>
+
+    <div class="box">
+      <div>Authorized redirect URI</div>
+      <code id="redirect-uri">불러오는 중…</code>
+      <br />
+      <button type="button" id="copy-redirect">Redirect URI 복사</button>
+    </div>
+
+    <div class="box">
+      <div>Authorized JavaScript origin</div>
+      <code id="js-origin">https://triplog.my</code>
+      <br />
+      <button type="button" id="copy-origin">Origin 복사</button>
+    </div>
+
+    <div class="box">
+      <div>OAuth 클라이언트 ID (Render GOOGLE_CLIENT_ID와 동일해야 함)</div>
+      <code id="client-id">불러오는 중…</code>
+    </div>
+
+    <h2>Google Cloud Console 순서</h2>
+    <ol>
+      <li><a href="https://console.cloud.google.com/apis/credentials">API 및 서비스 → 사용자 인증 정보</a></li>
+      <li><strong>OAuth 2.0 클라이언트 ID</strong> (웹 애플리케이션) — 위 client_id와 같은 항목 선택</li>
+      <li>
+        <strong>Authorized JavaScript origins</strong>에 추가:
+        <code>https://triplog.my</code> (경로 없음, https)
+      </li>
+      <li>
+        <strong>Authorized redirect URIs</strong>에 위 Redirect URI <strong>한 글자도 틀리지 않게</strong> 추가
+        <ul>
+          <li><code>onrender.com</code> 주소만 있으면 mismatch 발생</li>
+          <li><code>www.</code>, 끝 <code>/</code>, <code>http://</code> 사용 금지</li>
+        </ul>
+      </li>
+      <li>저장 후 5~10분 기다렸다가 시크릿 창에서 Google 로그인 재시도</li>
+    </ol>
+
+    <h2>Render Environment</h2>
+    <ul>
+      <li><code>GOOGLE_CLIENT_ID</code> = 위 OAuth 클라이언트 ID</li>
+      <li><code>GOOGLE_CLIENT_SECRET</code> = 같은 클라이언트의 Secret</li>
+      <li><code>GOOGLE_REDIRECT_URI</code> = <code id="redirect-uri-2">…</code></li>
+      <li><code>APP_URL</code> = <code>https://triplog.my</code></li>
+    </ul>
+
+    <p><a href="/">← TripLog 홈</a> · <a href="/kakao-koe006.html">카카오 설정</a></p>
+
+    <script>
+      async function load() {
+        try {
+          const res = await fetch('/api/auth/oauth-setup', { cache: 'no-store' })
+          const data = await res.json()
+          const redirect = data.google || 'https://triplog.my/api/auth/google/callback'
+          document.getElementById('redirect-uri').textContent = redirect
+          document.getElementById('redirect-uri-2').textContent = redirect
+          document.getElementById('client-id').textContent = data.googleClientId || '(Render GOOGLE_CLIENT_ID 없음)'
+          if (data.appUrl) document.getElementById('js-origin').textContent = data.appUrl
+        } catch {
+          document.getElementById('redirect-uri').textContent = 'https://triplog.my/api/auth/google/callback'
+          document.getElementById('redirect-uri-2').textContent = 'https://triplog.my/api/auth/google/callback'
+        }
+      }
+      function copy(id) {
+        void navigator.clipboard.writeText(document.getElementById(id).textContent)
+        alert('복사했습니다.')
+      }
+      document.getElementById('copy-redirect').onclick = () => copy('redirect-uri')
+      document.getElementById('copy-origin').onclick = () => copy('js-origin')
+      void load()
+    </script>
+  </body>
+</html>

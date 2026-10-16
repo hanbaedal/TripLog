@@ -339,7 +339,11 @@ export function AuthModal({ onClose, onAuthed, initialError = '' }: Props) {
             <summary>
               카카오 KOE006 · Google redirect 오류 (관리자){' '}
               <a href="/kakao-koe006.html" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
-                설정 가이드
+                카카오
+              </a>
+              {' · '}
+              <a href="/google-oauth.html" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
+                Google
               </a>
             </summary>
             <p className="muted auth-oauth-help-lead">
