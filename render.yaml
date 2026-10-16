@@ -24,6 +24,10 @@ services:
         value: /opt/render/project/src/uploads
       - key: APP_URL
         value: https://triplog.my
+      - key: KAKAO_REDIRECT_URI
+        value: https://triplog.my/api/auth/kakao/callback
+      - key: GOOGLE_REDIRECT_URI
+        value: https://triplog.my/api/auth/google/callback
       - key: KAKAO_REST_API_KEY
         sync: false
       - key: GOOGLE_CLIENT_ID

@@ -152,6 +152,26 @@ authRouter.get('/oauth-redirects', (req, res) => {
   res.json(oauthRedirectHints(req))
 })
 
+authRouter.get('/oauth-setup', (req, res) => {
+  const hints = oauthRedirectHints(req)
+  const kakaoKey = String(process.env.KAKAO_REST_API_KEY || '').trim()
+  res.json({
+    ...hints,
+    kakaoRestApiKey: kakaoKey || null,
+    kakaoConsoleSteps: [
+      'developers.kakao.com → 앱(해수의 여행일지) 선택',
+      '제품 설정 → 카카오 로그인 → 상태 ON',
+      '앱 → 플랫폼 → Web → 사이트 도메인 https://triplog.my',
+      '앱 → 플랫폼 키 → REST API 키(아래 client_id와 동일) → Redirect URI에 kakao URL 등록',
+    ],
+    googleConsoleSteps: [
+      'Google Cloud Console → 사용자 인증 정보 → OAuth 클라이언트',
+      'Authorized redirect URIs에 google URL 등록',
+      'Authorized JavaScript origins에 https://triplog.my',
+    ],
+  })
+})
+
 authRouter.get('/kakao', (req, res) => {
   if (!oauthConfigured('kakao')) {
     finishOAuthRedirect(req, res, { error: 'not_configured' })

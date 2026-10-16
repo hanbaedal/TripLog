@@ -114,6 +114,20 @@ export function oauthErrorMessage(code: string): string {
   return OAUTH_ERROR_MESSAGES[code] || OAUTH_ERROR_MESSAGES.oauth_failed
 }
 
+export type OAuthSetupInfo = {
+  appUrl: string
+  kakao: string
+  google: string
+  kakaoRestApiKey: string | null
+  kakaoConsoleSteps: string[]
+  googleConsoleSteps: string[]
+  registerNote: string
+}
+
+export async function fetchOAuthSetup(): Promise<OAuthSetupInfo> {
+  return api<OAuthSetupInfo>('/auth/oauth-setup')
+}
+
 export async function fetchAuthProviders(): Promise<Record<AuthProvider, boolean>> {
   const data = await api<{ kakao: boolean; google: boolean }>('/auth/providers')
   return { email: true, kakao: data.kakao, google: data.google }
