@@ -8,6 +8,7 @@ import {
   exchangeGoogleCode,
   exchangeKakaoCode,
   finishOAuthRedirect,
+  kakaoOAuthScopeParam,
   oauthConfigured,
   oauthErrorMessage,
   oauthRedirectUri,
@@ -156,9 +157,10 @@ authRouter.get('/kakao', (req, res) => {
     client_id: process.env.KAKAO_REST_API_KEY,
     redirect_uri: oauthRedirectUri(req, 'kakao'),
     response_type: 'code',
-    scope: 'profile_nickname,account_email',
     state,
   })
+  const scope = kakaoOAuthScopeParam()
+  if (scope) params.set('scope', scope)
   res.redirect(`https://kauth.kakao.com/oauth/authorize?${params}`)
 })
 

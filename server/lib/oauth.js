@@ -27,6 +27,12 @@ export function verifyOAuthState(state, provider) {
   return payload
 }
 
+/** Comma-separated Kakao consent scopes, e.g. profile_nickname,account_email — only if enabled in Kakao Developers. */
+export function kakaoOAuthScopeParam() {
+  const raw = String(process.env.KAKAO_OAUTH_SCOPE ?? '').trim()
+  return raw
+}
+
 export function oauthConfigured(provider) {
   if (provider === 'kakao') return Boolean(process.env.KAKAO_REST_API_KEY)
   if (provider === 'google') {
