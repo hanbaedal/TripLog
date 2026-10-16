@@ -336,7 +336,12 @@ export function AuthModal({ onClose, onAuthed, initialError = '' }: Props) {
 
         {oauthSetup ? (
           <details className="auth-oauth-help">
-            <summary>카카오 KOE006 · Google redirect 오류 (관리자)</summary>
+            <summary>
+              카카오 KOE006 · Google redirect 오류 (관리자){' '}
+              <a href="/kakao-koe006.html" target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
+                설정 가이드
+              </a>
+            </summary>
             <p className="muted auth-oauth-help-lead">
               앱은 아래 주소로만 로그인합니다. 카카오·Google 콘솔에 <strong>한 글자도 틀리지 않게</strong> 등록해야 합니다.
             </p>

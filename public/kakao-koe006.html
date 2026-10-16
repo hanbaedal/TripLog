@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>카카오 KOE006 해결 — 해수의 여행일지</title>
+    <style>
+      body {
+        font-family: 'Noto Sans KR', system-ui, sans-serif;
+        line-height: 1.55;
+        max-width: 640px;
+        margin: 0 auto;
+        padding: 1.25rem;
+        color: #1a2233;
+      }
+      h1 {
+        font-size: 1.25rem;
+      }
+      .box {
+        background: #f4f7fb;
+        border: 1px solid #d8e0ea;
+        border-radius: 10px;
+        padding: 12px;
+        margin: 12px 0;
+        word-break: break-all;
+      }
+      code {
+        font-size: 0.85rem;
+      }
+      button {
+        margin-top: 8px;
+        padding: 8px 14px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        background: #fff;
+        cursor: pointer;
+      }
+      ol {
+        padding-left: 1.2rem;
+      }
+      li {
+        margin: 0.5rem 0;
+      }
+      .warn {
+        color: #b42318;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>카카오 KOE006 (Redirect URI) 해결</h1>
+    <p>
+      KOE006은 <strong>카카오 개발자 콘솔에 Redirect URI가 없거나, REST API 키가 다를 때</strong> 납니다. TripLog
+      서버는 아래 주소만 사용합니다.
+    </p>
+
+    <p class="warn">JavaScript 키가 아니라 REST API 키에 등록해야 합니다.</p>
+
+    <div class="box" id="redirect-box">
+      <div>Redirect URI</div>
+      <code id="redirect-uri">불러오는 중…</code>
+      <br />
+      <button type="button" id="copy-redirect">Redirect URI 복사</button>
+    </div>
+
+    <div class="box" id="key-box">
+      <div>REST API 키 (client_id)</div>
+      <code id="rest-key">불러오는 중…</code>
+      <br />
+      <button type="button" id="copy-key">REST API 키 복사</button>
+    </div>
+
+    <h2>카카오 개발자 콘솔 순서</h2>
+    <ol>
+      <li><a href="https://developers.kakao.com">developers.kakao.com</a> 로그인</li>
+      <li>앱 <strong>해수의 여행일지</strong> 선택</li>
+      <li><strong>제품 설정 → 카카오 로그인 → 활성화 ON</strong></li>
+      <li><strong>앱 → 플랫폼 → Web</strong> → 사이트 도메인 <code>https://triplog.my</code></li>
+      <li>
+        <strong>앱 → 플랫폼 키 → REST API 키</strong> (위 client_id와 <strong>완전히 동일</strong>한 키)
+        <ul>
+          <li>「Redirect URI」에 위 Redirect URI <strong>한 글자도 틀리지 않게</strong> 추가</li>
+          <li><code>http://</code>, <code>www.</code>, 끝 <code>/</code>, onrender.com 주소 사용 금지</li>
+        </ul>
+      </li>
+      <li>저장 후 1~2분 기다렸다가 시크릿 창에서 다시 로그인</li>
+    </ol>
+
+    <p><a href="/">← TripLog 홈</a></p>
+
+    <script>
+      async function load() {
+        try {
+          const res = await fetch('/api/auth/oauth-setup', { cache: 'no-store' })
+          const data = await res.json()
+          document.getElementById('redirect-uri').textContent = data.kakao || '(없음)'
+          document.getElementById('rest-key').textContent = data.kakaoRestApiKey || '(환경 변수 없음)'
+        } catch {
+          document.getElementById('redirect-uri').textContent = 'https://triplog.my/api/auth/kakao/callback'
+          document.getElementById('rest-key').textContent = '(API 호출 실패 — Render KAKAO_REST_API_KEY 확인)'
+        }
+      }
+      function copy(id) {
+        const text = document.getElementById(id).textContent
+        void navigator.clipboard.writeText(text)
+        alert('복사했습니다.')
+      }
+      document.getElementById('copy-redirect').onclick = () => copy('redirect-uri')
+      document.getElementById('copy-key').onclick = () => copy('rest-key')
+      void load()
+    </script>
+  </body>
+</html>
