@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { registerBackHandler } from '../lib/appBack'
 import type { ItemKind, MealSlot, SightType, TransportMode, Trip, TripItem, User, GalleryPhoto } from '../types'
 import { SIGHT_TYPES } from '../data/galleryTaxonomy.js'
 import { PageShell } from './PageShell'
@@ -140,10 +141,41 @@ export function Planner({
   const [galleryPhotos, setGalleryPhotos] = useState<GalleryPhoto[]>([])
   const open = editing !== null || preset !== null
   const locked = !user
+  const overlayOpen = open || chipMenu !== null || search !== null || lightbox !== null
 
   useEffect(() => {
     void loadGalleryPhotos().then(setGalleryPhotos)
   }, [])
+
+  useEffect(() => {
+    if (!overlayOpen) return
+    const url = `${window.location.pathname}${window.location.search}`
+    window.history.pushState({ __triplogOverlay: 'planner' }, '', url)
+  }, [overlayOpen])
+
+  useEffect(() => {
+    return registerBackHandler(() => {
+      if (lightbox) {
+        setLightbox(null)
+        return true
+      }
+      if (search) {
+        setSearch(null)
+        return true
+      }
+      if (open) {
+        setEditing(null)
+        setPreset(null)
+        setChipMenu(null)
+        return true
+      }
+      if (chipMenu) {
+        setChipMenu(null)
+        return true
+      }
+      return false
+    })
+  }, [chipMenu, lightbox, open, search])
 
   const summary = useMemo(() => summarize(trip), [trip])
   const selected = Math.min(day, Math.max(0, days - 1))

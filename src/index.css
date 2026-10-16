@@ -3621,3 +3621,19 @@ p {
     padding: 0;
   }
 }
+
+.back-exit-hint {
+  position: fixed;
+  left: 50%;
+  bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  z-index: 1200;
+  margin: 0;
+  padding: 0.65rem 1rem;
+  border-radius: 999px;
+  background: rgba(20, 24, 32, 0.92);
+  color: #fff;
+  font-size: 0.875rem;
+  pointer-events: none;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}

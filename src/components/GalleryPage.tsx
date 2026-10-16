@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { registerBackHandler } from '../lib/appBack'
 import { PageShell } from './PageShell'
 import { GalleryEditModal } from './GalleryEditModal'
 import { GalleryManageCardList } from './GalleryManageCardList'
@@ -55,6 +56,12 @@ export function GalleryPage({ focusId, returnToHome = false, ...nav }: Props) {
     setMode('slide')
     setActiveId(focusId)
   }, [focusId, photos])
+
+  useEffect(() => {
+    if (mode !== 'slide' && !editing) return
+    const url = `${window.location.pathname}${window.location.search}`
+    window.history.pushState({ __triplogOverlay: mode === 'slide' ? 'slide' : 'edit' }, '', url)
+  }, [mode, editing])
 
   const filtered = useMemo(() => {
     return photos.filter((photo) => {
@@ -113,6 +120,20 @@ export function GalleryPage({ focusId, returnToHome = false, ...nav }: Props) {
     setMode('list')
     setActiveId(null)
   }
+
+  useEffect(() => {
+    return registerBackHandler(() => {
+      if (editing) {
+        setEditing(null)
+        return true
+      }
+      if (mode === 'slide') {
+        backFromSlide()
+        return true
+      }
+      return false
+    })
+  }, [mode, editing, returnToHome, nav])
 
   function startEdit(photo: GalleryPhoto) {
     if (!nav.user || !canEditGallery(photo, nav.user)) return

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { AuthModal } from './components/AuthModal'
 import { BoardPage } from './components/BoardPage'
 import { GalleryPage } from './components/GalleryPage'
@@ -24,6 +24,7 @@ import { readMarket, writeMarket } from './lib/market'
 import type { AppView, SiteNav } from './lib/siteNav'
 import { isTaxonomyAdminView, taxonomyViewToKind } from './lib/siteNav'
 import type { Market, SampleRecord, Trip, User } from './types'
+import { useSystemBack } from './hooks/useSystemBack'
 
 export default function App() {
   const [market, setMarketState] = useState<Market>(() => readMarket())
@@ -46,6 +47,23 @@ export default function App() {
   const [guideTrip, setGuideTrip] = useState<Trip | null>(null)
   const [guideHint, setGuideHint] = useState('')
   const [oauthError, setOauthError] = useState('')
+  const [backExitHint, setBackExitHint] = useState('')
+
+  const closeAuth = useCallback(() => {
+    setAuthOpen(false)
+    setOauthError('')
+  }, [])
+
+  useSystemBack({
+    view,
+    setView,
+    authOpen,
+    closeAuth,
+    onExitPrompt: () => {
+      setBackExitHint('한 번 더 누르면 앱이 종료됩니다.')
+      window.setTimeout(() => setBackExitHint(''), 2000)
+    },
+  })
 
   useEffect(() => {
     void (async () => {
@@ -550,12 +568,14 @@ export default function App() {
       {authOpen ? (
         <AuthModal
           initialError={oauthError}
-          onClose={() => {
-            setAuthOpen(false)
-            setOauthError('')
-          }}
+          onClose={closeAuth}
           onAuthed={(next) => void handleAuthed(next)}
         />
+      ) : null}
+      {backExitHint ? (
+        <p className="back-exit-hint" role="status">
+          {backExitHint}
+        </p>
       ) : null}
     </>
   )
