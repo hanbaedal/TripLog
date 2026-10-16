@@ -5,16 +5,35 @@ import { applySupervisorRole, signToken, supervisorRole } from '../auth.js'
 
 const secret = () => process.env.JWT_SECRET || 'triplog-dev-secret'
 
+const DEFAULT_PRODUCTION_APP_URL = 'https://triplog.my'
+
 export function appBaseUrl(req) {
   const configured = String(process.env.APP_URL || process.env.OAUTH_CALLBACK_BASE || '').trim()
   if (configured) return configured.replace(/\/$/, '')
+  if (process.env.NODE_ENV === 'production') return DEFAULT_PRODUCTION_APP_URL
   const host = req.get('x-forwarded-host') || req.get('host')
   const proto = req.get('x-forwarded-proto') || req.protocol || 'http'
   return `${proto}://${host}`
 }
 
 export function oauthRedirectUri(req, provider) {
+  const explicit =
+    provider === 'kakao'
+      ? String(process.env.KAKAO_REDIRECT_URI || '').trim()
+      : String(process.env.GOOGLE_REDIRECT_URI || '').trim()
+  if (explicit) return explicit
   return `${appBaseUrl(req)}/api/auth/${provider}/callback`
+}
+
+export function oauthRedirectHints(req) {
+  const base = appBaseUrl(req)
+  return {
+    appUrl: base,
+    kakao: oauthRedirectUri(req, 'kakao'),
+    google: oauthRedirectUri(req, 'google'),
+    registerNote:
+      'Kakao REST API 키 Redirect URI · Google OAuth 클라이언트 Authorized redirect URIs에 위 kakao/google URL을 문자 그대로 등록하세요.',
+  }
 }
 
 export function signOAuthState(provider) {

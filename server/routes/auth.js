@@ -11,6 +11,7 @@ import {
   kakaoOAuthScopeParam,
   oauthConfigured,
   oauthErrorMessage,
+  oauthRedirectHints,
   oauthRedirectUri,
   signOAuthState,
   verifyOAuthState,
@@ -145,6 +146,10 @@ authRouter.get('/providers', (_req, res) => {
     kakao: oauthConfigured('kakao'),
     google: oauthConfigured('google'),
   })
+})
+
+authRouter.get('/oauth-redirects', (req, res) => {
+  res.json(oauthRedirectHints(req))
 })
 
 authRouter.get('/kakao', (req, res) => {
