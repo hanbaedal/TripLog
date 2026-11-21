@@ -604,7 +604,15 @@ export function Planner({
               성인 {trip.adults}
               {trip.children ? ` · 소아 ${trip.children}` : ''} · 1인당 {krw(summary.perPerson)}
             </p>
-            <p className="muted">하루 평균 {krw(summary.perDay)}</p>
+            <p className="muted">
+              하루 평균 {krw(summary.perDay)}
+              {summary.nights > 0
+                ? ` · ${summary.nights}박 ${summary.days}일`
+                : ` · ${summary.days}일`}
+            </p>
+            {!summary.actualItemCount ? (
+              <p className="muted budget-actual-hint">집행·차이는 일정에 ‘실제 비용’을 넣으면 합산됩니다.</p>
+            ) : null}
             <div className="kicker" style={{ marginTop: 10 }}>
               예산 vs 집행
             </div>
@@ -617,19 +625,41 @@ export function Planner({
             {(['flight', 'hotel', 'meal', 'sight', 'shopping', 'transport'] as const).map((kind) => {
               const budget = summary.byKindBudget[kind]
               const actual = summary.byKindActual[kind]
+              const compared = summary.byKindComparedBudget[kind]
+              const hasActual = compared > 0 || actual > 0
               const delta = summary.byKindVariance[kind]
               return (
                 <div className="budget-compare-row" key={kind}>
                   <span>{KIND_LABEL[kind]}</span>
                   <span>{budget ? krw(budget) : '—'}</span>
-                  <span>{actual ? krw(actual) : '—'}</span>
+                  <span>{hasActual ? krw(actual) : '—'}</span>
                   <span className={delta > 0 ? 'variance-over' : delta < 0 ? 'variance-under' : ''}>
-                    {actual ? (delta > 0 ? '+' : delta < 0 ? '−' : '') : ''}
-                    {actual ? krw(Math.abs(delta)).replace('원', '') : '—'}
+                    {hasActual ? (delta > 0 ? '+' : delta < 0 ? '−' : '') : ''}
+                    {hasActual ? krw(Math.abs(delta)).replace('원', '') : '—'}
                   </span>
                 </div>
               )
             })}
+            <div className="budget-compare-row budget-compare-total">
+              <span>합계</span>
+              <span>{summary.total ? krw(summary.total) : '—'}</span>
+              <span>{summary.actualItemCount ? krw(summary.actualTotal) : '—'}</span>
+              <span
+                className={
+                  summary.actualItemCount
+                    ? summary.variance > 0
+                      ? 'variance-over'
+                      : summary.variance < 0
+                        ? 'variance-under'
+                        : ''
+                    : ''
+                }
+              >
+                {summary.actualItemCount
+                  ? `${summary.variance > 0 ? '+' : summary.variance < 0 ? '−' : ''}${krw(Math.abs(summary.variance)).replace('원', '')}`
+                  : '—'}
+              </span>
+            </div>
             <div style={{ height: 10 }} />
             {(['flight', 'hotel', 'meal', 'sight', 'shopping', 'transport'] as const).map((kind) => (
               <div className="bar" key={kind}>

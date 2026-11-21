@@ -65,6 +65,7 @@ export function formatVariance(delta: number): string {
 export function summarize(trip: Trip) {
   const people = Math.max(1, trip.adults + trip.children)
   const days = dayCount(trip.startDate, trip.endDate)
+  const nights = Math.max(0, days - 1)
   const byKindBudget: Record<ItemKind, number> = {
     flight: 0,
     hotel: 0,
@@ -81,6 +82,15 @@ export function summarize(trip: Trip) {
     transport: 0,
     shopping: 0,
   }
+  /** 집행 금액이 입력된 항목의 예산만 모아, 차이 계산이 공정하도록 한다. */
+  const byKindComparedBudget: Record<ItemKind, number> = {
+    flight: 0,
+    hotel: 0,
+    meal: 0,
+    sight: 0,
+    transport: 0,
+    shopping: 0,
+  }
   const byMeal: Record<MealSlot, number> = {
     breakfast: 0,
     lunch: 0,
@@ -90,17 +100,23 @@ export function summarize(trip: Trip) {
   }
   const byDay = Array.from({ length: days }, () => 0)
   let actualItemCount = 0
+  let comparedBudgetTotal = 0
 
   for (const item of trip.items) {
+    const kind = item.kind in byKindBudget ? item.kind : undefined
+    if (!kind) continue
     const budget = itemBudget(item)
-    byKindBudget[item.kind] += budget
+    byKindBudget[kind] += budget
     const actual = itemActual(item)
     if (actual != null) {
-      byKindActual[item.kind] += actual
+      byKindActual[kind] += actual
+      byKindComparedBudget[kind] += budget
+      comparedBudgetTotal += budget
       actualItemCount += 1
     }
-    if (item.kind === 'meal' && item.mealSlot) {
-      byMeal[item.mealSlot] += budget
+    if (kind === 'meal') {
+      const slot = item.mealSlot && item.mealSlot in byMeal ? item.mealSlot : 'snack'
+      byMeal[slot] += budget
     }
     if (item.dayIndex >= 0 && item.dayIndex < days) {
       byDay[item.dayIndex] += budget
@@ -111,7 +127,11 @@ export function summarize(trip: Trip) {
   const actualTotal = Object.values(byKindActual).reduce((sum, v) => sum + v, 0)
   const byKindVariance = (Object.keys(byKindBudget) as ItemKind[]).reduce(
     (acc, kind) => {
-      acc[kind] = byKindActual[kind] - byKindBudget[kind]
+      // 집행 미입력 분류는 차이를 0으로 두고, 화면에서 — 로 표시한다.
+      acc[kind] =
+        byKindActual[kind] > 0 || byKindComparedBudget[kind] > 0
+          ? byKindActual[kind] - byKindComparedBudget[kind]
+          : 0
       return acc
     },
     {} as Record<ItemKind, number>,
@@ -121,7 +141,8 @@ export function summarize(trip: Trip) {
     total,
     actualTotal,
     actualItemCount,
-    variance: actualTotal - total,
+    comparedBudgetTotal,
+    variance: actualItemCount ? actualTotal - comparedBudgetTotal : 0,
     people,
     perPerson: Math.round(total / people),
     actualPerPerson: actualItemCount ? Math.round(actualTotal / people) : 0,
@@ -129,9 +150,11 @@ export function summarize(trip: Trip) {
     byKind: byKindBudget,
     byKindBudget,
     byKindActual,
+    byKindComparedBudget,
     byKindVariance,
     byMeal,
     byDay,
     days,
+    nights,
   }
 }

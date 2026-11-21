@@ -1,12 +1,24 @@
 import type { TripItem, TransportMode } from '../types'
 
+/** '105,000원' · 숫자 문자열도 안전하게 합산한다. */
+export function parseMoneyValue(value: unknown): number {
+  if (typeof value === 'number') return Number.isFinite(value) ? Math.max(0, Math.round(value)) : 0
+  if (value == null) return 0
+  const digits = String(value).replace(/[^\d.-]/g, '')
+  if (!digits || digits === '-' || digits === '.') return 0
+  const n = Number(digits)
+  return Number.isFinite(n) ? Math.max(0, Math.round(n)) : 0
+}
+
 export function itemBudget(item: Pick<TripItem, 'budgetCost' | 'cost'>): number {
-  return Number(item.budgetCost ?? item.cost) || 0
+  if (item.budgetCost != null) return parseMoneyValue(item.budgetCost)
+  if (item.cost != null) return parseMoneyValue(item.cost)
+  return 0
 }
 
 export function itemActual(item: Pick<TripItem, 'actualCost'>): number | null {
-  if (item.actualCost == null || item.actualCost === undefined) return null
-  return Number(item.actualCost) || 0
+  if (item.actualCost == null) return null
+  return parseMoneyValue(item.actualCost)
 }
 
 export function normalizeTransportMode(mode?: string | null): TransportMode | undefined {

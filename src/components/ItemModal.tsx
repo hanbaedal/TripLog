@@ -23,7 +23,7 @@ import {
 import { loadTaxonomy, type TaxonomyRow } from '../lib/taxonomy'
 import { KIND_LABEL, MEAL_LABEL, SHOPPING_LABEL, SHOPPING_TYPES, TRANSPORT_LABEL } from '../lib/costs'
 import { composeFlightItem, parseFlightForm } from '../lib/flightFields'
-import { itemBudget, normalizeTransportMode, withItemBudget } from '../lib/tripItem'
+import { itemBudget, normalizeTransportMode, parseMoneyValue, withItemBudget } from '../lib/tripItem'
 import { moneyInputStep } from '../lib/market'
 import { resolveTourBusCity } from '../data/krTourBusCatalog.js'
 import { TourBusPicker } from './TourBusPicker'
@@ -204,14 +204,14 @@ export function ItemModal({
   }
 
   function parseMoney(raw: string): number {
-    return Number(raw) || 0
+    return parseMoneyValue(raw)
   }
 
   function parseOptionalCount(raw: string): number | undefined {
     const trimmed = raw.trim()
     if (!trimmed) return undefined
-    const n = Number(trimmed)
-    return n > 0 ? Math.round(n) : undefined
+    const n = parseMoneyValue(trimmed)
+    return n > 0 ? n : undefined
   }
 
   function applyTourBusPick(pick: TourBusPick) {
