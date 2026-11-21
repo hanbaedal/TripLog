@@ -14,7 +14,8 @@
     "seed:catalog-images": "node scripts/seed-catalog-images.mjs all",
     "seed:catalog-images:food": "node scripts/seed-catalog-images.mjs cn-food",
     "seed:catalog-images:kr": "node scripts/seed-catalog-images.mjs kr-spots",
-    "seed:user-manual-pptx": "node scripts/seed-user-manual-pptx.mjs"
+    "seed:user-manual-pptx": "node scripts/seed-user-manual-pptx.mjs",
+    "gen:brand-icons": "node scripts/gen-brand-icons.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.0",
@@ -35,6 +36,7 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.4",
     "jszip": "^3.10.2",
+    "sharp": "^0.34.5",
     "typescript": "~6.0.2",
     "vite": "^8.2.2"
   }
