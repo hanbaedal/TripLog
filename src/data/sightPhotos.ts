@@ -1,6 +1,7 @@
 import type { GalleryPhoto } from '../types'
 import { GALLERY_PHOTOS } from './galleryCatalog.js'
-import { galleryMediaSrc } from '../lib/galleryResolve'
+import { galleryPhotoById } from './galleryPhotos'
+import { galleryMediaSrc, resolvePhotoSrc } from '../lib/galleryResolve'
 
 const CATALOG = GALLERY_PHOTOS as GalleryPhoto[]
 
@@ -257,6 +258,12 @@ const CITY_PHOTO: Record<string, string> = {
   운남: BY_TITLE.석림,
   贵州: BY_TITLE['황과수 대폭포'],
   귀주: BY_TITLE['황과수 대폭포'],
+  제주: '/samples/kr-jeju.jpg',
+  제주도: '/samples/kr-jeju.jpg',
+  서울: '/samples/kr-seoul.jpg',
+  부산: '/samples/kr-haeundae.jpg',
+  경주: '/samples/kr-gyeongju.jpg',
+  전주: '/samples/kr-jeonju.jpg',
 }
 
 function lookupTitle(title: string): string | undefined {
@@ -268,7 +275,8 @@ function lookupTitle(title: string): string | undefined {
 
 function cityPhoto(place?: string): string | undefined {
   const city = (place || '').split(/[·,]/)[0].trim()
-  return (city && CITY_PHOTO[city]) || undefined
+  const url = (city && CITY_PHOTO[city]) || undefined
+  return url ? galleryMediaSrc(url) : undefined
 }
 
 const MEAL_KEYS: { keys: string[]; url: string }[] = [
@@ -307,6 +315,7 @@ const TRANSPORT_BY_MODE: Record<string, string> = {
   ferry: wm('Star Ferry.jpg'),
   taxi: wm('China highway.jpg'),
   car: wm('China highway.jpg'),
+  rentalcar: '/samples/kr-jeju.jpg',
   walk: wm('Pedestrian street China.jpg'),
   other: wm('Cable car.jpg'),
 }
@@ -352,14 +361,15 @@ export function resolveItemPhoto(
   photos?: GalleryPhoto[],
 ): string | undefined {
   const photoId = item.photoId?.trim()
+  const custom = item.photo?.trim()
   if (photoId) {
-    const fromGallery =
-      photos?.find((row) => row.id === photoId)?.src || CATALOG.find((row) => row.id === photoId)?.src
-    if (fromGallery) return galleryMediaSrc(fromGallery)
+    const fromResolve = resolvePhotoSrc(photoId, photos || CATALOG, custom)
+    if (fromResolve) return fromResolve
+    const seed = galleryPhotoById(photoId)
+    if (seed?.src) return galleryMediaSrc(seed.src)
     // photoId에 URL·업로드 경로가 직접 저장된 경우
     if (/^(data:|https?:|\/)/i.test(photoId)) return galleryMediaSrc(photoId)
   }
-  const custom = item.photo?.trim()
   if (custom) return galleryMediaSrc(custom)
   const title = (item.title || '').trim()
   const hay = `${title} ${item.place || ''}`
@@ -375,19 +385,19 @@ export function resolveItemPhoto(
     }
   }
   if (item.kind === 'meal') {
-    return matchKeys(hay, MEAL_KEYS) || KIND_FALLBACK.meal
+    const url = matchKeys(hay, MEAL_KEYS) || KIND_FALLBACK.meal
+    return url ? galleryMediaSrc(url) : undefined
   }
   if (item.kind === 'hotel') {
-    return matchKeys(hay, HOTEL_KEYS) || KIND_FALLBACK.hotel
+    const url = matchKeys(hay, HOTEL_KEYS) || KIND_FALLBACK.hotel
+    return url ? galleryMediaSrc(url) : undefined
   }
   if (item.kind === 'transport') {
-    return (
-      matchKeys(hay, TRANSPORT_KEYS) ||
-      (item.transportMode ? TRANSPORT_BY_MODE[item.transportMode] : undefined) ||
-      KIND_FALLBACK.transport
-    )
+    const modePhoto = item.transportMode ? TRANSPORT_BY_MODE[item.transportMode] : undefined
+    const url = matchKeys(hay, TRANSPORT_KEYS) || modePhoto || KIND_FALLBACK.transport
+    return url ? galleryMediaSrc(url) : undefined
   }
-  return cityPhoto(destination) || cityPhoto(item.place)
+  return cityPhoto(destination) || cityPhoto(item.place) || cityPhoto(title)
 }
 
 export function resolveSightPhoto(

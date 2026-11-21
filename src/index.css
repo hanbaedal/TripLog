@@ -1060,6 +1060,11 @@ p {
   cursor: zoom-in;
 }
 
+.item-photo-missing {
+  cursor: default;
+  background: linear-gradient(145deg, var(--paper-2), #e8e0d4);
+}
+
 .item-photo img {
   display: block;
   width: 100%;

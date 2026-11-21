@@ -7,7 +7,11 @@ import { TimeStepper } from './TimeStepper'
 import { SIGHT_TYPES } from '../data/galleryTaxonomy.js'
 import { citySlugFromPlace, guessSightType } from '../data/galleryTaxonomy.js'
 import { itemKindToGalleryCategory } from '../lib/galleryFilter'
-import type { GalleryUploadMeta } from '../lib/galleryResolve'
+import {
+  loadGalleryPhotos,
+  resolvePhotoSrc,
+  type GalleryUploadMeta,
+} from '../lib/galleryResolve'
 import { loadTaxonomy, type TaxonomyRow } from '../lib/taxonomy'
 import { KIND_LABEL, MEAL_LABEL, TRANSPORT_LABEL } from '../lib/costs'
 import { composeFlightItem, parseFlightForm } from '../lib/flightFields'
@@ -130,7 +134,8 @@ export function ItemModal({
   const [place, setPlace] = useState(initial?.place ?? '')
   const [subtitle, setSubtitle] = useState(initial?.subtitle ?? '')
   const [note, setNote] = useState(initial?.note ?? '')
-  const [photoId, setPhotoId] = useState(initial?.photoId ?? initial?.photo ?? '')
+  const [photoId, setPhotoId] = useState(initial?.photoId ?? '')
+  const [photoSrc, setPhotoSrc] = useState(initial?.photo ?? '')
   const [budgetCost, setBudgetCost] = useState(() =>
     initial ? String(itemBudget(initial) || '') : '',
   )
@@ -213,7 +218,7 @@ export function ItemModal({
     tripDestination ||
     ''
 
-  function submit(e: FormEvent) {
+  async function submit(e: FormEvent) {
     e.preventDefault()
     const budget = parseMoney(budgetCost)
     const actual = parseOptionalCount(actualCost)
@@ -254,6 +259,20 @@ export function ItemModal({
 
     const trimmed = title.trim()
     if (!trimmed) return
+    const canPhoto =
+      kind === 'sight' || kind === 'meal' || kind === 'hotel' || kind === 'transport'
+    const nextPhotoId = canPhoto ? photoId.trim() || undefined : undefined
+    let nextPhoto = canPhoto ? photoSrc.trim() || undefined : undefined
+    if (nextPhotoId) {
+      try {
+        const rows = await loadGalleryPhotos()
+        nextPhoto = resolvePhotoSrc(nextPhotoId, rows, nextPhoto) || nextPhoto
+      } catch {
+        /* 갤러리 조회 실패 시 이미 캐시된 photoSrc 유지 */
+      }
+    } else {
+      nextPhoto = undefined
+    }
     onSave(
       buildItemPayload(
         {
@@ -268,10 +287,8 @@ export function ItemModal({
           mealSlot: kind === 'meal' ? mealSlot : undefined,
           sightType: kind === 'sight' && sightType ? sightType : undefined,
           transportMode: kind === 'transport' ? transportMode : undefined,
-          photoId:
-            kind === 'sight' || kind === 'meal' || kind === 'hotel' || kind === 'transport'
-              ? photoId.trim() || undefined
-              : undefined,
+          photoId: nextPhotoId,
+          photo: nextPhoto,
           source: initial?.source,
         },
         budget,
@@ -524,7 +541,21 @@ export function ItemModal({
             <div className="span-2">
               <ImagePicker
                 photoId={photoId}
-                onChange={setPhotoId}
+                pendingSrc={photoSrc || undefined}
+                onChange={(id, pending) => {
+                  setPhotoId(id)
+                  if (pending?.src) {
+                    setPhotoSrc(pending.src)
+                    return
+                  }
+                  if (!id) {
+                    setPhotoSrc('')
+                    return
+                  }
+                  void loadGalleryPhotos().then((rows) => {
+                    setPhotoSrc(resolvePhotoSrc(id, rows) || '')
+                  })
+                }}
                 user={user ?? null}
                 defaultTitle={title}
                 scope="all"

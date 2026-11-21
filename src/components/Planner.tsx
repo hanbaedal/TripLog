@@ -97,7 +97,12 @@ function costLine(item: TripItem): string {
 
 function SightThumb({ src, label, onOpen }: { src: string; label: string; onOpen: () => void }) {
   const [ok, setOk] = useState(true)
-  if (!ok) return null
+  useEffect(() => {
+    setOk(true)
+  }, [src])
+  if (!ok) {
+    return <div className="item-photo item-photo-missing" aria-hidden="true" />
+  }
   return (
     <button
       type="button"
@@ -153,8 +158,13 @@ export function Planner({
   }
 
   useEffect(() => {
-    void loadGalleryPhotos().then(setGalleryPhotos)
+    void refreshGalleryPhotos()
   }, [])
+
+  useEffect(() => {
+    const needsPhoto = trip.items.some((item) => Boolean(item.photoId || item.photo))
+    if (needsPhoto && galleryPhotos.length === 0) void refreshGalleryPhotos()
+  }, [trip.items])
 
   useEffect(() => {
     if (!overlayOpen) return
@@ -464,10 +474,12 @@ export function Planner({
           ) : null}
           {dayItems.length === 0 ? null : (
             dayItems.map((item) => {
+              const destination =
+                trip.destination || tripDestinationFromTitle(trip.title, '')
               const photo = hasItemPhoto(item.kind)
-                ? resolveItemPhoto(item, trip.destination, galleryPhotos)
+                ? resolveItemPhoto(item, destination, galleryPhotos)
                 : undefined
-              const pictured = Boolean(photo) || hasItemPhoto(item.kind)
+              const pictured = Boolean(photo)
               const copy = (
                 <>
                   <span className={`badge ${item.kind}`}>{badgeText(item)}</span>
