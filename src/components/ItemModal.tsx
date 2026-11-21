@@ -11,6 +11,7 @@ import { loadTaxonomy, type TaxonomyRow } from '../lib/taxonomy'
 import { KIND_LABEL, MEAL_LABEL, TRANSPORT_LABEL } from '../lib/costs'
 import { composeFlightItem, parseFlightForm } from '../lib/flightFields'
 import { itemBudget, normalizeTransportMode, withItemBudget } from '../lib/tripItem'
+import { moneyInputStep } from '../lib/market'
 import { resolveTourBusCity } from '../data/krTourBusCatalog.js'
 import { TourBusPicker } from './TourBusPicker'
 import type { TourBusPick } from '../lib/tourbus'
@@ -129,9 +130,10 @@ export function ItemModal({
     initial?.actualPeople != null ? String(initial.actualPeople) : '',
   )
   const [tourBusOpen, setTourBusOpen] = useState(false)
+  const market = tripMarket === 'kr' ? 'kr' : 'cn'
+  const costStep = moneyInputStep(market)
 
   useEffect(() => {
-    const market = tripMarket === 'kr' ? 'kr' : 'cn'
     void loadTaxonomy(market).then((bundle) => {
       if (bundle.sightTypes.length) setSightTypes(bundle.sightTypes)
     })
@@ -468,7 +470,7 @@ export function ItemModal({
                 <input
                   type="number"
                   min="0"
-                  step="1000"
+                  step={costStep}
                   value={budgetCost}
                   onChange={(e) => setBudgetCost(e.target.value)}
                   placeholder="0"
@@ -485,7 +487,7 @@ export function ItemModal({
                 <input
                   type="number"
                   min="0"
-                  step="1000"
+                  step={costStep}
                   value={actualCost}
                   onChange={(e) => setActualCost(e.target.value)}
                   placeholder="미입력"

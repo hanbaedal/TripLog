@@ -62,6 +62,11 @@ export function galleryPhotoMarket(photo: { market?: Market; id?: string; city?:
   return 'cn'
 }
 
+/** 일정 항목 예산·실비 입력 `<input type="number">` step */
+export function moneyInputStep(market: Market | undefined): number {
+  return market === 'kr' ? 10 : 100
+}
+
 export function filterByMarket<T extends { market?: Market; id?: string }>(
   rows: T[],
   market: Market,
