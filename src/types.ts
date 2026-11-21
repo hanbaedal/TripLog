@@ -1,6 +1,6 @@
 export type Market = 'kr' | 'cn'
 
-export type ItemKind = 'flight' | 'hotel' | 'meal' | 'sight' | 'transport'
+export type ItemKind = 'flight' | 'hotel' | 'meal' | 'sight' | 'transport' | 'shopping'
 
 export type MealSlot = 'breakfast' | 'lunch' | 'dinner' | 'latenight' | 'snack'
 
@@ -16,6 +16,15 @@ export type TransportMode =
   | 'other'
 
 export type SightType = 'mountain' | 'lake' | 'beach' | 'palace' | 'temple' | 'town' | 'park'
+
+export type ShoppingType =
+  | 'dutyfree'
+  | 'mall'
+  | 'outlet'
+  | 'market'
+  | 'nightmarket'
+  | 'supermarket'
+  | 'street'
 
 export type FlightFields = {
   departTerminal?: string
@@ -44,6 +53,7 @@ export type TripItem = {
   actualPeople?: number
   mealSlot?: MealSlot
   sightType?: SightType
+  shoppingType?: ShoppingType
   transportMode?: TransportMode
   source?: 'manual' | 'connect'
   flight?: FlightFields

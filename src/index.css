@@ -16,6 +16,8 @@
   --sky-soft: #d3e5ed;
   --meal: #c45c2a;
   --meal-soft: #f3ddd0;
+  --shop: #7a4e3a;
+  --shop-soft: #ead9d0;
   --shadow: 0 18px 40px rgba(23, 32, 51, 0.08);
   --serif: "Fraunces", "Song Myung", serif;
   --sans: "Noto Sans KR", "Outfit", sans-serif;
@@ -586,6 +588,7 @@ p {
 }
 
 .hub-tile.sight { border-top: 4px solid var(--gold); }
+.hub-tile.shopping { border-top: 4px solid var(--shop); }
 .hub-tile.hotel { border-top: 4px solid var(--forest); }
 .hub-tile.move { border-top: 4px solid var(--ink); }
 .hub-tile.cost { border-top: 4px solid var(--stamp); }
@@ -637,6 +640,7 @@ p {
 .tile.hotel { border-top: 4px solid var(--forest); }
 .tile.meal { border-top: 4px solid var(--meal); }
 .tile.sight { border-top: 4px solid var(--gold); }
+.tile.shopping { border-top: 4px solid var(--shop); }
 .tile.move { border-top: 4px solid var(--ink); }
 .tile.cost { border-top: 4px solid var(--stamp); }
 
@@ -1132,6 +1136,7 @@ p {
 .dot.hotel { background: var(--forest); }
 .dot.meal { background: var(--meal); }
 .dot.sight { background: var(--gold); }
+.dot.shopping { background: var(--shop); }
 .dot.transport { background: var(--ink); }
 
 .card {
@@ -1169,6 +1174,7 @@ p {
 .badge.hotel { background: var(--forest-soft); color: var(--forest); }
 .badge.meal { background: var(--meal-soft); color: var(--meal); }
 .badge.sight { background: var(--gold-soft); color: #8a6a2c; }
+.badge.shopping { background: var(--shop-soft); color: var(--shop); }
 .badge.transport { background: var(--paper-2); color: var(--ink); }
 
 .card h3 {

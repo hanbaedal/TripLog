@@ -342,11 +342,37 @@ function matchKeys(text: string, groups: { keys: string[]; url: string }[]): str
   return undefined
 }
 
-export const PHOTO_KINDS = ['sight', 'meal', 'hotel', 'transport'] as const
+export const PHOTO_KINDS = ['sight', 'meal', 'hotel', 'transport', 'shopping'] as const
 
 export function hasItemPhoto(kind?: string): boolean {
-  return kind === 'sight' || kind === 'meal' || kind === 'hotel' || kind === 'transport'
+  return (
+    kind === 'sight' ||
+    kind === 'meal' ||
+    kind === 'hotel' ||
+    kind === 'transport' ||
+    kind === 'shopping'
+  )
 }
+
+const SHOPPING_BY_TYPE: Record<string, string> = {
+  dutyfree: '/samples/kr-seoul.jpg',
+  mall: '/samples/kr-haeundae.jpg',
+  outlet: '/samples/kr-gyeonggi.jpg',
+  market: '/samples/kr-jeonju.jpg',
+  nightmarket: '/samples/kr-yeosu.jpg',
+  supermarket: '/samples/kr-chungcheong.jpg',
+  street: '/samples/kr-heiri.jpg',
+}
+
+const SHOPPING_KEYS: { keys: string[]; url: string }[] = [
+  { keys: ['면세'], url: SHOPPING_BY_TYPE.dutyfree },
+  { keys: ['아울렛', 'outlet'], url: SHOPPING_BY_TYPE.outlet },
+  { keys: ['야시장'], url: SHOPPING_BY_TYPE.nightmarket },
+  { keys: ['마트', '이마트', '홈플러스', '코스트코'], url: SHOPPING_BY_TYPE.supermarket },
+  { keys: ['시장', '동문', '남대문', '광장시장'], url: SHOPPING_BY_TYPE.market },
+  { keys: ['거리', '명동', '홍대', '가로수'], url: SHOPPING_BY_TYPE.street },
+  { keys: ['몰', '쇼핑몰', '백화점', '롯데', '신세계', '현대'], url: SHOPPING_BY_TYPE.mall },
+]
 
 export function resolveItemPhoto(
   item: {
@@ -356,6 +382,7 @@ export function resolveItemPhoto(
     photoId?: string
     place?: string
     transportMode?: string
+    shoppingType?: string
   },
   destination?: string,
   photos?: GalleryPhoto[],
@@ -395,6 +422,16 @@ export function resolveItemPhoto(
   if (item.kind === 'transport') {
     const modePhoto = item.transportMode ? TRANSPORT_BY_MODE[item.transportMode] : undefined
     const url = matchKeys(hay, TRANSPORT_KEYS) || modePhoto || KIND_FALLBACK.transport
+    return url ? galleryMediaSrc(url) : undefined
+  }
+  if (item.kind === 'shopping') {
+    const typePhoto = item.shoppingType ? SHOPPING_BY_TYPE[item.shoppingType] : undefined
+    const url =
+      matchKeys(hay, SHOPPING_KEYS) ||
+      typePhoto ||
+      SHOPPING_BY_TYPE.mall ||
+      cityPhoto(destination) ||
+      cityPhoto(item.place)
     return url ? galleryMediaSrc(url) : undefined
   }
   return cityPhoto(destination) || cityPhoto(item.place) || cityPhoto(title)

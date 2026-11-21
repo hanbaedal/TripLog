@@ -1,13 +1,31 @@
 import { useEffect, useMemo, useState } from 'react'
 import { registerBackHandler } from '../lib/appBack'
-import type { ItemKind, MealSlot, SightType, TransportMode, Trip, TripItem, User, GalleryPhoto } from '../types'
+import type {
+  ItemKind,
+  MealSlot,
+  ShoppingType,
+  SightType,
+  TransportMode,
+  Trip,
+  TripItem,
+  User,
+  GalleryPhoto,
+} from '../types'
 import { SIGHT_TYPES } from '../data/galleryTaxonomy.js'
 import { PageShell } from './PageShell'
 import { FlightSearch } from './FlightSearch'
 import { HotelSearch } from './HotelSearch'
 import { ItemModal } from './ItemModal'
 import { attachFlight, attachHotel } from '../lib/connect/attach'
-import { KIND_LABEL, MEAL_LABEL, TRANSPORT_LABEL, krw, summarize } from '../lib/costs'
+import {
+  KIND_LABEL,
+  MEAL_LABEL,
+  SHOPPING_LABEL,
+  SHOPPING_TYPES,
+  TRANSPORT_LABEL,
+  krw,
+  summarize,
+} from '../lib/costs'
 import { itemActual, itemBudget } from '../lib/tripItem'
 import { rescaleConnectItems } from '../lib/pax'
 import { dateOn, dayCount, formatShort } from '../lib/dates'
@@ -36,14 +54,19 @@ type ItemPreset = {
   kind: ItemKind
   mealSlot?: MealSlot
   sightType?: SightType | ''
+  shoppingType?: ShoppingType
   transportMode?: TransportMode
 }
 
-const MAIN_CHIPS: { label: string; action: 'flight' | 'hotel' | 'meal' | 'sight' | 'transport' }[] = [
+const MAIN_CHIPS: {
+  label: string
+  action: 'flight' | 'hotel' | 'meal' | 'sight' | 'transport' | 'shopping'
+}[] = [
   { label: '+ 항공', action: 'flight' },
   { label: '+ 호텔', action: 'hotel' },
   { label: '+ 식비', action: 'meal' },
   { label: '+ 관광', action: 'sight' },
+  { label: '+ 쇼핑', action: 'shopping' },
   { label: '+ 교통', action: 'transport' },
 ]
 
@@ -72,6 +95,7 @@ const KIND_COLOR: Record<ItemKind, string> = {
   hotel: 'var(--forest)',
   meal: 'var(--meal)',
   sight: 'var(--gold)',
+  shopping: 'var(--shop)',
   transport: 'var(--ink)',
 }
 
@@ -81,6 +105,9 @@ function badgeText(item: TripItem): string {
   if (item.kind === 'sight' && item.sightType) {
     const row = SIGHT_TYPES.find((entry) => entry.slug === item.sightType)
     label = row ? `${KIND_LABEL.sight} · ${row.label}` : KIND_LABEL.sight
+  }
+  if (item.kind === 'shopping' && item.shoppingType) {
+    label = `${KIND_LABEL.shopping} · ${SHOPPING_LABEL[item.shoppingType]}`
   }
   if (item.kind === 'transport' && item.transportMode) {
     label = `${KIND_LABEL.transport} · ${TRANSPORT_LABEL[item.transportMode]}`
@@ -144,7 +171,7 @@ export function Planner({
   const [day, setDay] = useState(0)
   const [editing, setEditing] = useState<TripItem | null>(null)
   const [preset, setPreset] = useState<ItemPreset | null>(null)
-  const [chipMenu, setChipMenu] = useState<null | 'meal' | 'sight' | 'transport'>(null)
+  const [chipMenu, setChipMenu] = useState<null | 'meal' | 'sight' | 'transport' | 'shopping'>(null)
   const [search, setSearch] = useState<null | 'flight' | 'hotel'>(null)
   const [lightbox, setLightbox] = useState<{ src: string; title: string } | null>(null)
   const [galleryPhotos, setGalleryPhotos] = useState<GalleryPhoto[]>([])
@@ -446,6 +473,22 @@ export function Planner({
                         </button>
                       ))
                     : null}
+                  {chipMenu === 'shopping'
+                    ? SHOPPING_TYPES.map((row) => (
+                        <button
+                          key={row.slug}
+                          className="chip"
+                          type="button"
+                          onClick={() => {
+                            setEditing(null)
+                            setPreset({ kind: 'shopping', shoppingType: row.slug })
+                            setChipMenu(null)
+                          }}
+                        >
+                          {row.label}
+                        </button>
+                      ))
+                    : null}
                 </>
               ) : (
                 MAIN_CHIPS.map((chip) => (
@@ -571,7 +614,7 @@ export function Planner({
               <span>집행</span>
               <span>차이</span>
             </div>
-            {(['flight', 'hotel', 'meal', 'sight', 'transport'] as const).map((kind) => {
+            {(['flight', 'hotel', 'meal', 'sight', 'shopping', 'transport'] as const).map((kind) => {
               const budget = summary.byKindBudget[kind]
               const actual = summary.byKindActual[kind]
               const delta = summary.byKindVariance[kind]
@@ -588,7 +631,7 @@ export function Planner({
               )
             })}
             <div style={{ height: 10 }} />
-            {(['flight', 'hotel', 'meal', 'sight', 'transport'] as const).map((kind) => (
+            {(['flight', 'hotel', 'meal', 'sight', 'shopping', 'transport'] as const).map((kind) => (
               <div className="bar" key={kind}>
                 <span>{KIND_LABEL[kind]}</span>
                 <div className="bar-track">

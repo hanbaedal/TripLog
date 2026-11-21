@@ -1,5 +1,5 @@
 import type { Trip, TripItem } from '../types'
-import { KIND_LABEL, MEAL_LABEL, TRANSPORT_LABEL, krw, summarize } from './costs'
+import { KIND_LABEL, MEAL_LABEL, SHOPPING_LABEL, TRANSPORT_LABEL, krw, summarize } from './costs'
 import { itemActual, itemBudget } from './tripItem'
 import { dayCount, dateOn, formatLong, formatRange } from './dates'
 
@@ -39,6 +39,9 @@ function itemDetail(item: TripItem): string {
   const bits: string[] = []
   if (item.kind === 'meal' && item.mealSlot) bits.push(MEAL_LABEL[item.mealSlot])
   if (item.actualPeople) bits.push(`집행 ${item.actualPeople}명`)
+  if (item.kind === 'shopping' && item.shoppingType) {
+    bits.push(SHOPPING_LABEL[item.shoppingType] ?? item.shoppingType)
+  }
   if (item.kind === 'transport' && item.transportMode) {
     bits.push(TRANSPORT_LABEL[item.transportMode] ?? item.transportMode)
   }
@@ -66,6 +69,7 @@ function dayParagraph(items: TripItem[]): string {
   const hotels = items.filter((i) => i.kind === 'hotel')
   const meals = items.filter((i) => i.kind === 'meal')
   const sights = items.filter((i) => i.kind === 'sight')
+  const shops = items.filter((i) => i.kind === 'shopping')
   const moves = items.filter((i) => i.kind === 'transport')
 
   if (flights.length) {
@@ -81,6 +85,10 @@ function dayParagraph(items: TripItem[]): string {
   if (sights.length) {
     const names = sights.map((s) => s.title).join(', ')
     chunks.push(`관광은 ${names}${objectMarker(names)} 중심으로 돕니다.`)
+  }
+  if (shops.length) {
+    const names = shops.map((s) => s.title).join(', ')
+    chunks.push(`쇼핑은 ${names}${objectMarker(names)} 들릅니다.`)
   }
   if (meals.length) {
     const mealText = meals
@@ -110,7 +118,7 @@ export function buildGuidebook(trip: Trip): Guidebook {
         ? ` 집행 합계 ${krw(summary.actualTotal)} (차이 ${summary.variance > 0 ? '+' : ''}${krw(Math.abs(summary.variance)).replace('원', '')}원).`
         : ''
     }`,
-    '항공·호텔·끼니·관광·교통을 하루 타임라인에 모아 두면, 아래 안내서는 그 기록에서 바로 만들어집니다.',
+    '항공·호텔·끼니·관광·쇼핑·교통을 하루 타임라인에 모아 두면, 아래 안내서는 그 기록에서 바로 만들어집니다.',
   ]
 
   const flights = trip.items.filter((i) => i.kind === 'flight').sort((a, b) => a.dayIndex - b.dayIndex || a.time.localeCompare(b.time))
@@ -178,7 +186,7 @@ export function buildGuidebook(trip: Trip): Guidebook {
     rows: mealRows,
   })
 
-  const kindRows = (['flight', 'hotel', 'meal', 'sight', 'transport'] as const).map((kind) => {
+  const kindRows = (['flight', 'hotel', 'meal', 'sight', 'shopping', 'transport'] as const).map((kind) => {
     const budget = summary.byKindBudget[kind]
     const actual = summary.byKindActual[kind]
     const delta = summary.byKindVariance[kind]

@@ -1,7 +1,15 @@
 import { useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import type { FormEvent } from 'react'
-import type { ItemKind, MealSlot, SightType, TransportMode, TripItem, User } from '../types'
+import type {
+  ItemKind,
+  MealSlot,
+  ShoppingType,
+  SightType,
+  TransportMode,
+  TripItem,
+  User,
+} from '../types'
 import { ImagePicker } from './ImagePicker'
 import { TimeStepper } from './TimeStepper'
 import { SIGHT_TYPES } from '../data/galleryTaxonomy.js'
@@ -13,7 +21,7 @@ import {
   type GalleryUploadMeta,
 } from '../lib/galleryResolve'
 import { loadTaxonomy, type TaxonomyRow } from '../lib/taxonomy'
-import { KIND_LABEL, MEAL_LABEL, TRANSPORT_LABEL } from '../lib/costs'
+import { KIND_LABEL, MEAL_LABEL, SHOPPING_LABEL, SHOPPING_TYPES, TRANSPORT_LABEL } from '../lib/costs'
 import { composeFlightItem, parseFlightForm } from '../lib/flightFields'
 import { itemBudget, normalizeTransportMode, withItemBudget } from '../lib/tripItem'
 import { moneyInputStep } from '../lib/market'
@@ -28,6 +36,7 @@ type Props = {
     kind: ItemKind
     mealSlot?: MealSlot
     sightType?: SightType | ''
+    shoppingType?: ShoppingType
     transportMode?: TransportMode
   }
   user?: User | null
@@ -40,7 +49,7 @@ type Props = {
   onDelete?: () => void
 }
 
-const KINDS: ItemKind[] = ['flight', 'hotel', 'meal', 'sight', 'transport']
+const KINDS: ItemKind[] = ['flight', 'hotel', 'meal', 'sight', 'shopping', 'transport']
 const MEALS: MealSlot[] = ['breakfast', 'lunch', 'dinner', 'latenight', 'snack']
 const MODES: TransportMode[] = [
   'train',
@@ -55,7 +64,7 @@ const MODES: TransportMode[] = [
 ]
 
 function needsSubMenu(kind: ItemKind): boolean {
-  return kind === 'meal' || kind === 'sight' || kind === 'transport'
+  return kind === 'meal' || kind === 'sight' || kind === 'transport' || kind === 'shopping'
 }
 
 function defaultTime(kind: ItemKind, mealSlot?: MealSlot): string {
@@ -69,6 +78,7 @@ function defaultTime(kind: ItemKind, mealSlot?: MealSlot): string {
   if (kind === 'flight') return '09:00'
   if (kind === 'hotel') return '15:00'
   if (kind === 'transport') return '09:30'
+  if (kind === 'shopping') return '14:00'
   return '10:30'
 }
 
@@ -118,6 +128,9 @@ export function ItemModal({
   )
   const [transportMode, setTransportMode] = useState<TransportMode>(
     normalizeTransportMode(initial?.transportMode ?? preset?.transportMode) ?? 'train',
+  )
+  const [shoppingType, setShoppingType] = useState<ShoppingType>(
+    initial?.shoppingType ?? preset?.shoppingType ?? 'mall',
   )
   const [sightTypes, setSightTypes] = useState<TaxonomyRow[]>(
     SIGHT_TYPES.map((row, index) => ({
@@ -260,7 +273,11 @@ export function ItemModal({
     const trimmed = title.trim()
     if (!trimmed) return
     const canPhoto =
-      kind === 'sight' || kind === 'meal' || kind === 'hotel' || kind === 'transport'
+      kind === 'sight' ||
+      kind === 'meal' ||
+      kind === 'hotel' ||
+      kind === 'transport' ||
+      kind === 'shopping'
     const nextPhotoId = canPhoto ? photoId.trim() || undefined : undefined
     let nextPhoto = canPhoto ? photoSrc.trim() || undefined : undefined
     if (nextPhotoId) {
@@ -286,6 +303,7 @@ export function ItemModal({
           note: note.trim() || undefined,
           mealSlot: kind === 'meal' ? mealSlot : undefined,
           sightType: kind === 'sight' && sightType ? sightType : undefined,
+          shoppingType: kind === 'shopping' ? shoppingType : undefined,
           transportMode: kind === 'transport' ? transportMode : undefined,
           photoId: nextPhotoId,
           photo: nextPhoto,
@@ -394,6 +412,21 @@ export function ItemModal({
           </>
         ) : null}
 
+        {menuLevel === 'sub' && kind === 'shopping' ? (
+          <div className="slot-grid slot-grid-wide">
+            {SHOPPING_TYPES.map((row) => (
+              <button
+                key={row.slug}
+                type="button"
+                className={shoppingType === row.slug ? 'on' : ''}
+                onClick={() => setShoppingType(row.slug)}
+              >
+                {row.label}
+              </button>
+            ))}
+          </div>
+        ) : null}
+
         <div className={kind === 'flight' ? 'form-grid flight-fields' : 'form-grid'}>
           {kind === 'flight' ? (
             <>
@@ -468,7 +501,9 @@ export function ItemModal({
                           ? tripMarket === 'kr'
                             ? '예: KTX 경주 · 제주 렌터카 하루'
                             : '예: 난카이 라피트'
-                          : '예: 오사카성'
+                          : kind === 'shopping'
+                            ? `예: ${SHOPPING_LABEL[shoppingType]}`
+                            : '예: 오사카성'
                   }
                   required
                 />
@@ -537,7 +572,11 @@ export function ItemModal({
             </div>
           </fieldset>
 
-          {kind === 'sight' || kind === 'meal' || kind === 'hotel' || kind === 'transport' ? (
+          {kind === 'sight' ||
+          kind === 'meal' ||
+          kind === 'hotel' ||
+          kind === 'transport' ||
+          kind === 'shopping' ? (
             <div className="span-2">
               <ImagePicker
                 photoId={photoId}

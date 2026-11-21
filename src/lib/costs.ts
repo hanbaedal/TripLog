@@ -1,4 +1,4 @@
-import type { ItemKind, MealSlot, Trip } from '../types'
+import type { ItemKind, MealSlot, ShoppingType, Trip } from '../types'
 import { dayCount } from './dates'
 import { itemActual, itemBudget } from './tripItem'
 
@@ -8,6 +8,7 @@ export const KIND_LABEL: Record<ItemKind, string> = {
   meal: '식사',
   sight: '관광',
   transport: '교통',
+  shopping: '쇼핑',
 }
 
 export const MEAL_LABEL: Record<MealSlot, string> = {
@@ -31,6 +32,26 @@ export const TRANSPORT_LABEL: Record<string, string> = {
   other: '기타',
 }
 
+export const SHOPPING_TYPES: { slug: ShoppingType; label: string }[] = [
+  { slug: 'dutyfree', label: '면세점' },
+  { slug: 'mall', label: '복합쇼핑몰' },
+  { slug: 'outlet', label: '아울렛' },
+  { slug: 'market', label: '전통시장' },
+  { slug: 'nightmarket', label: '야시장' },
+  { slug: 'supermarket', label: '대형마트' },
+  { slug: 'street', label: '쇼핑거리' },
+]
+
+export const SHOPPING_LABEL: Record<ShoppingType, string> = {
+  dutyfree: '면세점',
+  mall: '복합쇼핑몰',
+  outlet: '아울렛',
+  market: '전통시장',
+  nightmarket: '야시장',
+  supermarket: '대형마트',
+  street: '쇼핑거리',
+}
+
 export function krw(n: number): string {
   return `${new Intl.NumberFormat('ko-KR').format(Math.round(n))}원`
 }
@@ -50,6 +71,7 @@ export function summarize(trip: Trip) {
     meal: 0,
     sight: 0,
     transport: 0,
+    shopping: 0,
   }
   const byKindActual: Record<ItemKind, number> = {
     flight: 0,
@@ -57,6 +79,7 @@ export function summarize(trip: Trip) {
     meal: 0,
     sight: 0,
     transport: 0,
+    shopping: 0,
   }
   const byMeal: Record<MealSlot, number> = {
     breakfast: 0,

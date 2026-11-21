@@ -35,7 +35,10 @@ export type GalleryFilter = {
 }
 
 export function itemKindToGalleryCategory(kind?: ItemKind): GalleryCategory | undefined {
-  if (!kind || kind === 'flight') return kind === 'flight' ? 'flight' : undefined
+  if (!kind) return undefined
+  if (kind === 'flight') return 'flight'
+  // 쇼핑 사진은 관광 분류 갤러리를 함께 사용
+  if (kind === 'shopping') return 'sight'
   return kind
 }
 
