@@ -1,7 +1,7 @@
 import { Capacitor } from '@capacitor/core'
 
 const TOKEN_KEY = 'triplog.token'
-const NATIVE_API = 'https://triplog-361k.onrender.com'
+const NATIVE_API = 'https://triplog.my'
 
 export function apiUrl(path: string): string {
   const base = Capacitor.isNativePlatform() ? NATIVE_API : ''
