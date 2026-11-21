@@ -21,6 +21,8 @@ type Props = {
   copyingSample?: boolean
   saveStatus?: 'idle' | 'saving' | 'saved' | 'error'
   onChange: (trip: Trip) => void
+  /** 일정 항목 저장 직 여행 DB에 바로 반영할 때 */
+  onPersistTrip?: (trip: Trip) => void | Promise<void>
   onSave?: () => void
   onSaveCopy?: () => void
   nav: SiteNav
@@ -124,6 +126,7 @@ export function Planner({
   copyingSample,
   saveStatus = 'idle',
   onChange,
+  onPersistTrip,
   onSave,
   onSaveCopy,
   nav,
@@ -229,22 +232,26 @@ export function Planner({
   function saveItem(item: TripItem) {
     if (locked) return
     const exists = trip.items.some((it) => it.id === item.id)
-    onChange({
+    const next = {
       ...trip,
       items: exists
         ? trip.items.map((it) => (it.id === item.id ? item : it))
         : [...trip.items, item],
-    })
+    }
+    onChange(next)
     setEditing(null)
     setPreset(null)
     if (item.photoId || item.photo) void refreshGalleryPhotos()
+    if (onPersistTrip) void onPersistTrip(next)
   }
 
   function deleteItem(id: string) {
     if (locked) return
-    onChange({ ...trip, items: trip.items.filter((it) => it.id !== id) })
+    const next = { ...trip, items: trip.items.filter((it) => it.id !== id) }
+    onChange(next)
     setEditing(null)
     setPreset(null)
+    if (onPersistTrip) void onPersistTrip(next)
   }
 
   return (

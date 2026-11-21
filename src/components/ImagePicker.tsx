@@ -84,12 +84,15 @@ export function ImagePicker({
     setBusy(true)
     setError('')
     try {
+      // 일정·갤러리 모두 PC 선택 시 갤러리에 즉시 저장 (deferUpload는 작성 폼 임시용)
       if (deferUpload) {
         const src = await compressImage(file)
         onChange('', { src })
       } else {
-        const meta = uploadMeta ?? { city: 'dalian', category: 'sight' as const }
-        const saved = await uploadGalleryImage(file, user, defaultTitle, meta)
+        if (!uploadMeta?.city || !uploadMeta?.category) {
+          throw new Error('도시·분류 정보가 없어 갤러리에 저장할 수 없습니다. 여행지와 항목을 확인해 주세요.')
+        }
+        const saved = await uploadGalleryImage(file, user, defaultTitle, uploadMeta)
         const rows = await loadGalleryPhotos()
         setPhotos(rows)
         onChange(saved.id)
@@ -109,7 +112,7 @@ export function ImagePicker({
   }
 
   const pcDisabled =
-    disabled || busy || !user || (scope === 'mine' && (!uploadMeta?.city || !uploadMeta?.category))
+    disabled || busy || !user || (!deferUpload && (!uploadMeta?.city || !uploadMeta?.category))
 
   const previewSrc = preview ? galleryMediaSrc(preview) : ''
 

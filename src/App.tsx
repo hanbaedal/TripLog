@@ -184,6 +184,24 @@ export default function App() {
     }
   }
 
+  async function persistTripAfterItem(next: Trip) {
+    if (!user) return
+    if (samplePreview && !sampleEditId) return
+    if (sampleEditId) return
+    setGuideHint('')
+    setSaveStatus('saving')
+    const owned = { ...next, savedByUser: true, market: next.market || market }
+    setTrip(owned)
+    setTripDirty(true)
+    const ok = await persistTrip(owned, true, user)
+    if (ok) {
+      setTripDirty(false)
+      setSaveStatus('saved')
+    } else {
+      setSaveStatus('error')
+    }
+  }
+
   async function viewGuidebook() {
     setGuideHint('')
     if (!user) {
@@ -568,6 +586,11 @@ export default function App() {
           copyingSample={samplePreview && !sampleEditId}
           saveStatus={saveStatus}
           onChange={handleTripChange}
+          onPersistTrip={
+            user && !(samplePreview && !sampleEditId) && !sampleEditId
+              ? (next) => void persistTripAfterItem(next)
+              : undefined
+          }
           onSave={user && !(samplePreview && !sampleEditId) ? () => void saveTripNow() : undefined}
           onSaveCopy={() => void saveSampleCopy()}
           nav={nav}

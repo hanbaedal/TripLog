@@ -853,6 +853,62 @@ p {
   background: var(--paper-2);
 }
 
+.time-stepper {
+  display: grid;
+  gap: 8px;
+}
+
+.time-stepper-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.time-stepper-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.time-stepper-period {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--cream);
+}
+
+.time-stepper-period button {
+  border: 0;
+  background: transparent;
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.time-stepper-period button.on {
+  background: var(--ink);
+  color: #fff;
+  font-weight: 600;
+}
+
+.time-stepper-unit {
+  padding: 6px 10px;
+}
+
+.time-stepper-unit strong {
+  min-width: 1.6rem;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.time-stepper-unit-label {
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  margin-left: 2px;
+}
+
 .planner-grid {
   width: min(1280px, calc(100% - 24px));
   margin: 8px auto 40px;
@@ -3521,35 +3577,62 @@ p {
   font-size: 0.88rem;
 }
 
+.visit-stats-lead {
+  margin: 6px 0 0;
+  font-size: 0.88rem;
+}
+
+.visit-stats-hint {
+  margin: 0 0 12px;
+  font-size: 0.82rem;
+}
+
 .visit-stats-cards {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
-  margin: 16px 0 24px;
+  margin: 16px 0 16px;
+}
+
+.visit-stats-cards-6 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .visit-stat-card {
   padding: 14px 16px;
-  border: 1px solid var(--line, #dde3ea);
+  border: 1px solid var(--line);
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(251, 248, 242, 0.85);
+}
+
+.visit-stat-card-wide {
+  margin-bottom: 8px;
 }
 
 .visit-stat-label {
   margin: 0;
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   color: var(--ink-soft);
 }
 
 .visit-stat-value {
   margin: 6px 0 0;
-  font-size: 1.45rem;
+  font-family: var(--serif);
+  font-size: 1.55rem;
   font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--forest);
+}
+
+.visit-stat-value-sm {
+  font-size: 1.25rem;
 }
 
 .visit-stats-subtitle {
-  margin: 20px 0 10px;
-  font-size: 1rem;
+  margin: 22px 0 8px;
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  color: var(--ink);
 }
 
 .visit-stats-days {
@@ -3566,7 +3649,7 @@ p {
 
 .visit-day-row {
   display: grid;
-  grid-template-columns: 52px 1fr 40px;
+  grid-template-columns: 52px 1fr 88px;
   gap: 10px;
   align-items: center;
   font-size: 0.85rem;
@@ -3579,16 +3662,79 @@ p {
   overflow: hidden;
 }
 
+.visit-day-bar-stack {
+  display: flex;
+  height: 100%;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.visit-day-bar-guest {
+  display: block;
+  height: 100%;
+  background: var(--forest);
+}
+
+.visit-day-bar-user {
+  display: block;
+  height: 100%;
+  background: color-mix(in srgb, var(--forest) 35%, white);
+}
+
 .visit-day-bar-fill {
   display: block;
   height: 100%;
   border-radius: 999px;
-  background: var(--accent, #2f6fed);
+  background: var(--forest);
 }
 
 .visit-day-count {
   text-align: right;
+  font-size: 0.75rem;
+  color: var(--ink-soft);
   font-variant-numeric: tabular-nums;
+}
+
+.visit-stats-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(251, 248, 242, 0.7);
+}
+
+.visit-stats-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.visit-stats-table th,
+.visit-stats-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+
+.visit-stats-table thead th {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  background: rgba(232, 223, 210, 0.55);
+}
+
+.visit-stats-table tbody tr:last-child th,
+.visit-stats-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.visit-stats-table .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.visit-stats-table .mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8rem;
 }
 
 .visit-stats-split {
@@ -3598,15 +3744,30 @@ p {
   margin-top: 8px;
 }
 
+@media (max-width: 900px) {
+  .visit-stats-cards-6 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
 @media (max-width: 720px) {
   .visit-stats-cards,
   .visit-stats-split {
     grid-template-columns: 1fr 1fr;
   }
+
+  .visit-day-row {
+    grid-template-columns: 44px 1fr 76px;
+  }
 }
 
 @media (max-width: 520px) {
-  .visit-stats-cards {
+  .visit-stats-cards,
+  .visit-stats-cards-6 {
+    grid-template-columns: 1fr;
+  }
+
+  .visit-stats-split {
     grid-template-columns: 1fr;
   }
 }

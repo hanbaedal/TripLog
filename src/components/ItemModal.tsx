@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import type { FormEvent } from 'react'
 import type { ItemKind, MealSlot, SightType, TransportMode, TripItem, User } from '../types'
 import { ImagePicker } from './ImagePicker'
+import { TimeStepper } from './TimeStepper'
 import { SIGHT_TYPES } from '../data/galleryTaxonomy.js'
 import { citySlugFromPlace, guessSightType } from '../data/galleryTaxonomy.js'
 import { itemKindToGalleryCategory } from '../lib/galleryFilter'
@@ -152,15 +153,17 @@ export function ItemModal({
   const uploadMeta = useMemo((): GalleryUploadMeta | undefined => {
     const category = itemKindToGalleryCategory(kind)
     if (!category) return undefined
+    const city =
+      citySlugFromPlace(tripDestination) ||
+      citySlugFromPlace(place) ||
+      citySlugFromPlace(title) ||
+      (tripMarket === 'kr' ? 'kr-seoul' : 'dalian')
     return {
-      city: citySlugFromPlace(tripDestination) || 'dalian',
+      city,
       category,
-      sightType:
-        category === 'sight'
-          ? sightType || guessSightType(title) || 'town'
-          : '',
+      sightType: category === 'sight' ? sightType || guessSightType(title) || 'town' : '',
     }
-  }, [kind, tripDestination, title, sightType])
+  }, [kind, tripDestination, tripMarket, title, sightType, place])
 
   const parsed = parseFlightForm(initial?.kind === 'flight' ? initial : undefined)
   const [departTerminal, setDepartTerminal] = useState(parsed.departTerminal)
@@ -377,9 +380,9 @@ export function ItemModal({
         <div className={kind === 'flight' ? 'form-grid flight-fields' : 'form-grid'}>
           {kind === 'flight' ? (
             <>
-              <label>
+              <label className="span-2">
                 출발시간
-                <input type="time" value={time} onChange={(e) => setTime(e.target.value)} required />
+                <TimeStepper value={time} onChange={setTime} required />
               </label>
               <label>
                 출발 터미널
@@ -398,9 +401,9 @@ export function ItemModal({
                   required
                 />
               </label>
-              <label>
+              <label className="span-2">
                 도착시간
-                <input type="time" value={arriveTime} onChange={(e) => setArriveTime(e.target.value)} />
+                <TimeStepper value={arriveTime || '12:00'} onChange={setArriveTime} />
               </label>
               <label>
                 도착 터미널
@@ -430,9 +433,9 @@ export function ItemModal({
             </>
           ) : (
             <>
-              <label>
+              <label className="span-2">
                 시간
-                <input type="time" value={time} onChange={(e) => setTime(e.target.value)} required />
+                <TimeStepper value={time} onChange={setTime} required />
               </label>
               <label>
                 제목
