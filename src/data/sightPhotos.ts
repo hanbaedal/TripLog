@@ -1,5 +1,6 @@
 import type { GalleryPhoto } from '../types'
 import { GALLERY_PHOTOS } from './galleryCatalog.js'
+import { galleryMediaSrc } from '../lib/galleryResolve'
 
 const CATALOG = GALLERY_PHOTOS as GalleryPhoto[]
 
@@ -352,11 +353,14 @@ export function resolveItemPhoto(
 ): string | undefined {
   const photoId = item.photoId?.trim()
   if (photoId) {
-    const fromGallery = photos?.find((row) => row.id === photoId)?.src || CATALOG.find((row) => row.id === photoId)?.src
-    if (fromGallery) return fromGallery
+    const fromGallery =
+      photos?.find((row) => row.id === photoId)?.src || CATALOG.find((row) => row.id === photoId)?.src
+    if (fromGallery) return galleryMediaSrc(fromGallery)
+    // photoId에 URL·업로드 경로가 직접 저장된 경우
+    if (/^(data:|https?:|\/)/i.test(photoId)) return galleryMediaSrc(photoId)
   }
   const custom = item.photo?.trim()
-  if (custom) return custom
+  if (custom) return galleryMediaSrc(custom)
   const title = (item.title || '').trim()
   const hay = `${title} ${item.place || ''}`
   if (title) {

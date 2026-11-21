@@ -12,7 +12,7 @@ import { itemActual, itemBudget } from '../lib/tripItem'
 import { rescaleConnectItems } from '../lib/pax'
 import { dateOn, dayCount, formatShort } from '../lib/dates'
 import { hasItemPhoto, resolveItemPhoto } from '../data/sightPhotos'
-import { loadGalleryPhotos } from '../lib/galleryResolve'
+import { invalidateGalleryCache, loadGalleryPhotos } from '../lib/galleryResolve'
 import type { SiteNav } from '../lib/siteNav'
 
 type Props = {
@@ -144,6 +144,11 @@ export function Planner({
   const locked = !user
   const overlayOpen = open || chipMenu !== null || search !== null || lightbox !== null
 
+  async function refreshGalleryPhotos() {
+    invalidateGalleryCache()
+    setGalleryPhotos(await loadGalleryPhotos())
+  }
+
   useEffect(() => {
     void loadGalleryPhotos().then(setGalleryPhotos)
   }, [])
@@ -232,6 +237,7 @@ export function Planner({
     })
     setEditing(null)
     setPreset(null)
+    if (item.photoId || item.photo) void refreshGalleryPhotos()
   }
 
   function deleteItem(id: string) {
@@ -451,8 +457,10 @@ export function Planner({
           ) : null}
           {dayItems.length === 0 ? null : (
             dayItems.map((item) => {
-              const pictured = hasItemPhoto(item.kind)
-              const photo = pictured ? resolveItemPhoto(item, trip.destination, galleryPhotos) : undefined
+              const photo = hasItemPhoto(item.kind)
+                ? resolveItemPhoto(item, trip.destination, galleryPhotos)
+                : undefined
+              const pictured = Boolean(photo) || hasItemPhoto(item.kind)
               const copy = (
                 <>
                   <span className={`badge ${item.kind}`}>{badgeText(item)}</span>
