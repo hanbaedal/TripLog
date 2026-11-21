@@ -35,6 +35,9 @@ type Props = {
   tripDestination?: string
   itemTitle?: string
   compact?: boolean
+  /** false면 PC 업로드 숨김 — 갤러리에서 선택(링크)만 */
+  allowUpload?: boolean
+  linkHint?: string
 }
 
 export function ImagePicker({
@@ -53,6 +56,8 @@ export function ImagePicker({
   tripDestination,
   itemTitle,
   compact = false,
+  allowUpload = true,
+  linkHint,
 }: Props) {
   const [photos, setPhotos] = useState<GalleryPhoto[]>([])
   const [open, setOpen] = useState(false)
@@ -76,7 +81,7 @@ export function ImagePicker({
   const preview = pendingSrc || resolvePhotoSrc(photoId, photos)
 
   async function onPc(file: File | undefined) {
-    if (!file || disabled) return
+    if (!allowUpload || !file || disabled) return
     if (!user) {
       setError('로그인 후 PC에서 사진을 올릴 수 있습니다.')
       return
@@ -118,9 +123,11 @@ export function ImagePicker({
 
   const actions = (
     <div className="nav-actions image-picker-actions">
-      <button className="btn ghost" type="button" disabled={pcDisabled} onClick={() => fileRef.current?.click()}>
-        PC에서 선택
-      </button>
+      {allowUpload ? (
+        <button className="btn ghost" type="button" disabled={pcDisabled} onClick={() => fileRef.current?.click()}>
+          PC에서 선택
+        </button>
+      ) : null}
       <button className="btn ghost" type="button" disabled={disabled || busy} onClick={() => setOpen(true)}>
         갤러리에서 선택
       </button>
@@ -147,16 +154,19 @@ export function ImagePicker({
           {actions}
         </>
       )}
-      <input
-        ref={fileRef}
-        type="file"
-        accept="image/*"
-        hidden
-        onChange={(e) => void onPc(e.target.files?.[0])}
-      />
+      {allowUpload ? (
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/*"
+          hidden
+          onChange={(e) => void onPc(e.target.files?.[0])}
+        />
+      ) : null}
       {error ? <p className="muted">{error}</p> : null}
-      {!user ? <p className="muted">PC 업로드는 로그인 후 이용할 수 있습니다.</p> : null}
-      {scope === 'mine' && user && (!uploadMeta?.city || !uploadMeta?.category) ? (
+      {!allowUpload && linkHint ? <p className="muted">{linkHint}</p> : null}
+      {allowUpload && !user ? <p className="muted">PC 업로드는 로그인 후 이용할 수 있습니다.</p> : null}
+      {allowUpload && scope === 'mine' && user && (!uploadMeta?.city || !uploadMeta?.category) ? (
         <p className="muted">PC 업로드 전에 도시와 분류를 선택해 주세요.</p>
       ) : null}
 

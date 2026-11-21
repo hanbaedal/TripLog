@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { GalleryPhoto } from './models.js'
+import { GalleryPhoto, Trip } from './models.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -123,4 +123,56 @@ export async function migrateGalleryDataUrls() {
     }
   }
   if (rows.length) console.log(`gallery migrated ${rows.length} inline photo(s) to files`)
+}
+
+/** 디스크만 참조하고 파일이 없는 갤러리 행 삭제 */
+export async function purgeMissingGalleryMedia() {
+  const rows = await GalleryPhoto.find({ src: /^\/uploads\/gallery\// })
+  const removed = []
+  for (const doc of rows) {
+    const media = await readGalleryMedia(doc)
+    if (media) continue
+    removed.push(doc.photoId)
+    await doc.deleteOne()
+  }
+  const emptySrc = await GalleryPhoto.find({ $or: [{ src: '' }, { src: { $exists: false } }] })
+  for (const doc of emptySrc) {
+    removed.push(doc.photoId)
+    await doc.deleteOne()
+  }
+  if (removed.length) console.log(`gallery purged ${removed.length} missing or empty photo(s)`)
+  return removed
+}
+
+/** 삭제된 photoId를 여행 일정 항목에서 해제 */
+export async function clearTripPhotoReferences(photoIds) {
+  if (!photoIds?.length) return 0
+  const idSet = new Set(photoIds.map(String))
+  const trips = await Trip.find({ 'items.photoId': { $in: [...idSet] } })
+  let count = 0
+  for (const trip of trips) {
+    let dirty = false
+    const items = (trip.items || []).map((item) => {
+      if (!item?.photoId || !idSet.has(String(item.photoId))) return item
+      dirty = true
+      const next = { ...item }
+      delete next.photoId
+      delete next.photo
+      return next
+    })
+    if (dirty) {
+      trip.items = items
+      trip.updatedAt = new Date()
+      await trip.save()
+      count += 1
+    }
+  }
+  if (count) console.log(`cleared photo refs on ${count} trip(s)`)
+  return count
+}
+
+export async function purgeGalleryAndTripPhotoRefs() {
+  const removed = await purgeMissingGalleryMedia()
+  await clearTripPhotoReferences(removed)
+  return removed
 }

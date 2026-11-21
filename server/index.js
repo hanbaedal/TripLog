@@ -16,7 +16,12 @@ import { adminRouter } from './routes/admin.js'
 import { visitsRouter } from './routes/visits.js'
 import { seedTaxonomy } from './seedTaxonomy.js'
 import { tourbusRouter, seedTourBus } from './routes/tourbus.js'
-import { ensureGalleryUploadDir, migrateGalleryDataUrls, uploadRoot } from './galleryStorage.js'
+import {
+  ensureGalleryUploadDir,
+  migrateGalleryDataUrls,
+  purgeGalleryAndTripPhotoRefs,
+  uploadRoot,
+} from './galleryStorage.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const app = express()
@@ -88,6 +93,7 @@ async function start() {
   await mongoose.connect(mongoUri, { dbName: process.env.MONGODB_DB || 'triplog' })
   await ensureGalleryUploadDir()
   await migrateGalleryDataUrls()
+  await purgeGalleryAndTripPhotoRefs()
   await seedSamples()
   await seedGallery()
   await seedTravelInfo()

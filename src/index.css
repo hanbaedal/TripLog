@@ -2432,6 +2432,11 @@ p {
   min-height: 140px;
 }
 
+.gallery-write-photo-hint {
+  margin: 0 0 8px;
+  font-size: 0.82rem;
+}
+
 .gallery-card-thumb {
   position: relative;
   width: 100%;

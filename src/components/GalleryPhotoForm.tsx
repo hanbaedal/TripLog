@@ -123,6 +123,9 @@ export function GalleryPhotoForm({
         </div>
         <div className="gallery-write-photo">
           {!showCatalogFlag ? <span className="gallery-write-photo-label">사진 선택</span> : null}
+          <p className="muted gallery-write-photo-hint">
+            여기서 올린 사진은 갤러리에 저장됩니다. 일정에서는 갤러리에서 선택해 연결하세요.
+          </p>
           <ImagePicker
             photoId={values.photoId}
             pendingSrc={values.pendingSrc}

@@ -14,7 +14,7 @@ import { ImagePicker } from './ImagePicker'
 import { TimeStepper } from './TimeStepper'
 import { SIGHT_TYPES } from '../data/galleryTaxonomy.js'
 import { citySlugFromPlace, guessSightType } from '../data/galleryTaxonomy.js'
-import { itemKindToGalleryCategory } from '../lib/galleryFilter'
+import { buildGalleryFilter, itemKindToGalleryCategory } from '../lib/galleryFilter'
 import {
   loadGalleryPhotos,
   resolvePhotoSrc,
@@ -581,6 +581,8 @@ export function ItemModal({
               <ImagePicker
                 photoId={photoId}
                 pendingSrc={photoSrc || undefined}
+                allowUpload={false}
+                linkHint="새 사진은 갤러리 → 사진 올리기에서 먼저 등록한 뒤, 여기서 갤러리에서 선택하세요."
                 onChange={(id, pending) => {
                   setPhotoId(id)
                   if (pending?.src) {
@@ -601,7 +603,7 @@ export function ItemModal({
                 itemKind={kind}
                 tripDestination={tripDestination}
                 itemTitle={title}
-                uploadMeta={uploadMeta}
+                filter={uploadMeta ? buildGalleryFilter({ itemKind: kind, tripDestination, itemTitle: title }) : undefined}
               />
             </div>
           ) : null}
