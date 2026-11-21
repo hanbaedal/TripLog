@@ -15,7 +15,15 @@ const GROUPS: SitemapGroup[] = [
   {
     title: '관리',
     tone: 'admin',
-    ids: ['catalog', 'taxonomyCity', 'taxonomyCategory', 'taxonomySightType', 'taxonomyFoodType', 'usersAdmin'],
+    ids: [
+      'catalog',
+      'taxonomyCity',
+      'taxonomyCategory',
+      'taxonomySightType',
+      'taxonomyFoodType',
+      'usersAdmin',
+      'visitStats',
+    ],
   },
 ]
 

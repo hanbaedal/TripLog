@@ -23,7 +23,15 @@ const MENU_GROUPS: MenuGroup[] = [
 
 const ADMIN_GROUP: MenuGroup = {
   title: '관리',
-  ids: ['catalog', 'taxonomyCity', 'taxonomyCategory', 'taxonomySightType', 'taxonomyFoodType', 'usersAdmin'],
+  ids: [
+    'catalog',
+    'taxonomyCity',
+    'taxonomyCategory',
+    'taxonomySightType',
+    'taxonomyFoodType',
+    'usersAdmin',
+    'visitStats',
+  ],
 }
 
 export function SideMenu({ drawerOpen, overlay, onDrawerClose, ...nav }: Props) {

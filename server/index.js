@@ -13,6 +13,7 @@ import { seedGallery } from './seedGallery.js'
 import { seedTravelInfo, travelInfoRouter } from './routes/travelInfo.js'
 import { taxonomyRouter } from './routes/taxonomy.js'
 import { adminRouter } from './routes/admin.js'
+import { visitsRouter } from './routes/visits.js'
 import { seedTaxonomy } from './seedTaxonomy.js'
 import { tourbusRouter, seedTourBus } from './routes/tourbus.js'
 import { ensureGalleryUploadDir, migrateGalleryDataUrls, uploadRoot } from './galleryStorage.js'
@@ -58,6 +59,7 @@ app.use('/api/travel-info', travelInfoRouter)
 app.use('/api/taxonomy', taxonomyRouter)
 app.use('/api/tourbus', tourbusRouter)
 app.use('/api/admin', adminRouter)
+app.use('/api/visits', visitsRouter)
 
 const dist = path.join(__dirname, '..', 'dist')
 app.use(express.static(dist))

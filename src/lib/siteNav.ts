@@ -22,6 +22,7 @@ export type AppView =
   | 'taxonomySightType'
   | 'taxonomyFoodType'
   | 'usersAdmin'
+  | 'visitStats'
 
 export type SiteGo = {
   home: () => void
@@ -43,6 +44,7 @@ export type SiteGo = {
   taxonomySightType: () => void
   taxonomyFoodType: () => void
   usersAdmin: () => void
+  visitStats: () => void
   auth: () => void
   logout: () => void
 }
@@ -79,6 +81,7 @@ export const SUPERVISOR_LINKS: { id: AppView; label: string }[] = [
   { id: 'catalog', label: '카탈로그' },
   ...TAXONOMY_ADMIN_LINKS,
   { id: 'usersAdmin', label: '회원 관리' },
+  { id: 'visitStats', label: '방문통계' },
 ]
 
 export type TaxonomyAdminView = (typeof TAXONOMY_ADMIN_LINKS)[number]['id']
@@ -117,4 +120,5 @@ export function goSite(nav: SiteNav, id: AppView) {
   else if (id === 'taxonomySightType') nav.go.taxonomySightType()
   else if (id === 'taxonomyFoodType') nav.go.taxonomyFoodType()
   else if (id === 'usersAdmin') nav.go.usersAdmin()
+  else if (id === 'visitStats') nav.go.visitStats()
 }

@@ -239,3 +239,18 @@ const tourBusCitySchema = new mongoose.Schema(
 
 export const TourBusCity =
   mongoose.models.TourBusCity || mongoose.model('TourBusCity', tourBusCitySchema)
+
+const visitSchema = new mongoose.Schema(
+  {
+    view: { type: String, required: true, trim: true, index: true },
+    market: { type: String, enum: ['kr', 'cn', ''], default: '', index: true },
+    path: { type: String, default: '', trim: true },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null, index: true },
+    day: { type: String, required: true, index: true },
+  },
+  { timestamps: true },
+)
+
+visitSchema.index({ createdAt: -1 })
+
+export const Visit = mongoose.models.Visit || mongoose.model('Visit', visitSchema)

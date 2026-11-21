@@ -3521,6 +3521,96 @@ p {
   font-size: 0.88rem;
 }
 
+.visit-stats-cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 16px 0 24px;
+}
+
+.visit-stat-card {
+  padding: 14px 16px;
+  border: 1px solid var(--line, #dde3ea);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.visit-stat-label {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+}
+
+.visit-stat-value {
+  margin: 6px 0 0;
+  font-size: 1.45rem;
+  font-weight: 700;
+}
+
+.visit-stats-subtitle {
+  margin: 20px 0 10px;
+  font-size: 1rem;
+}
+
+.visit-stats-days {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+}
+
+.visit-day-bars {
+  display: grid;
+  gap: 8px;
+}
+
+.visit-day-row {
+  display: grid;
+  grid-template-columns: 52px 1fr 40px;
+  gap: 10px;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.visit-day-bar-track {
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(23, 32, 51, 0.08);
+  overflow: hidden;
+}
+
+.visit-day-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent, #2f6fed);
+}
+
+.visit-day-count {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.visit-stats-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 8px;
+}
+
+@media (max-width: 720px) {
+  .visit-stats-cards,
+  .visit-stats-split {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .visit-stats-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
 .admin-section {
   margin-top: 20px;
 }

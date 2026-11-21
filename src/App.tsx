@@ -15,11 +15,13 @@ import { SampleGallery } from './components/SampleGallery'
 import { SitemapPage } from './components/SitemapPage'
 import { TaxonomyAdminPage } from './components/TaxonomyAdminPage'
 import { UsersAdminPage } from './components/UsersAdminPage'
+import { VisitStatsPage } from './components/VisitStatsPage'
 import { TripList } from './components/TripList'
 import { emptyTrip } from './data/demo'
 import { cloneSampleTrip, isBlankDraft, removeSample, sampleFromTrip, saveSample } from './data/samples'
 import { isSupervisor, oauthErrorMessage, remoteMe, signOut } from './lib/auth'
 import { probeRemote, setToken } from './lib/remote'
+import { trackVisit } from './lib/visits'
 import { deleteTrip, filterTripsByMarket, listTrips, onlyPersonalTrips, purgeSampleCopies, upsertTrip } from './lib/trips'
 import { readMarket, writeMarket } from './lib/market'
 import type { AppView, SiteNav } from './lib/siteNav'
@@ -114,8 +116,14 @@ export default function App() {
     if (view === 'galleryWrite' && !user) setView('home')
     if (view === 'catalog' && (!user || !isSupervisor(user))) setView('home')
     if (view === 'usersAdmin' && (!user || !isSupervisor(user))) setView('home')
+    if (view === 'visitStats' && (!user || !isSupervisor(user))) setView('home')
     if (isTaxonomyAdminView(view) && (!user || !isSupervisor(user))) setView('home')
   }, [view, user])
+
+  useEffect(() => {
+    if (view === 'visitStats') return
+    void trackVisit(view, market)
+  }, [view, market])
 
   async function persistTrip(next: Trip, forceMine = false, actor: User | null = user): Promise<boolean> {
     const seq = ++saveSeq.current
@@ -450,6 +458,10 @@ export default function App() {
         if (!user || !isSupervisor(user)) return
         setView('usersAdmin')
       },
+      visitStats: () => {
+        if (!user || !isSupervisor(user)) return
+        setView('visitStats')
+      },
       auth: () => askAuth(samplePreview && !sampleEditId ? 'claimSample' : null),
       logout: handleLogout,
     },
@@ -548,6 +560,7 @@ export default function App() {
         <TaxonomyAdminPage kind={taxonomyViewToKind(view)} {...nav} />
       ) : null}
       {view === 'usersAdmin' && user && isSupervisor(user) ? <UsersAdminPage {...nav} /> : null}
+      {view === 'visitStats' && user && isSupervisor(user) ? <VisitStatsPage {...nav} /> : null}
       {view === 'planner' ? (
         <Planner
           trip={trip}
