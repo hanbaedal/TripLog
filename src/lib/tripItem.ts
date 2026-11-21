@@ -19,6 +19,7 @@ export function normalizeTransportMode(mode?: string | null): TransportMode | un
     'tourbus',
     'ferry',
     'taxi',
+    'rentalcar',
     'walk',
     'other',
   ]

@@ -25,6 +25,7 @@ export const TRANSPORT_LABEL: Record<string, string> = {
   tourbus: '투어버스',
   ferry: '페리',
   taxi: '택시',
+  rentalcar: '렌터카',
   car: '택시',
   walk: '도보',
   other: '기타',

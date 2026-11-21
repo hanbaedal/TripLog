@@ -60,6 +60,7 @@ const TRANSPORT_CHIPS: { label: string; mode: TransportMode }[] = [
   { label: '투어버스', mode: 'tourbus' },
   { label: '페리', mode: 'ferry' },
   { label: '택시', mode: 'taxi' },
+  { label: '렌터카', mode: 'rentalcar' },
   { label: '도보', mode: 'walk' },
   { label: '기타', mode: 'other' },
 ]

@@ -11,6 +11,7 @@ export type TransportMode =
   | 'tourbus'
   | 'ferry'
   | 'taxi'
+  | 'rentalcar'
   | 'walk'
   | 'other'
 

@@ -37,7 +37,17 @@ type Props = {
 
 const KINDS: ItemKind[] = ['flight', 'hotel', 'meal', 'sight', 'transport']
 const MEALS: MealSlot[] = ['breakfast', 'lunch', 'dinner', 'latenight', 'snack']
-const MODES: TransportMode[] = ['train', 'subway', 'bus', 'tourbus', 'ferry', 'taxi', 'walk', 'other']
+const MODES: TransportMode[] = [
+  'train',
+  'subway',
+  'bus',
+  'tourbus',
+  'ferry',
+  'taxi',
+  'rentalcar',
+  'walk',
+  'other',
+]
 
 function needsSubMenu(kind: ItemKind): boolean {
   return kind === 'meal' || kind === 'sight' || kind === 'transport'
@@ -436,7 +446,7 @@ export function ItemModal({
                         ? '예: 구로몬 시장 모둠'
                         : kind === 'transport'
                           ? tripMarket === 'kr'
-                            ? '예: KTX 경주 · 제주 렌터카'
+                            ? '예: KTX 경주 · 제주 렌터카 하루'
                             : '예: 난카이 라피트'
                           : '예: 오사카성'
                   }
