@@ -1,6 +1,6 @@
-import { galleryMediaSrc } from '../lib/galleryResolve'
 import { photoManageCardDisplay } from '../lib/galleryFilter'
 import type { GalleryPhoto } from '../types'
+import { SafeImage } from './SafeImage'
 
 type Props = {
   photos: GalleryPhoto[]
@@ -27,12 +27,24 @@ export function GalleryManageCardList({
         const display = photoManageCardDisplay(photo)
         const managed = canManage?.(photo) ?? true
         const showDelete = managed && (!photo.catalog || allowCatalogDelete)
+        const broken = Boolean(photo.mediaMissing)
 
         return (
           <article className="info-card gallery-manage-card" key={photo.id}>
             <button type="button" className="gallery-manage-open" onClick={() => onOpen(photo)}>
-              <div className="gallery-card-thumb">
-                <img src={galleryMediaSrc(photo.src)} alt={photo.title} loading="lazy" />
+              <div className={`gallery-card-thumb${broken ? ' is-missing' : ''}`}>
+                {broken ? (
+                  <div className="safe-image-missing gallery-card-missing">
+                    <span>사진 유실</span>
+                    <small>수정에서 다시 올려 주세요</small>
+                  </div>
+                ) : (
+                  <SafeImage
+                    src={photo.src}
+                    alt={photo.title}
+                    missingClassName="safe-image-missing gallery-card-missing"
+                  />
+                )}
               </div>
               <div className="gallery-manage-meta">
                 {display.title ? <span className="gallery-manage-title">{display.title}</span> : null}

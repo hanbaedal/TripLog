@@ -299,40 +299,52 @@ const MEAL_KEYS: { keys: string[]; url: string }[] = [
   { keys: ['훠', '요리', '모둠', '코스', '정식', '석식', '안주'], url: wm('Chinese cuisine.jpg') },
 ]
 
-const HOTEL_PHOTO = wm('Hotel room.jpg')
+/** 일정표 폴백은 외부(위키미디어) 대신 항상 호스팅되는 /samples 를 쓴다. */
+const HOTEL_PHOTO = '/samples/kr-seoul.jpg'
 const HOTEL_KEYS: { keys: string[]; url: string }[] = [
-  { keys: ['온천'], url: wm('Hot spring hotel.jpg') },
-  { keys: ['객잔'], url: wm('Chinese courtyard inn.jpg') },
-  { keys: ['산장'], url: wm('Mountain lodge.jpg') },
+  { keys: ['온천'], url: '/samples/kr-gangwon.jpg' },
+  { keys: ['객잔'], url: '/samples/kr-jeonju.jpg' },
+  { keys: ['산장'], url: '/samples/kr-seorak.jpg' },
   { keys: ['호텔', '마리엇', '샹그릴라', '쉐라톤', '펜인슐라', '하버뷰'], url: HOTEL_PHOTO },
 ]
 
 const TRANSPORT_BY_MODE: Record<string, string> = {
-  train: wm('China Railway High-speed.jpg'),
-  subway: wm('China Railway High-speed.jpg'),
-  bus: wm('Airport bus.jpg'),
-  tourbus: wm('Coach bus China.jpg'),
-  ferry: wm('Star Ferry.jpg'),
-  taxi: wm('China highway.jpg'),
-  car: wm('China highway.jpg'),
+  train: '/samples/kr-gyeongju.jpg',
+  subway: '/samples/kr-subway.jpg',
+  bus: '/samples/kr-gyeonggi.jpg',
+  tourbus: '/samples/kr-jeju.jpg',
+  ferry: '/samples/kr-udo.jpg',
+  taxi: '/samples/kr-seoul.jpg',
+  car: '/samples/kr-seoul.jpg',
   rentalcar: '/samples/kr-jeju.jpg',
-  walk: wm('Pedestrian street China.jpg'),
-  other: wm('Cable car.jpg'),
+  walk: '/samples/kr-heiri.jpg',
+  other: '/samples/kr-nami.jpg',
 }
 
 const TRANSPORT_KEYS: { keys: string[]; url: string }[] = [
-  { keys: ['리무진', '공항'], url: wm('Airport bus.jpg') },
-  { keys: ['기차'], url: wm('China Railway High-speed.jpg') },
-  { keys: ['버스', '이동', '복귀'], url: wm('Coach bus China.jpg') },
-  { keys: ['케이블'], url: wm('Cable car.jpg') },
-  { keys: ['자전거'], url: wm('Bicycle.jpg') },
-  { keys: ['엘리베이터'], url: wm('Bailong Elevator.jpg') },
+  { keys: ['리무진', '공항'], url: '/samples/kr-jeju.jpg' },
+  { keys: ['기차', 'KTX'], url: '/samples/kr-gyeongju.jpg' },
+  { keys: ['버스', '이동', '복귀'], url: '/samples/kr-gyeonggi.jpg' },
+  { keys: ['페리', '여객'], url: '/samples/kr-udo.jpg' },
+  { keys: ['렌터', '자차'], url: '/samples/kr-jeju.jpg' },
+  { keys: ['도보', '산책'], url: '/samples/kr-heiri.jpg' },
 ]
 
 const KIND_FALLBACK: Record<string, string> = {
-  meal: wm('Chinese cuisine.jpg'),
+  meal: '/samples/kr-jeonju.jpg',
   hotel: HOTEL_PHOTO,
-  transport: wm('Airport bus.jpg'),
+  transport: '/samples/kr-subway.jpg',
+  shopping: '/samples/kr-haeundae.jpg',
+  sight: '/samples/kr-jeju.jpg',
+}
+
+function isFragileRemote(url: string): boolean {
+  return /wikimedia\.org|Special:FilePath/i.test(url)
+}
+
+function hostedOrFallback(url: string | undefined, fallback: string): string {
+  if (url && !isFragileRemote(url)) return url
+  return fallback
 }
 
 function matchKeys(text: string, groups: { keys: string[]; url: string }[]): string | undefined {
@@ -390,14 +402,24 @@ export function resolveItemPhoto(
   const photoId = item.photoId?.trim()
   const custom = item.photo?.trim()
   if (photoId) {
-    const fromResolve = resolvePhotoSrc(photoId, photos || CATALOG, custom)
+    const row = photos?.find((entry) => entry.id === photoId)
+    if (row?.src && !row.mediaMissing) return galleryMediaSrc(row.src)
+    const fromResolve = resolvePhotoSrc(
+      photoId,
+      (photos || CATALOG).filter((entry) => !entry.mediaMissing),
+      custom && !isFragileRemote(custom) && !/^\/uploads\//i.test(custom) ? custom : undefined,
+    )
     if (fromResolve) return fromResolve
     const seed = galleryPhotoById(photoId)
     if (seed?.src) return galleryMediaSrc(seed.src)
-    // photoId에 URL·업로드 경로가 직접 저장된 경우
-    if (/^(data:|https?:|\/)/i.test(photoId)) return galleryMediaSrc(photoId)
+    // photoId에 URL·업로드 경로가 직접 저장된 경우 (유실된 /uploads 는 제외)
+    if (/^(data:|https?:|\/)/i.test(photoId) && !/^\/uploads\//i.test(photoId)) {
+      return galleryMediaSrc(photoId)
+    }
   }
-  if (custom) return galleryMediaSrc(custom)
+  if (custom && !isFragileRemote(custom) && !/^\/uploads\//i.test(custom)) {
+    return galleryMediaSrc(custom)
+  }
   const title = (item.title || '').trim()
   const hay = `${title} ${item.place || ''}`
   if (title) {
@@ -412,29 +434,66 @@ export function resolveItemPhoto(
     }
   }
   if (item.kind === 'meal') {
-    const url = matchKeys(hay, MEAL_KEYS) || KIND_FALLBACK.meal
-    return url ? galleryMediaSrc(url) : undefined
+    const url = hostedOrFallback(matchKeys(hay, MEAL_KEYS), KIND_FALLBACK.meal)
+    return galleryMediaSrc(url)
   }
   if (item.kind === 'hotel') {
-    const url = matchKeys(hay, HOTEL_KEYS) || KIND_FALLBACK.hotel
-    return url ? galleryMediaSrc(url) : undefined
+    const url = hostedOrFallback(matchKeys(hay, HOTEL_KEYS), KIND_FALLBACK.hotel)
+    return galleryMediaSrc(url)
   }
   if (item.kind === 'transport') {
     const modePhoto = item.transportMode ? TRANSPORT_BY_MODE[item.transportMode] : undefined
-    const url = matchKeys(hay, TRANSPORT_KEYS) || modePhoto || KIND_FALLBACK.transport
-    return url ? galleryMediaSrc(url) : undefined
+    const url = hostedOrFallback(
+      matchKeys(hay, TRANSPORT_KEYS) || modePhoto,
+      KIND_FALLBACK.transport,
+    )
+    return galleryMediaSrc(url)
   }
   if (item.kind === 'shopping') {
     const typePhoto = item.shoppingType ? SHOPPING_BY_TYPE[item.shoppingType] : undefined
-    const url =
-      matchKeys(hay, SHOPPING_KEYS) ||
-      typePhoto ||
-      SHOPPING_BY_TYPE.mall ||
-      cityPhoto(destination) ||
-      cityPhoto(item.place)
-    return url ? galleryMediaSrc(url) : undefined
+    const url = hostedOrFallback(
+      matchKeys(hay, SHOPPING_KEYS) || typePhoto || cityPhoto(destination) || cityPhoto(item.place),
+      KIND_FALLBACK.shopping,
+    )
+    return galleryMediaSrc(url)
   }
-  return cityPhoto(destination) || cityPhoto(item.place) || cityPhoto(title)
+  return (
+    cityPhoto(destination) ||
+    cityPhoto(item.place) ||
+    cityPhoto(title) ||
+    galleryMediaSrc(KIND_FALLBACK.sight)
+  )
+}
+
+/** 업로드 파일이 사라졌을 때 일정 카드가 빈칸이 되지 않도록 종류별 안전한 폴백 */
+export function kindPhotoFallback(
+  kind?: string,
+  opts?: {
+    transportMode?: string
+    shoppingType?: string
+    destination?: string
+  },
+): string {
+  if (kind === 'shopping') {
+    return galleryMediaSrc(
+      SHOPPING_BY_TYPE[opts?.shoppingType || ''] || KIND_FALLBACK.shopping,
+    )
+  }
+  if (kind === 'transport') {
+    return galleryMediaSrc(
+      (opts?.transportMode && TRANSPORT_BY_MODE[opts.transportMode]) || KIND_FALLBACK.transport,
+    )
+  }
+  if (kind === 'meal') return galleryMediaSrc(KIND_FALLBACK.meal)
+  if (kind === 'hotel') return galleryMediaSrc(KIND_FALLBACK.hotel)
+  return (
+    cityPhoto(opts?.destination) ||
+    galleryMediaSrc(KIND_FALLBACK.sight)
+  )
+}
+
+export function isUploadMediaSrc(src?: string | null): boolean {
+  return Boolean(src && /\/uploads\//i.test(src))
 }
 
 export function resolveSightPhoto(

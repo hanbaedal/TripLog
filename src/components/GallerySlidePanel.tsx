@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react'
-import { galleryMediaSrc } from '../lib/galleryResolve'
+import { SafeImage } from './SafeImage'
 import { photoTaxonomyLabel } from '../lib/galleryFilter'
 import type { GalleryPhoto } from '../types'
 
@@ -57,11 +57,14 @@ export function GallerySlidePanel({ photos, activeId, cityLabel, onBack }: Props
       <div className="gallery-track" ref={track}>
         {photos.map((photo) => (
           <figure className="gallery-frame" id={`gallery-${photo.id}`} key={photo.id}>
-            <img
-              src={galleryMediaSrc(photo.src)}
-              alt={photo.title}
-              loading={photo.id === activeId ? 'eager' : 'lazy'}
-            />
+            {photo.mediaMissing ? (
+              <div className="safe-image-missing gallery-frame-missing">
+                <span>사진 유실</span>
+                <small>수정에서 다시 올려 주세요</small>
+              </div>
+            ) : (
+              <SafeImage src={photo.src} alt={photo.title} missingClassName="safe-image-missing gallery-frame-missing" />
+            )}
             <figcaption>
               {photo.title}
               <br />

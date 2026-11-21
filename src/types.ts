@@ -127,6 +127,8 @@ export type GalleryPhoto = {
   ownerName?: string
   at?: string
   catalog?: boolean
+  /** 서버에 이미지 바이너리가 없음 (재업로드 필요) */
+  mediaMissing?: boolean
 }
 
 export type BoardComment = {

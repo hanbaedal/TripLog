@@ -25,6 +25,12 @@ export function isStoredUploadUrl(src) {
   return String(src || '').startsWith('/uploads/gallery/')
 }
 
+/** Render 등 ephemeral 디스크에서는 파일을 쓰면 재배포 후 이미지가 사라진다. */
+export function storeGalleryAsFiles() {
+  const flag = String(process.env.GALLERY_STORE_FILES || '').trim().toLowerCase()
+  return flag === '1' || flag === 'true' || flag === 'yes'
+}
+
 export function galleryFilePath(photoId) {
   const safe = String(photoId || '').replace(/[^\w-]/g, '')
   if (!safe) throw new Error('Invalid photo id')
@@ -36,17 +42,23 @@ export function galleryPublicUrl(photoId) {
   return `/uploads/gallery/${safe}.jpg`
 }
 
-function parseDataUrl(src) {
+export function galleryMediaApiPath(photoId) {
+  return `/api/gallery/${encodeURIComponent(String(photoId || ''))}/media`
+}
+
+export function parseDataUrl(src) {
   const match = String(src).match(/^data:image\/(\w+);base64,(.+)$/i)
   if (!match) throw new Error('사진 형식을 확인해 주세요.')
   const buffer = Buffer.from(match[2], 'base64')
   if (buffer.length > 3_500_000) throw new Error('사진이 너무 큽니다.')
-  return buffer
+  return { buffer, subtype: match[1].toLowerCase() }
 }
 
 export async function saveGalleryImage(photoId, src) {
   if (!isDataUrl(src)) return String(src || '').trim()
-  const buffer = parseDataUrl(src)
+  // 기본: MongoDB에 data URL 유지 (재배포에도 남음)
+  if (!storeGalleryAsFiles()) return String(src).trim()
+  const { buffer } = parseDataUrl(src)
   await ensureGalleryUploadDir()
   await fs.writeFile(galleryFilePath(photoId), buffer)
   return galleryPublicUrl(photoId)
@@ -69,7 +81,38 @@ export async function resolveGallerySrc(photoId, src, previousSrc) {
   return next
 }
 
+export function publicGallerySrc(doc) {
+  const src = String(doc?.src || '').trim()
+  if (!src) return ''
+  if (isDataUrl(src) || isStoredUploadUrl(src)) return galleryMediaApiPath(doc.photoId)
+  return src
+}
+
+export async function readGalleryMedia(doc) {
+  const src = String(doc?.src || '').trim()
+  if (!src) return null
+  if (isDataUrl(src)) {
+    const { buffer, subtype } = parseDataUrl(src)
+    return { buffer, contentType: subtype === 'png' ? 'image/png' : 'image/jpeg' }
+  }
+  if (isStoredUploadUrl(src)) {
+    try {
+      const buffer = await fs.readFile(galleryFilePath(doc.photoId))
+      return { buffer, contentType: 'image/jpeg' }
+    } catch (err) {
+      if (err?.code === 'ENOENT') return null
+      throw err
+    }
+  }
+  return null
+}
+
+/** 파일 저장 모드일 때만 data URL → 파일 이관. 기본은 no-op. */
 export async function migrateGalleryDataUrls() {
+  if (!storeGalleryAsFiles()) {
+    console.log('gallery: inline DB photos enabled (set GALLERY_STORE_FILES=1 only with persistent disk)')
+    return
+  }
   const rows = await GalleryPhoto.find({ src: /^data:image\//i })
   for (const doc of rows) {
     try {

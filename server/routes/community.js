@@ -3,7 +3,14 @@ import crypto from 'node:crypto'
 import { BoardPost, GalleryPhoto, Inquiry } from '../models.js'
 import { optionalUser, requireSupervisor, requireUser } from '../auth.js'
 import { parseGalleryMeta } from '../galleryMeta.js'
-import { deleteGalleryFile, isDataUrl, resolveGallerySrc } from '../galleryStorage.js'
+import {
+  deleteGalleryFile,
+  isDataUrl,
+  isStoredUploadUrl,
+  publicGallerySrc,
+  readGalleryMedia,
+  resolveGallerySrc,
+} from '../galleryStorage.js'
 
 function nid(prefix) {
   return `${prefix}-${crypto.randomUUID()}`
@@ -13,7 +20,7 @@ function toPhoto(doc) {
   return {
     id: doc.photoId,
     title: doc.title,
-    src: doc.src,
+    src: publicGallerySrc(doc),
     city: doc.city || 'dalian',
     category: doc.category || 'sight',
     sightType: doc.sightType || undefined,
@@ -21,6 +28,7 @@ function toPhoto(doc) {
     ownerId: doc.ownerId ? String(doc.ownerId) : undefined,
     ownerName: doc.ownerName || '',
     at: doc.at?.toISOString?.() ?? new Date().toISOString(),
+    mediaMissing: false,
   }
 }
 
@@ -82,7 +90,39 @@ export const galleryRouter = Router()
 
 galleryRouter.get('/', async (_req, res) => {
   const rows = await GalleryPhoto.find().sort({ at: 1 })
-  res.json({ photos: rows.map(toPhoto).filter((row) => row.src?.trim()) })
+  const photos = []
+  for (const doc of rows) {
+    const photo = toPhoto(doc)
+    if (!photo.src?.trim()) continue
+    // /uploads 경로만 있고 실제 파일이 없으면 목록에서 깨진 썸네일 대신 표시 가능하게 표시
+    if (isStoredUploadUrl(doc.src)) {
+      const media = await readGalleryMedia(doc)
+      photo.mediaMissing = !media
+    } else {
+      photo.mediaMissing = false
+    }
+    photos.push(photo)
+  }
+  res.json({ photos })
+})
+
+galleryRouter.get('/:id/media', async (req, res) => {
+  const doc = await GalleryPhoto.findOne({ photoId: req.params.id })
+  if (!doc) {
+    res.status(404).json({ error: '사진을 찾지 못했습니다.' })
+    return
+  }
+  try {
+    const media = await readGalleryMedia(doc)
+    if (!media) {
+      res.status(404).json({ error: '이미지 파일이 없습니다. 사진을 다시 올려 주세요.' })
+      return
+    }
+    res.setHeader('Cache-Control', 'public, max-age=86400')
+    res.type(media.contentType).send(media.buffer)
+  } catch (err) {
+    res.status(400).json({ error: err instanceof Error ? err.message : '이미지를 읽지 못했습니다.' })
+  }
 })
 
 galleryRouter.post('/', requireUser, async (req, res) => {

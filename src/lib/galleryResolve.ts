@@ -47,7 +47,9 @@ export function pickableGalleryPhotos(
   user?: User | null,
   scope: 'default' | 'mine' | 'all' = 'default',
 ): GalleryPhoto[] {
-  const visible = photos.filter(hasDisplayableGallerySrc)
+  const visible = photos.filter(
+    (row) => hasDisplayableGallerySrc(row) && !row.mediaMissing,
+  )
   if (scope === 'all') return visible
   if (scope === 'mine' && user) return visible.filter((row) => !row.catalog && row.ownerId === user.id)
   if (!user) return visible.filter((row) => row.catalog)

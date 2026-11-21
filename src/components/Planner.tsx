@@ -29,7 +29,12 @@ import {
 import { itemActual, itemBudget } from '../lib/tripItem'
 import { rescaleConnectItems } from '../lib/pax'
 import { dateOn, dayCount, formatShort } from '../lib/dates'
-import { hasItemPhoto, resolveItemPhoto } from '../data/sightPhotos'
+import {
+  hasItemPhoto,
+  isUploadMediaSrc,
+  kindPhotoFallback,
+  resolveItemPhoto,
+} from '../data/sightPhotos'
 import { invalidateGalleryCache, loadGalleryPhotos } from '../lib/galleryResolve'
 import type { SiteNav } from '../lib/siteNav'
 
@@ -122,14 +127,27 @@ function costLine(item: TripItem): string {
   return budget ? krw(budget) : '—'
 }
 
-function SightThumb({ src, label, onOpen }: { src: string; label: string; onOpen: () => void }) {
-  const [ok, setOk] = useState(true)
+function SightThumb({
+  src,
+  fallbackSrc,
+  label,
+  onOpen,
+}: {
+  src: string
+  fallbackSrc: string
+  label: string
+  onOpen: (src: string) => void
+}) {
+  const initial = src || fallbackSrc
+  const [display, setDisplay] = useState(initial)
+  const [dead, setDead] = useState(false)
   useEffect(() => {
-    setOk(true)
-  }, [src])
-  if (!ok) {
-    return <div className="item-photo item-photo-missing" aria-hidden="true" />
-  }
+    setDisplay(src || fallbackSrc)
+    setDead(false)
+  }, [src, fallbackSrc])
+
+  if (dead || !display) return null
+
   return (
     <button
       type="button"
@@ -137,10 +155,20 @@ function SightThumb({ src, label, onOpen }: { src: string; label: string; onOpen
       aria-label={`${label} 사진 크게 보기`}
       onClick={(e) => {
         e.stopPropagation()
-        onOpen()
+        onOpen(display)
       }}
     >
-      <img src={src} alt="" onError={() => setOk(false)} />
+      <img
+        src={display}
+        alt=""
+        onError={() => {
+          if (fallbackSrc && display !== fallbackSrc) {
+            setDisplay(fallbackSrc)
+            return
+          }
+          setDead(true)
+        }}
+      />
     </button>
   )
 }
@@ -519,10 +547,24 @@ export function Planner({
             dayItems.map((item) => {
               const destination =
                 trip.destination || tripDestinationFromTitle(trip.title, '')
-              const photo = hasItemPhoto(item.kind)
+              const fallback = hasItemPhoto(item.kind)
+                ? kindPhotoFallback(item.kind, {
+                    transportMode: item.transportMode,
+                    shoppingType: item.shoppingType,
+                    destination,
+                  })
+                : ''
+              const resolved = hasItemPhoto(item.kind)
                 ? resolveItemPhoto(item, destination, galleryPhotos)
                 : undefined
-              const pictured = Boolean(photo)
+              // 업로드 경로가 깨진 경우(재배포 후 파일 유실) 처음부터 안전한 폴백을 쓴다
+              const photo =
+                resolved && isUploadMediaSrc(resolved)
+                  ? resolved
+                  : resolved || (fallback || undefined)
+              const photoFallback =
+                resolved && isUploadMediaSrc(resolved) ? fallback || resolved : fallback || resolved || ''
+              const pictured = Boolean(photo || photoFallback)
               const copy = (
                 <>
                   <span className={`badge ${item.kind}`}>{badgeText(item)}</span>
@@ -570,11 +612,12 @@ export function Planner({
                   </div>
                   <article className={`card${pictured ? ' card-photo' : ''}`}>
                     {body}
-                    {pictured && photo ? (
+                    {pictured ? (
                       <SightThumb
-                        src={photo}
+                        src={photo || photoFallback}
+                        fallbackSrc={photoFallback || photo || ''}
                         label={item.title}
-                        onOpen={() => setLightbox({ src: photo, title: item.title })}
+                        onOpen={(src) => setLightbox({ src, title: item.title })}
                       />
                     ) : null}
                   </article>

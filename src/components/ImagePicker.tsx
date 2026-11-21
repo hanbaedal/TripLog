@@ -182,7 +182,11 @@ export function ImagePicker({
                   onClick={() => pick(photo.id)}
                 >
                   <div className="image-picker-cell-thumb">
-                    <img src={galleryMediaSrc(photo.src)} alt={photo.title} />
+                    {photo.mediaMissing ? (
+                      <div className="safe-image-missing" />
+                    ) : (
+                      <img src={galleryMediaSrc(photo.src)} alt={photo.title} />
+                    )}
                   </div>
                   <span>{photo.title}</span>
                   <small>{photoTaxonomyLabel(photo)}</small>

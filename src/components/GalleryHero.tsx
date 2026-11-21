@@ -13,7 +13,7 @@ export function GalleryHero({ market = 'cn', onOpen }: Props) {
   const [index, setIndex] = useState(0)
 
   useEffect(() => {
-    void listGallery(market).then(setPhotos)
+    void listGallery(market).then((rows) => setPhotos(rows.filter((row) => !row.mediaMissing)))
     setIndex(0)
   }, [market])
 

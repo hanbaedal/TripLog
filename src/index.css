@@ -2406,6 +2406,32 @@ p {
   text-align: left;
 }
 
+.safe-image-missing {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  min-height: 88px;
+  background: linear-gradient(145deg, #2a2a2a, #111);
+  color: #d7d7d7;
+  text-align: center;
+  gap: 4px;
+  padding: 10px;
+  box-sizing: border-box;
+  font-size: 12px;
+}
+
+.safe-image-missing small {
+  opacity: 0.75;
+  font-size: 11px;
+}
+
+.gallery-card-missing,
+.gallery-frame-missing {
+  border-radius: 12px;
+  min-height: 140px;
+}
+
 .gallery-card-thumb {
   position: relative;
   width: 100%;
