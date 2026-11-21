@@ -1,6 +1,7 @@
-import type { GalleryPhoto } from '../types'
+import type { GalleryPhoto, Market } from '../types'
 import { galleryMediaSrc } from '../lib/galleryResolve'
 import { GALLERY_PHOTOS } from './galleryCatalog.js'
+import { KR_GALLERY_CITIES } from './krGalleryCatalog.js'
 
 const BY_PLACE: Record<string, string> = {
   대련: 'dalian',
@@ -37,6 +38,9 @@ const BY_PLACE: Record<string, string> = {
   경상: 'kr-gyeongsang',
   전라: 'kr-jeolla',
   제주: 'kr-jeju',
+  제주도: 'kr-jeju',
+  부산: 'kr-gyeongsang',
+  경주: 'kr-gyeongsang',
 }
 
 const KR_FALLBACK: Record<string, string> = {
@@ -52,16 +56,50 @@ const KR_FALLBACK: Record<string, string> = {
 
 const CATALOG = GALLERY_PHOTOS as GalleryPhoto[]
 
-export function sampleCoverPhotoId(sample: { id?: string; place?: string }): string {
+function sampleHaystack(sample: {
+  place?: string
+  title?: string
+  destination?: string
+}): string {
+  return `${sample.place || ''} ${sample.destination || ''} ${sample.title || ''}`.trim()
+}
+
+export function sampleCoverPhotoId(sample: {
+  id?: string
+  place?: string
+  title?: string
+  destination?: string
+  market?: Market
+}): string {
   const id = (sample.id || '').trim()
   if (id && KR_FALLBACK[id]) return id
   if (id && CATALOG.some((row) => row.id === id)) return id
-  const place = (sample.place || '').split(/[·,]/)[0].trim()
-  if (place && BY_PLACE[place]) return BY_PLACE[place]
-  return 'shanghai'
+
+  const hay = sampleHaystack(sample)
+  if (hay) {
+    for (const [key, slug] of Object.entries(BY_PLACE)) {
+      if (hay.includes(key)) return slug
+    }
+    for (const row of KR_GALLERY_CITIES) {
+      if (hay.includes(row.label) || hay.includes(row.slug)) return row.slug
+    }
+    const first = (sample.place || sample.destination || sample.title || '').split(/[·,]/)[0].trim()
+    if (first && BY_PLACE[first]) return BY_PLACE[first]
+  }
+
+  return sample.market === 'kr' ? 'kr-seoul' : 'shanghai'
 }
 
-export function sampleCover(sample: { id?: string; place?: string }, photos?: GalleryPhoto[]): string {
+export function sampleCover(
+  sample: {
+    id?: string
+    place?: string
+    title?: string
+    destination?: string
+    market?: Market
+  },
+  photos?: GalleryPhoto[],
+): string {
   const photoId = sampleCoverPhotoId(sample)
   if (photos?.length) {
     const found = photos.find((row) => row.id === photoId)
@@ -69,5 +107,6 @@ export function sampleCover(sample: { id?: string; place?: string }, photos?: Ga
   }
   if (KR_FALLBACK[photoId]) return galleryMediaSrc(KR_FALLBACK[photoId])
   const catalog = CATALOG.find((row) => row.id === photoId)
-  return galleryMediaSrc(catalog?.src || CATALOG.find((row) => row.id === 'shanghai')?.src || '')
+  const fallbackId = sample.market === 'kr' ? 'kr-seoul' : 'shanghai'
+  return galleryMediaSrc(catalog?.src || CATALOG.find((row) => row.id === fallbackId)?.src || '')
 }

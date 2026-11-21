@@ -56,6 +56,28 @@ export async function seedSamples() {
   }
 }
 
+function dayCount(start, end) {
+  const a = new Date(`${start}T00:00:00`).getTime()
+  const b = new Date(`${end}T00:00:00`).getTime()
+  return Math.max(1, Math.round((b - a) / 86_400_000) + 1)
+}
+
+function tripNightsFromDates(startDate, endDate) {
+  if (!startDate || !endDate) return 0
+  return Math.max(0, dayCount(startDate, endDate) - 1)
+}
+
+function resolveSampleNights(body) {
+  const trip = body.trip || {}
+  if (body.nights != null && body.nights !== '' && Number.isFinite(Number(body.nights))) {
+    return Math.max(0, Number(body.nights))
+  }
+  if (trip.startDate && trip.endDate) {
+    return tripNightsFromDates(trip.startDate, trip.endDate)
+  }
+  return 0
+}
+
 function payload(body, fallbackId, user) {
   const trip = body.trip || {}
   const place = String(body.place || trip.destination || '새 여행지').trim()
@@ -63,7 +85,7 @@ function payload(body, fallbackId, user) {
   return {
     sampleId: String(body.id || fallbackId || '').trim(),
     sort: Number(body.sort) || 80,
-    nights: Math.max(1, Number(body.nights) || 3),
+    nights: resolveSampleNights(body),
     place,
     title: String(body.title || trip.title || place).trim(),
     destination: String(body.destination || trip.destination || place).trim(),

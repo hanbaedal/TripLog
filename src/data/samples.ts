@@ -33,22 +33,40 @@ export function nightsLabel(nights: number): string {
   return `${nights}박 ${nights + 1}일`
 }
 
+export function sampleDisplayNights(sample: SampleRecord): number {
+  const embedded = sample.trip
+  if (embedded?.startDate && embedded?.endDate) {
+    return tripNightsFromDates(embedded.startDate, embedded.endDate)
+  }
+  return Math.max(0, sample.nights)
+}
+
 export function compareSamples(a: SampleRecord, b: SampleRecord): number {
-  return a.nights - b.nights || a.sort - b.sort || a.place.localeCompare(b.place, 'ko')
+  return (
+    sampleDisplayNights(a) - sampleDisplayNights(b) ||
+    a.sort - b.sort ||
+    a.place.localeCompare(b.place, 'ko')
+  )
 }
 
 export function filterSamplesByMarket(samples: SampleRecord[], market: Market): SampleRecord[] {
   return samples.filter((row) => sampleMarket(row) === market)
 }
 
+export function tripNightsFromDates(startDate: string, endDate: string): number {
+  return Math.max(0, dayCount(startDate, endDate) - 1)
+}
+
 export function cloneSampleTrip(sample: SampleRecord): Trip {
+  const embedded = sample.trip
+  const span = tripNightsFromDates(embedded.startDate, embedded.endDate)
+  const nights = span > 0 ? span : Math.max(0, sample.nights)
   const start = todayIso()
-  const nights = sample.nights
   return {
-    ...sample.trip,
+    ...embedded,
     id: uid('trip'),
-    title: sample.title || sample.trip.title,
-    destination: sample.destination || sample.place,
+    title: sample.title || embedded.title,
+    destination: sample.destination || sample.place || embedded.destination,
     startDate: start,
     endDate: addDays(start, nights),
     items: (sample.trip.items || []).map((entry) => ({
@@ -91,19 +109,32 @@ export async function removeSample(id: string): Promise<SampleRecord[]> {
   return data.samples || []
 }
 
-export function sampleFromTrip(trip: Trip, previous?: SampleRecord): SampleRecord {
-  const nights = Math.max(1, dayCount(trip.startDate, trip.endDate) - 1)
-  const place = (trip.destination || previous?.place || '새 여행지').split(/[·,]/)[0].trim()
+export function sampleFromTrip(trip: Trip, previous?: Partial<SampleRecord>): SampleRecord {
+  const nights = tripNightsFromDates(trip.startDate, trip.endDate)
+  const place = (
+    trip.destination ||
+    trip.title ||
+    previous?.place ||
+    '새 여행지'
+  )
+    .split(/[·,]/)[0]
+    .trim()
+  const market = trip.market || previous?.market || 'cn'
   return {
     id: previous?.id || uid('sample'),
     sort: previous?.sort ?? 80,
     nights,
     place,
     title: trip.title || place,
-    destination: trip.destination || place,
-    market: trip.market || previous?.market || 'cn',
+    destination: trip.destination || place || trip.title,
+    market,
     region: previous?.region,
-    trip: { ...trip, market: trip.market || previous?.market || 'cn' },
+    trip: {
+      ...trip,
+      startDate: trip.startDate,
+      endDate: trip.endDate,
+      market,
+    },
     ownerId: previous?.ownerId,
     ownerName: previous?.ownerName,
     sourceTripId: previous?.sourceTripId || trip.id,

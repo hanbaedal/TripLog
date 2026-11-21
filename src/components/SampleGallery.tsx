@@ -11,6 +11,7 @@ import {
   listSamples,
   nightsLabel,
   removeSample,
+  sampleDisplayNights,
 } from '../data/samples'
 import { isSupervisor } from '../lib/auth'
 import type { SiteNav } from '../lib/siteNav'
@@ -41,15 +42,19 @@ export function SampleGallery({ onPick, onEdit, onCreate, onUnpublish, ...nav }:
     const groupDefs = sampleGroupsForMarket(nav.market)
     const known = groupDefs.map((group: { nights: number; label: string }) => ({
       ...group,
-      items: marketRows.filter((row) => row.nights === group.nights).sort(compareSamples),
+      items: marketRows
+        .filter((row) => sampleDisplayNights(row) === group.nights)
+        .sort(compareSamples),
     }))
-    const extraNights = [...new Set(marketRows.map((row) => row.nights))]
+    const extraNights = [...new Set(marketRows.map((row) => sampleDisplayNights(row)))]
       .filter((n) => !groupDefs.some((g: { nights: number }) => g.nights === n))
       .sort((a, b) => a - b)
     const extra = extraNights.map((nights) => ({
       nights,
       label: nightsLabel(nights),
-      items: marketRows.filter((row) => row.nights === nights).sort(compareSamples),
+      items: marketRows
+        .filter((row) => sampleDisplayNights(row) === nights)
+        .sort(compareSamples),
     }))
     return [...known, ...extra].filter((group) => group.items.length > 0 || supervisor)
   }, [marketRows, nav.market, supervisor])
@@ -79,7 +84,7 @@ export function SampleGallery({ onPick, onEdit, onCreate, onUnpublish, ...nav }:
               {group.items.map((sample) => (
                 <article className="sample-card" key={sample.id}>
                   <button type="button" className="sample-card-main" onClick={() => onPick(sample)}>
-                    <span className="sample-card-duration">{nightsLabel(sample.nights)}</span>
+                    <span className="sample-card-duration">{nightsLabel(sampleDisplayNights(sample))}</span>
                     <img className="sample-card-photo" src={sampleCover(sample, photos)} alt="" />
                     <span className="sample-card-label">
                       <h3>{sample.place}</h3>

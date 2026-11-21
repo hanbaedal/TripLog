@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { SampleRecord, GalleryPhoto } from '../types'
 import { sampleCover } from '../data/sampleCovers'
-import { nightsLabel } from '../data/samples'
+import { nightsLabel, sampleDisplayNights } from '../data/samples'
 import { loadGalleryPhotos } from '../lib/galleryResolve'
 
 type Props = {
@@ -113,7 +113,7 @@ export function SampleSlider({ items, auto, supervisor, onPick, onEdit, onDelete
     return (
       <article className="sample-card" key={key}>
         <button type="button" className="sample-card-main" onClick={() => onPick(sample)}>
-          <span className="sample-card-duration">{nightsLabel(sample.nights)}</span>
+          <span className="sample-card-duration">{nightsLabel(sampleDisplayNights(sample))}</span>
           <img className="sample-card-photo" src={sampleCover(sample, photos)} alt="" />
           <span className="sample-card-label">
             <h3>{sample.place}</h3>

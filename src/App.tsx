@@ -18,7 +18,14 @@ import { UsersAdminPage } from './components/UsersAdminPage'
 import { VisitStatsPage } from './components/VisitStatsPage'
 import { TripList } from './components/TripList'
 import { emptyTrip } from './data/demo'
-import { cloneSampleTrip, isBlankDraft, removeSample, sampleFromTrip, saveSample } from './data/samples'
+import {
+  cloneSampleTrip,
+  isBlankDraft,
+  removeSample,
+  sampleFromTrip,
+  saveSample,
+  tripNightsFromDates,
+} from './data/samples'
 import { isSupervisor, oauthErrorMessage, remoteMe, signOut } from './lib/auth'
 import { probeRemote, setToken } from './lib/remote'
 import { trackVisit } from './lib/visits'
@@ -151,14 +158,15 @@ export default function App() {
           sampleFromTrip(saved, {
             id: saved.publishedSampleId,
             sort: 80,
-            nights: 1,
-            place: saved.destination || '여행',
+            nights: tripNightsFromDates(saved.startDate, saved.endDate),
+            place: saved.destination || saved.title || '여행',
             title: saved.title,
             destination: saved.destination,
             trip: saved,
             ownerId: actor.id,
             ownerName: actor.name,
             sourceTripId: saved.id,
+            market: saved.market,
           }),
         )
       }
@@ -247,26 +255,21 @@ export default function App() {
 
   async function publishTrip(target: Trip) {
     if (!user || isBlankDraft(target)) return
+    const owned = { ...target, savedByUser: true, market: target.market || market }
+    if (!(await persistTrip(owned, true))) return
     const saved = await saveSample(
-      sampleFromTrip(
-        { ...target, savedByUser: true },
-        {
-          id: target.publishedSampleId || '',
-          sort: 80,
-          nights: 1,
-          place: target.destination || '여행',
-          title: target.title,
-          destination: target.destination,
-          trip: target,
-          ownerId: user.id,
-          ownerName: user.name,
-          sourceTripId: target.id,
-        },
-      ),
+      sampleFromTrip(owned, {
+        id: owned.publishedSampleId || '',
+        sort: 80,
+        ownerId: user.id,
+        ownerName: user.name,
+        sourceTripId: owned.id,
+        market: owned.market,
+      }),
     )
-    const owned = { ...target, savedByUser: true, publishedSampleId: saved.id }
-    setTrip((cur) => (cur.id === owned.id ? owned : cur))
-    if (await persistTrip(owned, true)) setTripDirty(false)
+    const linked = { ...owned, publishedSampleId: saved.id }
+    setTrip((cur) => (cur.id === linked.id ? linked : cur))
+    setTripDirty(false)
   }
 
   async function unpublishTrip(target: Trip) {
