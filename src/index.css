@@ -210,8 +210,8 @@ p {
 
 .brand-avatar {
   display: block;
-  width: 38px;
-  height: 38px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
   object-fit: cover;
   object-position: center center;
@@ -3404,8 +3404,8 @@ p {
   }
 
   .brand-avatar {
-    width: 32px;
-    height: 32px;
+    width: 38px;
+    height: 38px;
   }
 
   .brand-label {
@@ -3449,8 +3449,8 @@ p {
   }
 
   .brand-avatar {
-    width: 28px;
-    height: 28px;
+    width: 34px;
+    height: 34px;
   }
 
   .brand-label {
